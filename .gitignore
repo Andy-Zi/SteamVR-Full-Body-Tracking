@@ -1,0 +1,6 @@
+
+*.db
+arvrdriver/.vs
+*.ipch
+arvrdriver/x64
+arvrdriver/OpenVrDriverExample/x64
