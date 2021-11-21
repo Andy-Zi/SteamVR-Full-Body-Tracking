@@ -28,9 +28,9 @@
       }
    },
    "category" : "legacy",
-   "controller_type" : "example_controller",
-   "description" : "Legacy mapping for example",
-   "name" : "Legacy_Binding_Example",
+   "controller_type" : "camtracker_controller",
+   "description" : "Legacy mapping for camtracker",
+   "name" : "Legacy_Binding_Camtracker",
    "options" : {
       "mirror_actions" : false,
       "returnBindingsWithLeftHand" : true,

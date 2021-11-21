@@ -1,6 +1,6 @@
 
 *.db
-arvrdriver/.vs
+CameraDriver/.vs
 *.ipch
-arvrdriver/x64
-arvrdriver/OpenVrDriverExample/x64
+CameraDriver/x64
+CameraDriver/CameraTracker/x64

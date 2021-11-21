@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ControllerDriver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\openvr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -27,32 +24,33 @@
     <ClInclude Include="include\openvr_driver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\ControllerDriver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\DeviceProvider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ControllerDriver.cpp">
+    <ClCompile Include="src\DeviceFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\DeviceProvider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DeviceFactory.cpp">
+    <ClCompile Include="src\ControllerDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="include\openvr_api.cs" />
-    <None Include="include\openvr_api.json" />
-    <None Include="resources\controller_profile.json">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="resources\game_controller.svg" />
-    <None Include="resources\legacy_bindings_example.json" />
-    <None Include="resources\driver.vrdrivermanifest" />
+    <Library Include="lib\openvr_api.lib" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="lib\openvr_api.lib" />
+    <None Include="include\openvr_api.cs" />
+    <None Include="include\openvr_api.json" />
+    <None Include="resources\controller_profile.json" />
+    <None Include="resources\driver.vrdrivermanifest" />
+    <None Include="resources\game_controller.svg" />
+    <None Include="resources\legacy_bindings_controller.json" />
   </ItemGroup>
 </Project>

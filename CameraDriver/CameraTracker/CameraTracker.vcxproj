@@ -18,34 +18,11 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\ControllerDriver.h" />
-    <ClInclude Include="include\DeviceProvider.h" />
-    <ClInclude Include="include\openvr.h" />
-    <ClInclude Include="include\openvr_capi.h" />
-    <ClInclude Include="include\openvr_driver.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\ControllerDriver.cpp" />
-    <ClCompile Include="src\DeviceFactory.cpp" />
-    <ClCompile Include="src\DeviceProvider.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="include\openvr_api.cs" />
-    <None Include="include\openvr_api.json" />
-    <None Include="resources\controller_profile.json" />
-    <None Include="resources\driver.vrdrivermanifest" />
-    <None Include="resources\game_controller.svg" />
-    <None Include="resources\legacy_bindings_example.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="lib\openvr_api.lib" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{e9f07c0e-b5a2-4119-8473-bd3783ce73a0}</ProjectGuid>
-    <RootNamespace>OpenVrDriverExample</RootNamespace>
+    <ProjectGuid>{5d727e3b-1867-491f-9161-70d0fadad00d}</ProjectGuid>
+    <RootNamespace>CameraTracker</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -95,45 +72,34 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>include;$(IncludePath)</IncludePath>
-    <LibraryPath>lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>include;$(IncludePath)</IncludePath>
-    <LibraryPath>lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>include;$(IncludePath)</IncludePath>
-    <LibraryPath>lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;OPENVRDRIVEREXAMPLE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;CAMERATRACKER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>openvr_api.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)$(Platform)\$(Configuration)\$(TargetName).dll" "$(SolutionDir)Example\bin\win32\driver_$(TargetName).dll"
-copy /Y "$(ProjectDir)resources\driver.vrdrivermanifest" "$(SolutionDir)Example\driver.vrdrivermanifest"
-copy /Y "$(ProjectDir)resources\controller_profile.json" "$(SolutionDir)Example\resources\input\Example_profile.json"
-copy /Y "$(ProjectDir)resources\legacy_bindings_example.json" "$(SolutionDir)Example\resources\input\legacy_bindings_example.json"
-copy /Y "$(ProjectDir)resources\game_controller.svg" "$(SolutionDir)Example\resources\icons\game_controller.svg"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -141,7 +107,7 @@ copy /Y "$(ProjectDir)resources\game_controller.svg" "$(SolutionDir)Example\reso
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;OPENVRDRIVEREXAMPLE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;CAMERATRACKER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -153,22 +119,17 @@ copy /Y "$(ProjectDir)resources\game_controller.svg" "$(SolutionDir)Example\reso
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
     </Link>
-    <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)$(Platform)\$(Configuration)\$(TargetName).dll" "$(SolutionDir)Example\bin\win32\driver_$(TargetName).dll"
-copy /Y "$(ProjectDir)resources\driver.vrdrivermanifest" "$(SolutionDir)Example\driver.vrdrivermanifest"
-copy /Y "$(ProjectDir)resources\controller_profile.json" "$(SolutionDir)Example\resources\input\Example_profile.json"
-copy /Y "$(ProjectDir)resources\legacy_bindings_example.json" "$(SolutionDir)Example\resources\input\legacy_bindings_example.json"
-copy /Y "$(ProjectDir)resources\game_controller.svg" "$(SolutionDir)Example\resources\icons\game_controller.svg"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;OPENVRDRIVEREXAMPLE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;CAMERATRACKER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -176,11 +137,11 @@ copy /Y "$(ProjectDir)resources\game_controller.svg" "$(SolutionDir)Example\reso
       <EnableUAC>false</EnableUAC>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)$(Platform)\$(Configuration)\$(TargetName).dll" "$(SolutionDir)Example\bin\win64\driver_example.dll"
-copy /Y "$(ProjectDir)resources\driver.vrdrivermanifest" "$(SolutionDir)Example\driver.vrdrivermanifest"
-copy /Y "$(ProjectDir)resources\controller_profile.json" "$(SolutionDir)Example\resources\input\Example_profile.json"
-copy /Y "$(ProjectDir)resources\legacy_bindings_example.json" "$(SolutionDir)Example\resources\input\legacy_bindings_example.json"
-copy /Y "$(ProjectDir)resources\game_controller.svg" "$(SolutionDir)Example\resources\icons\game_controller.svg"</Command>
+      <Command>copy /Y "$(SolutionDir)$(Platform)\$(Configuration)\$(TargetName).dll" "$(SolutionDir)camtracker\bin\win64\driver_camtracker.dll"
+copy /Y "$(ProjectDir)resources\driver.vrdrivermanifest" "$(SolutionDir)camtracker\driver.vrdrivermanifest"
+copy /Y "$(ProjectDir)resources\controller_profile.json" "$(SolutionDir)camtracker\resources\input\camtracker_profile.json"
+copy /Y "$(ProjectDir)resources\legacy_bindings_controller.json" "$(SolutionDir)camtracker\resources\input\legacy_bindings_camtracker.json"
+copy /Y "$(ProjectDir)resources\game_controller.svg" "$(SolutionDir)camtracker\resources\icons\game_controller.svg"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -189,11 +150,12 @@ copy /Y "$(ProjectDir)resources\game_controller.svg" "$(SolutionDir)Example\reso
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;OPENVRDRIVEREXAMPLE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;CAMERATRACKER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile />
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -203,13 +165,36 @@ copy /Y "$(ProjectDir)resources\game_controller.svg" "$(SolutionDir)Example\reso
       <EnableUAC>false</EnableUAC>
     </Link>
     <PostBuildEvent>
-      <Command>copy /Y "$(SolutionDir)$(Platform)\$(Configuration)\$(TargetName).dll" "$(SolutionDir)Example\bin\win64\driver_example.dll"
-copy /Y "$(ProjectDir)resources\driver.vrdrivermanifest" "$(SolutionDir)Example\driver.vrdrivermanifest"
-copy /Y "$(ProjectDir)resources\controller_profile.json" "$(SolutionDir)Example\resources\input\Example_profile.json"
-copy /Y "$(ProjectDir)resources\legacy_bindings_example.json" "$(SolutionDir)Example\resources\input\legacy_bindings_example.json"
-copy /Y "$(ProjectDir)resources\game_controller.svg" "$(SolutionDir)Example\resources\icons\game_controller.svg"</Command>
+      <Command>copy /Y "$(SolutionDir)$(Platform)\$(Configuration)\$(TargetName).dll" "$(SolutionDir)camtracker\bin\win64\driver_camtracker.dll"
+copy /Y "$(ProjectDir)resources\driver.vrdrivermanifest" "$(SolutionDir)camtracker\driver.vrdrivermanifest"
+copy /Y "$(ProjectDir)resources\controller_profile.json" "$(SolutionDir)camtracker\resources\input\camtracker_profile.json"
+copy /Y "$(ProjectDir)resources\legacy_bindings_controller.json" "$(SolutionDir)camtracker\resources\input\legacy_bindings_camtracker.json"
+copy /Y "$(ProjectDir)resources\game_controller.svg" "$(SolutionDir)camtracker\resources\icons\game_controller.svg"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="include\ControllerDriver.h" />
+    <ClInclude Include="include\DeviceProvider.h" />
+    <ClInclude Include="include\openvr.h" />
+    <ClInclude Include="include\openvr_capi.h" />
+    <ClInclude Include="include\openvr_driver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\ControllerDriver.cpp" />
+    <ClCompile Include="src\DeviceFactory.cpp" />
+    <ClCompile Include="src\DeviceProvider.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="lib\openvr_api.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="include\openvr_api.cs" />
+    <None Include="include\openvr_api.json" />
+    <None Include="resources\controller_profile.json" />
+    <None Include="resources\driver.vrdrivermanifest" />
+    <None Include="resources\game_controller.svg" />
+    <None Include="resources\legacy_bindings_controller.json" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

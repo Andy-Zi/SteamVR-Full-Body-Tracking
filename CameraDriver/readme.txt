@@ -1,8 +1,8 @@
-C:\Users\andyz\AppData\Local\openvr\openvrpaths.vrpath:
+...\AppData\Local\openvr\openvrpaths.vrpath:
 
 "external_drivers" : 
 	[
-		"...arvr-projekt-modularbeit\\arvrdriver\\example"
+		"...arvr-projekt-modularbeit\\CameraDriver\\camtracker"
 	],
 
 add to file for steamVR to find the controller

@@ -7,11 +7,11 @@ EVRInitError DeviceProvider::Init(IVRDriverContext* pDriverContext)
     {
         return initError;
     }
-    
-    VRDriverLog()->Log("Initializing example controller"); //this is how you log out Steam's log file.
+
+    VRDriverLog()->Log("Initializing camtracker controller"); //this is how you log out Steam's log file.
 
     controllerDriver = new ControllerDriver();
-    VRServerDriverHost()->TrackedDeviceAdded("example_controller", TrackedDeviceClass_Controller, controllerDriver); //add all your devices like this.
+    VRServerDriverHost()->TrackedDeviceAdded("camtracker_controller", TrackedDeviceClass_Controller, controllerDriver); //add all your devices like this.
 
     return vr::VRInitError_None;
 }

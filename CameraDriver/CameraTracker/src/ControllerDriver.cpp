@@ -6,7 +6,7 @@ EVRInitError ControllerDriver::Activate(uint32_t unObjectId)
 
 	PropertyContainerHandle_t props = VRProperties()->TrackedDeviceToPropertyContainer(driverId); //this gets a container object where you store all the information about your driver
 
-	VRProperties()->SetStringProperty(props, Prop_InputProfilePath_String, "{example}/input/controller_profile.json"); //tell OpenVR where to get your driver's Input Profile
+	VRProperties()->SetStringProperty(props, Prop_InputProfilePath_String, "{camtracker}/input/camtracker_profile.json"); //tell OpenVR where to get your driver's Input Profile
 	VRProperties()->SetInt32Property(props, Prop_ControllerRoleHint_Int32, ETrackedControllerRole::TrackedControllerRole_Treadmill); //tells OpenVR what kind of device this is
 	VRDriverInput()->CreateScalarComponent(props, "/input/joystick/y", &joystickYHandle, EVRScalarType::VRScalarType_Absolute,
 		EVRScalarUnits::VRScalarUnits_NormalizedTwoSided); //sets up handler you'll use to send joystick commands to OpenVR with, in the Y direction (forward/backward)
@@ -16,7 +16,7 @@ EVRInitError ControllerDriver::Activate(uint32_t unObjectId)
 		EVRScalarUnits::VRScalarUnits_NormalizedTwoSided); //Why VRScalarType_Absolute? Take a look at the comments on EVRScalarType.
 	VRDriverInput()->CreateScalarComponent(props, "/input/trackpad/x", &trackpadXHandle, EVRScalarType::VRScalarType_Absolute,
 		EVRScalarUnits::VRScalarUnits_NormalizedTwoSided); //Why VRScalarUnits_NormalizedTwoSided? Take a look at the comments on EVRScalarUnits.
-	
+
 	//The following properites are ones I tried out because I saw them in other samples, but I found they were not needed to get the sample working.
 	//There are many samples, take a look at the openvr_header.h file. You can try them out.
 
@@ -82,7 +82,7 @@ void* ControllerDriver::GetComponent(const char* pchComponentNameAndVersion)
 
 void ControllerDriver::EnterStandby() {}
 
-void ControllerDriver::DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize) 
+void ControllerDriver::DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize)
 {
 	if (unResponseBufferSize >= 1)
 	{

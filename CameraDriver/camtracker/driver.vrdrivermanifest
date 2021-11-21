@@ -1,6 +1,6 @@
 {
 	"alwaysActivate": true,
-	"name" : "example",
+	"name" : "camtracker",
 	"directory" : "",
 	"resourceOnly" : false,
 	"prefersUpperDeviceIndices" :  true,
