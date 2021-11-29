@@ -19,7 +19,7 @@ pipe_name = 'PTSC_pipe'
 pipe_connected = False
 
 # setup webcam
-cap = VideoCapture(0)
+cap = VideoCapture(2)
 success, image = cap.read()
 image_height, image_width, _ = image.shape
 
@@ -165,7 +165,8 @@ def video_stream():
 
             prev_landmarks = landmarks
 
-        # print(send)
+        if not send == 'n':
+            print(send)
 
         if pipe_connected:
             if calibrating or initial_calibrating:
