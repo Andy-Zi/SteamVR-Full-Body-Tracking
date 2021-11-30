@@ -1,0 +1,11 @@
+# created by virtualenv automatically
+**/__pychache__
+
+**/share
+#*.txt
+**/bin
+**/lib
+*.cfg
+# !keypoints.txt
+# !landmarks.txt
+# !requirements.txt
