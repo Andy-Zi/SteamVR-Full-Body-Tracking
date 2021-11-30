@@ -1,11 +1,11 @@
 
-
+from functools import lru_cache
 import mediapipe as mp
 import cv2
 import numpy as np
 import math
 import json
-
+import time
 
 class PoseMP:
 
@@ -65,6 +65,7 @@ class PoseMP:
         if self.visualize:
             self.visualize_pose()
 
+
     def prepare_data(self, width, height):
 
         # list world postions and fill in missing values
@@ -85,6 +86,7 @@ class PoseMP:
         self.data.append({"image_width": width})
         self.data.append({"image_height": height})
 
+
     def resize(self, reshape):
         DESIRED_HEIGHT = 480
         DESIRED_WIDTH = 480
@@ -101,6 +103,7 @@ class PoseMP:
                 w/(h/DESIRED_HEIGHT)), DESIRED_HEIGHT))
         return img, h, w
 
+    @lru_cache
     def get_pose(self):
         with self.mp_pose.Pose(
                 static_image_mode=self.static_image_mode,
@@ -114,10 +117,12 @@ class PoseMP:
             self.results = pose.process(
                 cv2.cvtColor(self.image, cv2.COLOR_BGR2RGB))
 
+    @lru_cache
     def dump_data(self) -> None:
         with open("./landmarks.txt", "w+") as outfile:
             json.dump(self.data, outfile, indent=4)
 
+    @lru_cache
     def lisify_and_fill_missing_landmarks(self) -> list:
         """
         Wenn man die Thresholds min_detection_confidence und min_tracking_confidence
@@ -125,9 +130,12 @@ class PoseMP:
         Für diesen fall könnte man die fehlenden Einträge durch die vergangenen ersetzen.
         """
         positions = []
-
+        if self.results.pose_landmarks is None:
+            return self.previous_positions
+        
         for ind, name in enumerate(self.landmark_names):
-            position = self.results.pose_world_landmarks.landmark[self.mp_pose.PoseLandmark[name.upper(
+            
+            position = self.results.pose_landmarks.landmark[self.mp_pose.PoseLandmark[name.upper(
             )]]
 
             # fill in missing values with old value
@@ -144,16 +152,62 @@ class PoseMP:
 
         self.mp_drawing.draw_landmarks(
             self.image,
-            self.results.pose_landmarks,
+            self.results.pose_world_landmarks,
             self.mp_pose.POSE_CONNECTIONS,
             landmark_drawing_spec=self.mp_drawing_styles.get_default_pose_landmarks_style())
 
 
-def main():
-    pose = PoseMP(visualize=False)
-    image = cv2.imread("example.png")
-    pose.classify_image(image)
+
+def main(use_img):
+    pose = PoseMP(visualize=True, static_image_mode=False, smooth_landmarks=False,
+                 smooth_segmentation=False, min_detection_confidence=0.5,
+                 min_tracking_confidence=0.5, enable_segmentation=False, model_complexity=2,
+                 landmark_names=['left_shoulder', 'right_shoulder',
+                                 'left_elbow', 'right_elbow',
+                                 'left_wrist', 'right_wrist', 'left_hip', 'right_hip',
+                                 'left_knee', 'right_knee',
+                                 'left_ankle', 'right_ankle',
+                                 'left_heel', 'right_heel',
+                                 'left_foot_index', 'right_foot_index'
+                                 ])
+    
+    count = 0
+    start = 0
+    total_time = 0.0
+    if not use_img:
+        try:
+            cap = cv2.VideoCapture(0)
+            
+            while cap.isOpened(): 
+
+                if cv2.waitKey(5) & 0xFF == 27:
+                    break
+                
+                success, image = cap.read()
+                
+                if not success:
+                    # ignore empty frames
+                    continue
+                start = time.perf_counter()
+                count += 1
+                image.flags.writeable = False
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+                pose.classify_image(image)
+                end = time.perf_counter()
+                total_time += end-start
+                
+            cap.release()
+            if total_time:
+                print(f"performance: {count/total_time}")
+            
+        except KeyboardInterrupt:
+            end = time.perf_counter()
+            total_time = end-start
+            
+            print(f"performance: {count/(total_time*1000)}")
+            if total_time:
+                return count/total_time
 
 
 if __name__ == "__main__":
-    main()
+    main(use_img=False)
