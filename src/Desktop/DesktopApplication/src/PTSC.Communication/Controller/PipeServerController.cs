@@ -39,13 +39,7 @@ namespace PTSC.Communication.Controller
                 string receivedData = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
                 // Remove null Payload from string
                 receivedData = receivedData.Replace("\0", string.Empty);
-                Logger.Log("Received data: " + receivedData);
-
-                //if (PipeMessage != null)
-                //{
-                //    // Pass message back to calling form
-                //    PipeMessage.Invoke(stringData);
-                //}                
+                Logger.Log("Received data: " + receivedData);         
 
                 // Kill original server and create new wait server
                 streamServer.Close();
