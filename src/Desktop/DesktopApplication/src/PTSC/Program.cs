@@ -1,3 +1,5 @@
+using PTSC.Communication;
+using PTSC.Communication.Controller;
 using PTSC.Interfaces;
 using PTSC.Ui.Controller;
 using PTSC.Ui.View;
@@ -18,6 +20,8 @@ namespace PTSC
 
             container.RegisterType<MainView, MainView>();
             container.RegisterType<MainController, MainController>();
+            container.RegisterType<PipeClientController, PipeClientController>();
+            container.RegisterType<PipeClientController, PipeClientController>();
 
             ApplicationConfiguration.Initialize();
             var controller = container.Resolve<MainController>();

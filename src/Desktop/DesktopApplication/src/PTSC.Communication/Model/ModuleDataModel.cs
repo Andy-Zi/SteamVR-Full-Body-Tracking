@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PTSC.Communication
+namespace PTSC.Communication.Model
 {
-    public class PipeService
+    internal class ModuleDataModel
     {
-
     }
 }

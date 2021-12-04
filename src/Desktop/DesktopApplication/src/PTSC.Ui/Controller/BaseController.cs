@@ -17,7 +17,7 @@ namespace PTSC.Ui.Controller
             //Close Stuff here
         }
 
-        public BaseController<TModel, TView> Initialize()
+        public virtual BaseController<TModel, TView> Initialize()
         {
             View.Initialize(this);
             return this;
