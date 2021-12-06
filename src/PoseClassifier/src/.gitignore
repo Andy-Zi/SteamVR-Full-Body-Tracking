@@ -6,6 +6,8 @@
 **/bin
 **/lib
 *.cfg
+*.txt
+**/*.txt
 # !keypoints.txt
 # !landmarks.txt
 # !requirements.txt
