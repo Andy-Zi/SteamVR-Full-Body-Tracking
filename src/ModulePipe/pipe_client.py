@@ -2,19 +2,34 @@ import win32file, json
 
 from win32pipe import error
 
-class NamedPipe():
-    def __init__(self) -> None:
-        self.pipe_name = r'\\.\pipe\ModulePipe'
-    
+from dataclasses import dataclass
 
-    def SendAcceleration(self, left_shoulder = None, right_shoulder = None, left_elbow = None, right_elbow = None, 
-                            left_wrist = None, right_wrist = None, left_hip = None, right_hip = None, left_knee = None, 
-                            right_knee = None, left_ankle = None, right_ankle = None, left_heel = None, right_heel = None, 
-                            left_foot = None, right_foot = None):
-        data = { 'LEFT_SHOULDER': left_shoulder, 'RIGHT_SHOULDER': right_shoulder, 'LEFT_ELBOW': left_elbow, 'RIGHT_ELBOW': right_elbow,
-                 'LEFT_WRIST': left_wrist, 'RIGHT_WRIST': right_wrist, 'LEFT_HIP': left_hip, 'RIGHT_HIP': right_hip, 'LEFT_KNEE': left_knee,
-                 'RIGHT_KNEE': right_knee, 'LEFT_ANKLE': left_ankle, 'RIGHT_ANKLE': right_ankle, 'LEFT_HEEL': left_heel, 'RIGHT_HEEL': right_heel,
-                 'LEFT_FOOT': left_foot, 'RIGHT_FOOT': right_foot }
+@dataclass
+class NamedPipe:
+    left_shoulder: list = None
+    right_shoulder: list = None
+    left_elbow: list = None
+    right_elbow: list = None
+    left_wrist: list = None
+    right_wrist:list = None
+    left_hip: list = None
+    right_hip: list = None
+    left_knee: list = None
+    right_knee: list = None
+    left_ankle: list = None
+    right_ankle: list = None
+    left_heel: list = None
+    right_heel: list = None
+    left_foot: list = None
+    right_foot: list = None
+    pipe_name: str = r'\\.\pipe\ModulePipe'
+
+
+    def SendAcceleration(self):
+        data = { 'LEFT_SHOULDER': self.left_shoulder, 'RIGHT_SHOULDER': self.right_shoulder, 'LEFT_ELBOW': self.left_elbow, 'RIGHT_ELBOW': self.right_elbow,
+                 'LEFT_WRIST': self.left_wrist, 'RIGHT_WRIST': self.right_wrist, 'LEFT_HIP': self.left_hip, 'RIGHT_HIP': self.right_hip, 'LEFT_KNEE': self.left_knee,
+                 'RIGHT_KNEE': self.right_knee, 'LEFT_ANKLE': self.left_ankle, 'RIGHT_ANKLE': self.right_ankle, 'LEFT_HEEL': self.left_heel, 'RIGHT_HEEL': self.right_heel,
+                 'LEFT_FOOT': self.left_foot, 'RIGHT_FOOT': self.right_foot }
         self.__PipeData(json.dumps(data))
 
 
