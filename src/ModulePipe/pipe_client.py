@@ -1,33 +1,44 @@
 import win32file, json
-
+import cv2
+import numpy as np
 from win32pipe import error
 
 from positions_dataclass import Positions
-
+#8192 Json -> rest 0
 class NamedPipe():
-    pipe_name: str = r'\\.\pipe\ModulePipe'
+    def __init__(self, pipe_name : str = r'\\.\pipe\ModulePipe') -> None:
+        self.pipe_name = pipe_name
+        self.handle = win32file.CreateFile(self.pipe_name, win32file.GENERIC_WRITE,
+                        0, None, win32file.OPEN_EXISTING, win32file.FILE_ATTRIBUTE_NORMAL, None)
 
+    def __del__(self):
+        if self.handle:
+            win32file.CloseHandle(self.handle)
 
-    def SendPositions(self, positions: Positions):
-        self.__PipeData(json.dumps(positions.serialize()))
+    def SendPositions(self, positions: Positions, image: np.ndarray = None):
+        self.__PipeData(json.dumps(positions.serialize()), image)
 
 
     def SendJSONString(self, json_data : str):
         self.__PipeData(json_data)
 
 
-    def __PipeData(self, string : str):
+    def __PipeData(self, string : str, image : np.ndarray):
 
+        
         try:
-            handle = win32file.CreateFile(self.pipe_name, win32file.GENERIC_WRITE,
-                        0, None, win32file.OPEN_EXISTING, win32file.FILE_ATTRIBUTE_NORMAL, None)
-            dat = string.encode("utf-8")
-            win32file.WriteFile(handle, dat)
+            dat = np.frombuffer(string.encode("utf-8"), dtype=np.uint8)
+            arr = np.zeros(8192, dtype=np.uint8)
+            arr[:len(dat)] = dat
 
-            win32file.CloseHandle(handle)
+            win32file.WriteFile(self.handle, arr.tobytes())
+            win32file.FlushFileBuffers(self.handle)
+
         except error as e:
             raise Exception("Pipe {} konnte nicht beschrieben werden! {}".format(self.pipe_name, e)) from None
 
+
+NamedPipe().SendPositions(Positions(LEFT_ANKLE=[1,3,4], RIGHT_ANKLE=[8,5,4]))
 
 """
 {
