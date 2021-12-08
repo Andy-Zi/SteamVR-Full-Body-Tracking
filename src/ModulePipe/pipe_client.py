@@ -5,6 +5,7 @@ from win32pipe import error
 
 from positions_dataclass import Positions
 #8192 Json -> rest 0
+#8193-Ende Image
 class NamedPipe():
     def __init__(self, pipe_name : str = r'\\.\pipe\ModulePipe') -> None:
         self.pipe_name = pipe_name
@@ -27,9 +28,13 @@ class NamedPipe():
 
         
         try:
-            dat = np.frombuffer(string.encode("utf-8"), dtype=np.uint8)
             arr = np.zeros(8192, dtype=np.uint8)
+            dat = np.frombuffer(string.encode("utf-8"), dtype=np.uint8)
             arr[:len(dat)] = dat
+            
+            if image is not None:
+                arr = np.append(arr,cv2.imencode('.jpg' , image)[1])
+
 
             win32file.WriteFile(self.handle, arr.tobytes())
             win32file.FlushFileBuffers(self.handle)
@@ -37,8 +42,8 @@ class NamedPipe():
         except error as e:
             raise Exception("Pipe {} konnte nicht beschrieben werden! {}".format(self.pipe_name, e)) from None
 
-
-NamedPipe().SendPositions(Positions(LEFT_ANKLE=[1,3,4], RIGHT_ANKLE=[8,5,4]))
+if __name__ == "__main__":
+    NamedPipe().SendPositions(Positions(LEFT_ANKLE=[1,3,4], RIGHT_ANKLE=[8,5,4]),np.ones((1280,720,3)))
 
 """
 {

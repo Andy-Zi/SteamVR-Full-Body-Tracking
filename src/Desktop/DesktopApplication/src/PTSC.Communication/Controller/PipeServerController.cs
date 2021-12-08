@@ -1,5 +1,8 @@
-﻿using System.IO.Pipes;
+﻿using System.Diagnostics;
+using System.IO.Pipes;
 using System.Text;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
 using PTSC.Communication.Model;
 using PTSC.Interfaces;
 using Unity;
@@ -12,54 +15,55 @@ namespace PTSC.Communication.Controller
     {
         //public event DelegateMessage PipeMessage;
         [Dependency] public ILogger Logger { get; set; }
-
+        protected NamedPipeServerStream server;
         public void Start()
         {
-            // Create Async Pipe Server
-            NamedPipeServerStream serverStream = new NamedPipeServerStream(ModulePipeDataModel.PipeName, PipeDirection.In, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-            // Wait for Client Connection
-            serverStream.BeginWaitForConnection(new AsyncCallback(WaitForConnectionCallBack), serverStream);
+            // Create Pipe Server
+           server = new NamedPipeServerStream(ModulePipeDataModel.PipeName, PipeDirection.In, 1, PipeTransmissionMode.Byte);
+           Task.Run(ServerFunction);
         }
 
-        private void WaitForConnectionCallBack(IAsyncResult iar)
+
+        protected void ServerFunction()
         {
-            try
+            server.WaitForConnection();
+            while (true)
             {
-                // Get the pipe
-                NamedPipeServerStream streamServer = (NamedPipeServerStream)iar.AsyncState;
-                // End waiting for the connection
-                streamServer.EndWaitForConnection(iar);
+                var stopwatch = Stopwatch.StartNew();
+                var message = new Span<byte>(new byte[ModulePipeDataModel.BufferSize]);
+                var lenght = server.Read(message);
+                if (lenght > 0)
+                {
+                    if (lenght == ModulePipeDataModel.JsonBufferSize)
+                    {
 
-                byte[] buffer = new byte[ModulePipeDataModel.BufferSize];
+                        //Only JSON no Image
+                        var jsondata = message[..ModulePipeDataModel.JsonBufferSize];
+                        string receivedData = Encoding.UTF8.GetString(jsondata.ToArray(), 0, jsondata.Length);
 
-                // Read the incoming message
-                streamServer.Read(buffer, 0, ModulePipeDataModel.BufferSize);
+                        Logger.Log($"Received data: {receivedData}");
+                        stopwatch.Stop();
+                        Logger.Log($"Time: {stopwatch.ElapsedMilliseconds}");
 
-                // Convert byte buffer to string
-                string receivedData = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                // Remove null Payload from string
-                receivedData = receivedData.Replace("\0", string.Empty);
-                Logger.Log("Received data: " + receivedData);         
-
-                // Kill original server and create new wait server
-                streamServer.Close();
-                streamServer = null;
-                streamServer = new NamedPipeServerStream(ModulePipeDataModel.PipeName, PipeDirection.In,
-                   1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-
-                // Recursively wait for the connection again and again....
-                streamServer.BeginWaitForConnection(
-                   new AsyncCallback(WaitForConnectionCallBack), streamServer);
-            }
-            catch
-            {
-                return;
+                    }
+                    else
+                    {
+                        var jsondata = message[..ModulePipeDataModel.JsonBufferSize];
+                        var imagedata = message[ModulePipeDataModel.JsonBufferSize..lenght];
+                        var img = Cv2.ImDecode(imagedata, ImreadModes.Color);
+                        Cv2.Flip(img, img, FlipMode.Y);
+                        var test = BitmapConverter.ToBitmap(img);
+                        stopwatch.Stop();
+                        Logger.Log($"Time: {stopwatch.ElapsedMilliseconds}");
+                    }
+                }
+                message.Clear();
             }
         }
 
         public void Stop()
         {
-
+            server.Close();
         }
     }
 
