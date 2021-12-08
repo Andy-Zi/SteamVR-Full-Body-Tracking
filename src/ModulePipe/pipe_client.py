@@ -19,7 +19,7 @@ class NamedPipe():
         self.__PipeData(json.dumps(positions.serialize()), image)
 
 
-    def SendJSONString(self, json_data : str):
+    def SendJSONString(self, json_data : str, image: np.ndarray = None):
         self.__PipeData(json_data)
 
 
