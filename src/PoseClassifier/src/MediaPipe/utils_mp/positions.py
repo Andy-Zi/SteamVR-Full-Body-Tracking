@@ -2,31 +2,32 @@
 import json
 from operator import pos
 import mediapipe as mp
+import numpy as np
 
 
 class Positions:
+    defaultPosition = [0, 0, 0]
+    position_visible_threshold: float = 0.5
 
     def __init__(self, outputfile: str = "../landmarks.txt", inputfile: str = "../keypoints.txt"):
 
         self.input_file = inputfile
-
         self.export_file = outputfile
         self.keys = self._read_point_names()
-        self.points = {key: None for key in self.keys}
-        self.previous_positions = self.points
+        self.points = {key: [] for key in self.keys}
+        self.num_landmarks = len(self.keys)
+        self.previous_position = None#[[] for _ in range(self.num_landmarks)]
         self.mp_pose = mp.solutions.pose
+        self.current_position = list()#None#self.previous_position
 
     def manage_points(self, results):
 
         positions = self._calc_positions(results=results)
-
-        print(f"{positions=}")
+        # print(f"{positions=}")
         if positions == []:
             return
-
         landmarks = self._calc_landmarks(positions=positions)
-
-        print(f"{landmarks=}")
+        # print(f"{landmarks=}")
         self._prepare_data(landmarks=landmarks)
         self.write_file()
 
@@ -37,7 +38,7 @@ class Positions:
         for ind, name in enumerate(self.keys):
 
             try:
-                position = results.pose_landmarks.landmark[self.mp_pose.PoseLandmark[name.upper(
+                position = results.pose_world_landmarks.landmark[self.mp_pose.PoseLandmark[name.upper(
                 )]]
             except AttributeError:
                 # single missing value
@@ -48,28 +49,40 @@ class Positions:
                 positions.append(position)
 
         assert len(positions) == len(self.keys)
-        self.previous_positions = positions
+        #self.previous_positions = self.current
         return positions
 
     def _calc_landmarks(self, positions):
         """listify positions
 
         Returns:
-            [list]: [list of lists of points [x,y,z]]
+            [list]: [list of lists of self.current_position [x,y,z]]
         """
-        # TODO:
-        # Man könnte die werte von der Sichtbarkeit abhängig machen:
-        # position.visibility und einen default wert benutzen
+        
+        # werte von der Sichtbarkeit abhängig:
+        # position.visibility<self.position_visibility_threshold setzt einen default wert 
         if not positions:
             return
-
-        points = []
-        for position in positions:
+        points = list()
+        for i,position in enumerate(positions):
             if position:
-                points.append([position.x, position.y, position.z])
+                if position.visibility < self.position_visible_threshold:
+                    points.append(self.defaultPosition)
+                else: points.append([position.x, position.y, position.z])#, self.dist(position,index=i)])
             else:
                 continue
+        self.previous_position = points
         return points
+    
+    def dist(self,position,index)->list:
+        if not self.previous_position:
+            return 0
+        p1 = np.array([position.x, position.y, position.z])
+        p2 = np.array([self.previous_position[index][:3]])
+
+        dist = np.linalg.norm(p1 - p2)
+        print(dist)
+        return dist
 
     def _prepare_data(self, landmarks: list):
         """fills in points for keys
@@ -78,7 +91,8 @@ class Positions:
             landmarks ([list]): [list of points: x,y,z]
         """
         for ind, key in enumerate(self.keys):
-            if landmarks != []:
+            if landmarks:
+                #print(ind,key)
                 self.points[key] = landmarks[ind]
 
     def write_file(self):
