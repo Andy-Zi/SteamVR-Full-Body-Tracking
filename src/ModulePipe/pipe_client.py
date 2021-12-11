@@ -21,7 +21,7 @@ class NamedPipe():
 
 
     def SendJSONString(self, json_data : str, image: np.ndarray = None):
-        self.__PipeData(json_data)
+        self.__PipeData(json_data, image)
 
 
     def __PipeData(self, string : str, image : np.ndarray):
