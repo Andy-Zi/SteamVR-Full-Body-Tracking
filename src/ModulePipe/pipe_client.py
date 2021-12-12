@@ -2,8 +2,8 @@ import win32file, json
 import cv2
 import numpy as np
 from win32pipe import error
-
 from positions_dataclass import Positions
+
 #8192 Json -> rest 0
 #8193-Ende Image
 class NamedPipe():
@@ -35,7 +35,6 @@ class NamedPipe():
             if image is not None:
                 arr = np.append(arr,cv2.imencode('.jpg' , image)[1])
 
-
             win32file.WriteFile(self.handle, arr.tobytes())
             win32file.FlushFileBuffers(self.handle)
 
@@ -43,7 +42,10 @@ class NamedPipe():
             raise Exception("Pipe {} konnte nicht beschrieben werden! {}".format(self.pipe_name, e)) from None
 
 if __name__ == "__main__":
-    NamedPipe().SendPositions(Positions(LEFT_ANKLE=[1,3,4], RIGHT_ANKLE=[8,5,4]),np.ones((1280,720,3)))
+    img = cv2.imread('No-Signal-TV.jpg')
+    pipe = NamedPipe()
+    while True:
+        pipe.SendPositions(Positions(LEFT_ANKLE=[1,3,4], RIGHT_ANKLE=[8,5,4]),img)
 
 """
 {

@@ -1,19 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Prism.Core" Version="8.1.97" />
-    <PackageReference Include="Unity.Container" Version="5.11.11" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\PTSC.Interfaces\PTSC.Interfaces.csproj" />
     <ProjectReference Include="..\PTSC.OpenCV\PTSC.OpenCV.csproj" />
-    <ProjectReference Include="..\PTSC.PubSub\PTSC.PubSub.csproj" />
   </ItemGroup>
 
 </Project>

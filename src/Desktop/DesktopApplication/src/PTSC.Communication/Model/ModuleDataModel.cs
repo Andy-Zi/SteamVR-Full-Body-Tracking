@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PTSC.Interfaces;
 
 namespace PTSC.Communication.Model
 {
-    public class ModuleDataModel
+
+    public class ModuleDataModel : IModuleDataModel
     {
         public List<double> left_shoulder { get; set; }
         public List<double> right_shoulder { get; set; }
