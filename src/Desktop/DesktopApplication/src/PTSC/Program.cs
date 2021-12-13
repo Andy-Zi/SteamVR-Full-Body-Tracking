@@ -1,9 +1,10 @@
-using PTSC.Communication;
 using PTSC.Communication.Controller;
 using PTSC.Interfaces;
+using PTSC.Pipeline;
 using PTSC.Ui.Controller;
 using PTSC.Ui.View;
 using Unity;
+using Unity.Lifetime;
 
 namespace PTSC
 {
@@ -18,14 +19,18 @@ namespace PTSC
             var container = new UnityContainer();
             container.RegisterInstance<ILogger>(new Logger(System.Reflection.Assembly.GetExecutingAssembly().Location));
 
+
             container.RegisterType<MainView, MainView>();
             container.RegisterType<MainController, MainController>();
-            container.RegisterType<PipeClientController, PipeClientController>();
-            container.RegisterType<PipeClientController, PipeClientController>();
 
+
+            container.RegisterType<PipeClientController, PipeClientController>(new ContainerControlledLifetimeManager());
+            container.RegisterType<PipeClientController, PipeClientController>(new ContainerControlledLifetimeManager());
+            container.RegisterType<ProcessingPipeline, ProcessingPipeline>(new ContainerControlledLifetimeManager());
+            
             ApplicationConfiguration.Initialize();
             var controller = container.Resolve<MainController>();
-            Application.Run(controller.Initialize().View);
+            Application.Run(controller.RegisterEventAggregator(container).Initialize().View);
         }
     }
 }

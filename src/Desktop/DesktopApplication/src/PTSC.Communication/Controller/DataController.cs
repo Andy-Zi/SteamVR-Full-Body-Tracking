@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections;
 using System.Reflection;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using PTSC.Communication.Model;
 using PTSC.Interfaces;
 using Unity;
@@ -43,7 +38,7 @@ namespace PTSC.Communication.Controller
             return serialOutput;
         }
 
-        public object DeserializeModuleData(string jsonString)
+        public ModuleDataModel DeserializeModuleData(string jsonString)
         {
             return JsonSerializer.Deserialize<ModuleDataModel>(jsonString);
         }

@@ -2,47 +2,69 @@
 using PTSC.Ui.Model;
 using PTSC.Ui.View;
 using PTSC.Communication.Controller;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Unity;
-
+using PTSC.Pipeline;
+using Prism.Events;
+using PTSC.PubSub;
 
 namespace PTSC.Ui.Controller
 {
     public class MainController : BaseController<MainModel, MainView>
     {
         [Dependency] public ILogger Logger { get; set; }
-        [Dependency] public PipeClientController PipeClient { get; set; }
-        [Dependency] public PipeServerController PipeServer { get; set; }
-
+        //Lazy Dependency Injection
+        [Dependency] public Lazy<PipeClientController> PipeClient { get; set; }
+        [Dependency] public Lazy<PipeServerController> PipeServer { get; set; }
+        [Dependency] public Lazy<ProcessingPipeline> ProcessingPipeline { get; set; }
+        [Dependency] public Lazy<PipeClientController> PipeClientController { get; set; }
+        
+        public IEventAggregator EventAggregator { get; set; }
         public MainController(MainView view) : base(view)
         {
 
         }
 
-        public void SaySomething()
+        public BaseController<MainModel, MainView> RegisterEventAggregator(IUnityContainer container)
         {
-            Logger.Log("foobar");
+            //This need to be consturcted on the UI-Thread to enable the Publish on UI-Thread option!
+            EventAggregator = new EventAggregator();
+            container.RegisterInstance<IEventAggregator>(EventAggregator);
+            return this;
         }
         public override BaseController<MainModel, MainView> Initialize()
         {
-            PipeServer.Start();
+ 
+            PipeServer.Value.FPSLimit = 30;
+            PipeServer.Value.RetrieveImage = true;
+            PipeServer.Value.Start();
+            ProcessingPipeline.Value.Start();
+            PipeClientController.Value.Start();
+            EventAggregator.GetEvent<ImageProcessedEvent>().Subscribe(DisplayImage, ThreadOption.BackgroundThread, false);
             return base.Initialize();
+        }
+
+        private void DisplayImage(ImageProcessedPayload obj)
+        {
+            try
+            {
+                this.View.Invoke(() =>
+                {
+                    this.View.pictureBoxImage.Image = obj.Image;
+                    this.View.pictureBoxImage.Refresh();
+                });
+                obj.Image?.Dispose();
+            }
+            catch {}
         }
 
         public override void Dispose()
         {
-            PipeServer.Stop();
+            PipeServer.Value.Stop();
+            ProcessingPipeline.Value.Stop();
+            PipeClientController.Value.Stop();
             base.Dispose();
         }
 
-        public void PipeTest()
-        {
-            PipeClient.SendData("Hello World!");
-            Logger.Log("Sent data");
-        }
+
     }
 }

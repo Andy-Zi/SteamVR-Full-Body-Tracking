@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 using PTSC.Interfaces;
 using Unity;
 using PTSC.Communication.Model;
-
+using Prism.Events;
+using PTSC.PubSub;
 
 namespace PTSC.Communication.Controller
 {
@@ -20,40 +21,40 @@ namespace PTSC.Communication.Controller
         }
 
         [Dependency] public ILogger Logger { get; set; }
-        public void SendData(string data)
+
+        [Dependency] public DataController DataController { get; set; }
+
+        [Dependency] public IEventAggregator EventAggregator { get; set; }
+
+        SubscriptionToken subscriptionToken;
+        NamedPipeClientStream ClientStream;
+        public void Start()
         {
             try
             {
-                NamedPipeClientStream clientStream = new NamedPipeClientStream(".", DriverPipeDataModel.PipeName, PipeDirection.Out, PipeOptions.Asynchronous);
-                clientStream.Connect(DriverPipeDataModel.ClientTimeout);
+                ClientStream = new NamedPipeClientStream(".", DriverPipeDataModel.PipeName, PipeDirection.Out);
+                ClientStream.Connect(DriverPipeDataModel.ClientTimeout);
+                subscriptionToken = EventAggregator.GetEvent<DataProcessedEvent>().Subscribe(SendData,ThreadOption.BackgroundThread);
                 Logger.Log("Pipe connection established.");
-                byte[] buffer = Encoding.UTF8.GetBytes(data);
-
-                clientStream.BeginWrite(buffer, 0, buffer.Length, new AsyncCallback(AsyncSend), clientStream);
-            }
-            catch (TimeoutException ex)
-            {
-                Logger.Log(ex.Message);
-            }
-        }
-
-        private void AsyncSend(IAsyncResult iar)
-        {
-            try
-            {
-                // Get the pipe
-                NamedPipeClientStream pipeStream = (NamedPipeClientStream)iar.AsyncState;
-
-                // End the write
-                pipeStream.EndWrite(iar);
-                pipeStream.Flush();
-                pipeStream.Close();
-                pipeStream.Dispose();
             }
             catch (Exception ex)
             {
                 Logger.Log(ex.Message);
             }
+        }
+
+        private void SendData(DataProcessedPayload obj)
+        {
+            if (ClientStream?.IsConnected ?? false)
+            {
+                byte[] buffer = Encoding.UTF8.GetBytes(DataController.SerializeDriverData(obj.DriverDataModel));
+                ClientStream?.Write(buffer, 0, buffer.Length);
+            }
+        }
+
+        public void Stop()
+        {
+            ClientStream.Dispose();
         }
     }
 
