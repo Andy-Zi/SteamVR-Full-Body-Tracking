@@ -15,7 +15,7 @@ vr::EVRInitError ptscDriver::VRDriver::Init(vr::IVRDriverContext* pDriverContext
     Log("Activating ptscDriver...");
 
     Log("Connecting to pipe...");
-    LPTSTR lpszPipename = (LPTSTR)(L"\\\\.\\pipe\\posevr_pipe");
+    LPTSTR lpszPipename = (LPTSTR)(L"\\\\.\\pipe\\PTSCDriverPipe");
 
     // Open the named pipe
     // Most of these parameters aren't very relevant for pipes.
@@ -201,7 +201,6 @@ void ptscDriver::VRDriver::PipeThread()
     DWORD numBytesRead = 0;
     while (true)
     {
-
         BOOL result = ReadFile(
             pipe,
             buffer,             // the data from the pipe will be put here
