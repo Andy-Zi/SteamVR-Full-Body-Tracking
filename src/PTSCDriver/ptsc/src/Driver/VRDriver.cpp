@@ -4,6 +4,7 @@
 #include <Driver/ControllerDevice.hpp>
 #include <Driver/TrackingReferenceDevice.hpp>
 
+
 vr::EVRInitError ptscDriver::VRDriver::Init(vr::IVRDriverContext* pDriverContext)
 {
     // Perform driver context initialisation
@@ -12,6 +13,19 @@ vr::EVRInitError ptscDriver::VRDriver::Init(vr::IVRDriverContext* pDriverContext
     }
 
     Log("Activating ptscDriver...");
+
+    LPTSTR lpszPipename = TEXT("\\\\.\\pipe\\posevr_pipe");
+
+    // Open the named pipe
+    // Most of these parameters aren't very relevant for pipes.
+    pipe = CreateFile(
+        lpszPipename,
+        GENERIC_READ, // only need read access
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
 
     // Add a HMD
     //this->AddDevice(std::make_shared<HMDDevice>("ptsc_HMDDevice"));

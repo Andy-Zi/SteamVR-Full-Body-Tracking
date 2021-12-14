@@ -8,6 +8,8 @@
 #include <Driver/IVRDriver.hpp>
 #include <Driver/IVRDevice.hpp>
 
+#include <Windows.h>
+
 namespace ptscDriver {
     class VRDriver : public IVRDriver {
     public:
@@ -33,7 +35,6 @@ namespace ptscDriver {
         virtual void EnterStandby() override;
         virtual void LeaveStandby() override;
         virtual ~VRDriver() = default;
-
     private:
         std::vector<std::shared_ptr<IVRDevice>> devices_;
         std::vector<vr::VREvent_t> openvr_events_;
@@ -41,5 +42,7 @@ namespace ptscDriver {
         std::chrono::system_clock::time_point last_frame_time_ = std::chrono::system_clock::now();
         std::string settings_key_ = "driver_ptsc";
 
+        //pipe
+        HANDLE pipe;
     };
 };
