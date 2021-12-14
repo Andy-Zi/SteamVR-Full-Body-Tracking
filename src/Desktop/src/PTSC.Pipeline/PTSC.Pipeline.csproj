@@ -10,8 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\PTSC.Communication\PTSC.Communication.csproj" />
-    <ProjectReference Include="..\src\PTSC.OpenCV\PTSC.OpenCV.csproj" />
+    <ProjectReference Include="..\PTSC.Communication\PTSC.Communication.csproj" />
+    <ProjectReference Include="..\PTSC.OpenCV\PTSC.OpenCV.csproj" />
+    <ProjectReference Include="..\PTSC.PubSub\PTSC.PubSub.csproj" />
   </ItemGroup>
 
 </Project>

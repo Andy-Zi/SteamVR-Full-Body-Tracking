@@ -39,22 +39,24 @@ namespace PTSC.Ui.Controller
             PipeServer.Value.Start();
             ProcessingPipeline.Value.Start();
             PipeClientController.Value.Start();
-            EventAggregator.GetEvent<ImageProcessedEvent>().Subscribe(DisplayImage, ThreadOption.BackgroundThread, false);
+            EventAggregator.GetEvent<ImageProcessedEvent>().Subscribe(DisplayImage, ThreadOption.UIThread, false);
             return base.Initialize();
         }
 
         private void DisplayImage(ImageProcessedPayload obj)
         {
+            this.View.pictureBoxImage.SuspendLayout();
             try
             {
-                this.View.Invoke(() =>
-                {
-                    this.View.pictureBoxImage.Image = obj.Image;
-                    this.View.pictureBoxImage.Refresh();
-                });
-                obj.Image?.Dispose();
+                 this.View.pictureBoxImage.Image = obj.Image;
+                 this.View.pictureBoxImage.Refresh();
             }
             catch {}
+            finally
+            {
+                this.View.pictureBoxImage.ResumeLayout();
+                obj.Image?.Dispose();
+            }
         }
 
         public override void Dispose()

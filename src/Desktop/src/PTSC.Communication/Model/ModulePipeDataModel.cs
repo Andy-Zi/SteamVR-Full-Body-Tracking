@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PTSC.Communication.Model
+﻿namespace PTSC.Communication.Model
 {
     public static class ModulePipeDataModel
     {

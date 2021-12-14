@@ -14,11 +14,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\PTSC.Pipeline\PTSC.Pipeline.csproj" />
     <ProjectReference Include="..\PTSC.Communication\PTSC.Communication.csproj" />
     <ProjectReference Include="..\PTSC.Nameservice\PTSC.Nameservice.csproj" />
     <ProjectReference Include="..\PTSC.Interfaces\PTSC.Interfaces.csproj" />
     <ProjectReference Include="..\PTSC.Nameservice\PTSC.Nameservice.csproj" />
+    <ProjectReference Include="..\PTSC.Pipeline\PTSC.Pipeline.csproj" />
   </ItemGroup>
 
   <ItemGroup>
