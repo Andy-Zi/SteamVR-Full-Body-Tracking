@@ -1,6 +1,6 @@
 
 *.db
-CameraDriver/.vs
 *.ipch
-CameraDriver/x64
-CameraDriver/CameraTracker/x64
+src/PTSCDriver/x64/
+src/PTSCDriver/ptsc/x64/
+src/PTSCDriver/.vs
