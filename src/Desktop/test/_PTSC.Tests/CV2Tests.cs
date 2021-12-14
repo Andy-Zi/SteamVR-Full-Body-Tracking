@@ -15,6 +15,7 @@ namespace _PTSC.Tests
         {
             TestImage = new Mat(new OpenCvSharp.Size(1280,720),MatType.CV_8UC3);
         }
+
         [TearDown]
         public void Teardown()
         {

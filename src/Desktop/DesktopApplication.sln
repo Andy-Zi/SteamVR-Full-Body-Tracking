@@ -21,6 +21,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_PTSC.Tests", "test\_PTSC.T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PTSC.Pipeline", "src\PTSC.Pipeline\PTSC.Pipeline.csproj", "{9C0EC52A-987C-4955-8952-491D4EAD8087}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PTSC.Modules", "src\PTSC.Modules\PTSC.Modules.csproj", "{E9AB78CE-3C6F-415E-B6B7-6F1C5C4432EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{9C0EC52A-987C-4955-8952-491D4EAD8087}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C0EC52A-987C-4955-8952-491D4EAD8087}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C0EC52A-987C-4955-8952-491D4EAD8087}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9AB78CE-3C6F-415E-B6B7-6F1C5C4432EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9AB78CE-3C6F-415E-B6B7-6F1C5C4432EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9AB78CE-3C6F-415E-B6B7-6F1C5C4432EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9AB78CE-3C6F-415E-B6B7-6F1C5C4432EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

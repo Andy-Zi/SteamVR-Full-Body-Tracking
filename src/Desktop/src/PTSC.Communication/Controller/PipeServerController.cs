@@ -95,7 +95,7 @@ namespace PTSC.Communication.Controller
                     }
 
                     var jsondata = message[..ModulePipeDataModel.JsonBufferSize];
-                    moduleDataModel = HandleJsonData(jsondata.ToArray());
+                    moduleDataModel = HandleJsonData(jsondata);
 
                     //Dispatch Processing to different Thread
                     dataRecievedEvent.Publish(new DataRecievedPayload(moduleDataModel, image));

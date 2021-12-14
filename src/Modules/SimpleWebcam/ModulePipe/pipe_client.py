@@ -2,8 +2,7 @@ import win32file, json
 import cv2
 import numpy as np
 from win32pipe import error
-from positions_dataclass import Positions
-import sys
+from ModulePipe.positions_dataclass import Positions
 
 #8192 Json -> rest 0
 #8193-Ende Image
@@ -44,8 +43,6 @@ class NamedPipe():
 
 if __name__ == "__main__":
     img = cv2.imread('No-Signal-TV.jpg')
-    print("Hello from Python!")
-    sys.stdout.flush()
     pipe = NamedPipe()
     while True:
         pipe.SendPositions(Positions(LEFT_ANKLE=[1,3,4], RIGHT_ANKLE=[8,5,4]),img)

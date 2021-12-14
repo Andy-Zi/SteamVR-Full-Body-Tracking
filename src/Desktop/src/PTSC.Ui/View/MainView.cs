@@ -8,5 +8,15 @@ namespace PTSC.Ui.View
         {
             InitializeComponent();
         }
+
+        private void buttonStartModule_Click(object sender, EventArgs e)
+        {
+            (this.Controller as MainController).StartModule();
+        }
+
+        private void buttonStopModule_Click(object sender, EventArgs e)
+        {
+            (this.Controller as MainController).StopModule();
+        }
     }
 }

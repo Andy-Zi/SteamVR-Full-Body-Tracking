@@ -32,13 +32,20 @@
             this.ModuleTab = new System.Windows.Forms.TabPage();
             this.splitContainerModule = new System.Windows.Forms.SplitContainer();
             this.pictureBoxImage = new System.Windows.Forms.PictureBox();
+            this.groupBoxModule = new System.Windows.Forms.GroupBox();
+            this.buttonStopModule = new System.Windows.Forms.Button();
+            this.buttonStartModule = new System.Windows.Forms.Button();
+            this.comboBoxModule = new System.Windows.Forms.ComboBox();
             this.SettingsTab = new System.Windows.Forms.TabPage();
+            this.richTextBoxModule = new System.Windows.Forms.RichTextBox();
             this.tabControl.SuspendLayout();
             this.ModuleTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerModule)).BeginInit();
             this.splitContainerModule.Panel1.SuspendLayout();
+            this.splitContainerModule.Panel2.SuspendLayout();
             this.splitContainerModule.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).BeginInit();
+            this.groupBoxModule.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl
@@ -74,6 +81,11 @@
             // splitContainerModule.Panel1
             // 
             this.splitContainerModule.Panel1.Controls.Add(this.pictureBoxImage);
+            // 
+            // splitContainerModule.Panel2
+            // 
+            this.splitContainerModule.Panel2.Controls.Add(this.richTextBoxModule);
+            this.splitContainerModule.Panel2.Controls.Add(this.groupBoxModule);
             this.splitContainerModule.Size = new System.Drawing.Size(1180, 772);
             this.splitContainerModule.SplitterDistance = 817;
             this.splitContainerModule.TabIndex = 0;
@@ -88,6 +100,46 @@
             this.pictureBoxImage.TabIndex = 0;
             this.pictureBoxImage.TabStop = false;
             // 
+            // groupBoxModule
+            // 
+            this.groupBoxModule.Controls.Add(this.buttonStopModule);
+            this.groupBoxModule.Controls.Add(this.buttonStartModule);
+            this.groupBoxModule.Controls.Add(this.comboBoxModule);
+            this.groupBoxModule.Location = new System.Drawing.Point(3, 3);
+            this.groupBoxModule.Name = "groupBoxModule";
+            this.groupBoxModule.Size = new System.Drawing.Size(349, 103);
+            this.groupBoxModule.TabIndex = 0;
+            this.groupBoxModule.TabStop = false;
+            this.groupBoxModule.Text = "Module";
+            // 
+            // buttonStopModule
+            // 
+            this.buttonStopModule.Location = new System.Drawing.Point(224, 51);
+            this.buttonStopModule.Name = "buttonStopModule";
+            this.buttonStopModule.Size = new System.Drawing.Size(119, 23);
+            this.buttonStopModule.TabIndex = 2;
+            this.buttonStopModule.Text = "Stop";
+            this.buttonStopModule.UseVisualStyleBackColor = true;
+            this.buttonStopModule.Click += new System.EventHandler(this.buttonStopModule_Click);
+            // 
+            // buttonStartModule
+            // 
+            this.buttonStartModule.Location = new System.Drawing.Point(6, 51);
+            this.buttonStartModule.Name = "buttonStartModule";
+            this.buttonStartModule.Size = new System.Drawing.Size(113, 23);
+            this.buttonStartModule.TabIndex = 1;
+            this.buttonStartModule.Text = "Start";
+            this.buttonStartModule.UseVisualStyleBackColor = true;
+            this.buttonStartModule.Click += new System.EventHandler(this.buttonStartModule_Click);
+            // 
+            // comboBoxModule
+            // 
+            this.comboBoxModule.FormattingEnabled = true;
+            this.comboBoxModule.Location = new System.Drawing.Point(6, 22);
+            this.comboBoxModule.Name = "comboBoxModule";
+            this.comboBoxModule.Size = new System.Drawing.Size(337, 23);
+            this.comboBoxModule.TabIndex = 0;
+            // 
             // SettingsTab
             // 
             this.SettingsTab.Location = new System.Drawing.Point(4, 24);
@@ -97,6 +149,15 @@
             this.SettingsTab.TabIndex = 1;
             this.SettingsTab.Text = "Settings";
             this.SettingsTab.UseVisualStyleBackColor = true;
+            // 
+            // richTextBoxModule
+            // 
+            this.richTextBoxModule.Location = new System.Drawing.Point(3, 112);
+            this.richTextBoxModule.Name = "richTextBoxModule";
+            this.richTextBoxModule.ReadOnly = true;
+            this.richTextBoxModule.Size = new System.Drawing.Size(349, 653);
+            this.richTextBoxModule.TabIndex = 1;
+            this.richTextBoxModule.Text = "";
             // 
             // MainView
             // 
@@ -109,9 +170,11 @@
             this.tabControl.ResumeLayout(false);
             this.ModuleTab.ResumeLayout(false);
             this.splitContainerModule.Panel1.ResumeLayout(false);
+            this.splitContainerModule.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerModule)).EndInit();
             this.splitContainerModule.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).EndInit();
+            this.groupBoxModule.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -123,5 +186,10 @@
         public TabPage SettingsTab;
         public SplitContainer splitContainerModule;
         public PictureBox pictureBoxImage;
+        private GroupBox groupBoxModule;
+        public ComboBox comboBoxModule;
+        private Button buttonStopModule;
+        private Button buttonStartModule;
+        public RichTextBox richTextBoxModule;
     }
 }

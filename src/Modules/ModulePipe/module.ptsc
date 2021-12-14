@@ -1,0 +1,7 @@
+{
+    "Name": "Python Pipe Demo",
+    "Description": "Starts a Demo Pipe-Stream",
+    "SupportsImage" : true,
+    "Process" : "python",
+    "Arguments" : "pipe_client.py"
+}

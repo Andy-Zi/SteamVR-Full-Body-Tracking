@@ -14,7 +14,7 @@ namespace PTSC
         public Logger(string path,string logFileName = "log.txt")
         {
             serilogLogger = new LoggerConfiguration()
-                .WriteTo.File(Path.Combine(Path.GetDirectoryName(path), logFileName))
+                .WriteTo.File(Path.Combine(path, logFileName))
                 .CreateLogger();
 
             
