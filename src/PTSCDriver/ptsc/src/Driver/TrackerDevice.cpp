@@ -73,7 +73,7 @@ void ptscDriver::TrackerDevice::Update()
         linalg::vec<float, 4> hmd_rotation{ (float)q.x, (float)q.y, (float)q.z, (float)q.w };
 
         // Do shaking animation if haptic vibration was requested
-        float controller_y = -0.35f + 0.35f * std::sinf(8 * 3.1415f * vibrate_anim_state_);
+        float controller_y = -0.35f + 0.01f * std::sinf(8 * 3.1415f * vibrate_anim_state_);
 
         linalg::vec<float, 3> hmd_pose_offset = { 0.f, controller_y, -0.5f };
 
