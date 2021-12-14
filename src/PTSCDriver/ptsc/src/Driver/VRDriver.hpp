@@ -7,6 +7,7 @@
 
 #include <Driver/IVRDriver.hpp>
 #include <Driver/IVRDevice.hpp>
+#include <Driver/TrackerDevice.hpp>
 
 namespace ptscDriver {
     class VRDriver : public IVRDriver {
@@ -41,5 +42,9 @@ namespace ptscDriver {
         std::chrono::system_clock::time_point last_frame_time_ = std::chrono::system_clock::now();
         std::string settings_key_ = "driver_ptsc";
 
+        HANDLE pipe;
+        bool pipe_connected = true;
+
+        void PipeThread();
     };
 };

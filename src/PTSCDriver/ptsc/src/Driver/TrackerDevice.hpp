@@ -8,6 +8,12 @@
 #include <Driver/IVRDevice.hpp>
 #include <Native/DriverFactory.hpp>
 
+#include <windows.h>    // used in VRDriver but can only be included here???
+#include <thread>
+#include <string>
+#include <mutex>
+#include <algorithm>
+
 namespace ptscDriver {
     class TrackerDevice : public IVRDevice {
         public:

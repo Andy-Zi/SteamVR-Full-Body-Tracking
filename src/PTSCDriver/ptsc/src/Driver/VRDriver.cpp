@@ -4,6 +4,7 @@
 #include <Driver/ControllerDevice.hpp>
 #include <Driver/TrackingReferenceDevice.hpp>
 
+
 vr::EVRInitError ptscDriver::VRDriver::Init(vr::IVRDriverContext* pDriverContext)
 {
     // Perform driver context initialisation
@@ -12,6 +13,35 @@ vr::EVRInitError ptscDriver::VRDriver::Init(vr::IVRDriverContext* pDriverContext
     }
 
     Log("Activating ptscDriver...");
+
+    Log("Connecting to pipe...");
+    LPTSTR lpszPipename = (LPTSTR)(L"\\\\.\\pipe\\posevr_pipe");
+
+    // Open the named pipe
+    // Most of these parameters aren't very relevant for pipes.
+    pipe = CreateFile(
+        lpszPipename,
+        GENERIC_READ, // only need read access
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
+
+    // trackers not created if pipe client isn't connected to server
+    if (pipe == INVALID_HANDLE_VALUE)
+    {
+        Log("Failed to connect to pipe. PoseVR not creating trackers.");
+        //system("pause");
+        pipe_connected = false;
+        CloseHandle(pipe);
+        return vr::VRInitError_None;
+    }
+
+    // Initialize pipe thread
+    Log("Starting pipe thread");
+    std::thread pipeThread(&ptscDriver::VRDriver::PipeThread, this);
+    pipeThread.detach();
 
     // Add a HMD
     //this->AddDevice(std::make_shared<HMDDevice>("ptsc_HMDDevice"));
@@ -160,4 +190,32 @@ vr::CVRPropertyHelpers* ptscDriver::VRDriver::GetProperties()
 vr::IVRServerDriverHost* ptscDriver::VRDriver::GetDriverHost()
 {
     return vr::VRServerDriverHost();
+}
+
+void ptscDriver::VRDriver::PipeThread()
+{
+    Log("Reading data from pipe...");
+
+    // The read operation will block until there is data to read
+    char buffer[512];
+    DWORD numBytesRead = 0;
+    while (true)
+    {
+
+        BOOL result = ReadFile(
+            pipe,
+            buffer,             // the data from the pipe will be put here
+            511 * sizeof(char), // number of bytes allocated
+            &numBytesRead,      // this will store number of bytes actually read
+            NULL                // not using overlapped IO
+        );
+
+           //TODO PIPE DATA nutzen
+    }
+    // Close our pipe handle
+    CloseHandle(pipe);
+
+    Log("Closing pipe PoseVR.");
+
+    //system("pause");
 }

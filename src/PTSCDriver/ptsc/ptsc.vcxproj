@@ -79,10 +79,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <LibraryPath>$(SolutionDir)dependencies\openvr\lib\win64;$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>$(SolutionDir)dependencies\linalg;$(SolutionDir)dependencies\openvr\headers;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <LibraryPath>$(SolutionDir)dependencies\openvr\lib\win64;$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>$(SolutionDir)dependencies\linalg;$(SolutionDir)dependencies\openvr\headers;$(VC_IncludePath);$(WindowsSDK_IncludePath);</ExternalIncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -151,6 +153,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="pipe.cpp" />
     <ClCompile Include="src\Driver\ControllerDevice.cpp" />
     <ClCompile Include="src\Driver\HMDDevice.cpp" />
     <ClCompile Include="src\Driver\TrackerDevice.cpp" />
@@ -159,6 +162,7 @@
     <ClCompile Include="src\Native\DriverFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="pipe.h" />
     <ClInclude Include="src\Driver\ControllerDevice.hpp" />
     <ClInclude Include="src\Driver\DeviceType.hpp" />
     <ClInclude Include="src\Driver\HMDDevice.hpp" />
