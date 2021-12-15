@@ -5,45 +5,51 @@ import numpy as np
 
 
 class Positions:
-    defaultPosition = [0, 0, 0]
+    defaultPosition: list[float] = [.0, .0, .0]
     position_visible_threshold: float = 0.5
 
     def __init__(self, outputfile: str = "src/Modules/PoseClassifier/landmarks.txt", inputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/keypoints.txt"):
-        self.use_visibility_threshold = False # don't set values to 0 if not visible
+        # settings
+        self.use_visibility_threshold = False  # don't set values to 0 if not visible
         self.input_file = inputfile
         self.export_file = outputfile
         self.keys = self._read_point_names()
-        self.points = {key: [] for key in self.keys}
+
+        # helping vars
+        self.not_visible_names: list[str] = []
+        self.points: dict[str, list[str]] = {key: [] for key in self.keys}
         self.num_landmarks = len(self.keys)
-        self.previous_position = None#[[] for _ in range(self.num_landmarks)]
+
+        self.previous_positions: list[list[float]] = []
         self.mp_pose = mp.solutions.pose
-        self.current_position = list()#None#self.previous_position
+        self.current_positions: list[str] = []
 
     def manage_points(self, results):
 
         positions = self._load_positions(results=results)
-        # print(f"{positions=}")
+
         if positions == []:
             return
         landmarks = self._calc_landmarks(positions=positions)
-        # print(f"{landmarks=}")
+
         self._prepare_data(landmarks=landmarks)
         self.write_file()
 
     def _load_positions(self, results):
         """ extracts the landmarks from the result"""
-        positions = []
-        position = None
-        
+        positions: list[list[float]] = []
+        position: list[float] = []
+
         for ind, name in enumerate(self.keys):
 
             try:
                 position = results.pose_world_landmarks.landmark[self.mp_pose.PoseLandmark[name.upper(
                 )]]
             except AttributeError:
-                # single missing value
+                # fill in single missing value with last position
                 if len(self.previous_positions) > ind and self.previous_positions:
-                    position = self.previous_positions[name]
+                    position = self.previous_positions[ind]
+                    self._set_name_warning(name)
 
             finally:
                 positions.append(position)
@@ -52,40 +58,47 @@ class Positions:
         #self.previous_positions = self.current
         return positions
 
-    def _calc_landmarks(self, positions):
+    def _set_name_warning(self, name: str):
+        """keep track of landmarks that cause trouble"""
+        self.not_visible_names.append(name)
+        print(f"{name=} caused an AttributeError \n")
+
+    def _calc_landmarks(self, positions: list[float]):
         """listify positions
 
         Returns:
             [list]: [list of lists of self.current_position [x,y,z]]
         """
-        
+
         # werte von der Sichtbarkeit abhängig:
-        # position.visibility<self.position_visibility_threshold setzt einen default wert 
+        # position.visibility<self.position_visibility_threshold setzt einen default wert
         if not positions:
             return
-        points = list()
-        for i,position in enumerate(positions):
+        landmarks: list[float] = []
+        for i, position in enumerate(positions):
             if position:
                 if self.use_visibility_threshold and position.visibility < self.position_visible_threshold:
-                    points.append(self.defaultPosition)
-                else: points.append([position.x, position.y, position.z])#, self.dist(position,index=i)])
+                    landmarks.extend(self.defaultPosition)
+                else:
+                    # , self.dist(position,index=i)])
+                    landmarks.extend([position.x, position.y, position.z])
             else:
                 continue
-        self.previous_position = points
-        return points
-    
-    def dist(self,position,index)->list:
+        self.previous_position = landmarks
+        return landmarks
+
+    def dist(self, position: list[float], index: int) -> float:
         """ calculate the distance of movement for each landmark"""
         if not self.previous_position:
             return 0
         p1 = np.array([position.x, position.y, position.z])
-        p2 = np.array([self.previous_position[index][:3]])
+        p2 = np.array([self.previous_positions[index][:3]])
 
         dist = np.linalg.norm(p1 - p2)
-        print(dist)
+
         return dist
 
-    def _prepare_data(self, landmarks: list):
+    def _prepare_data(self, landmarks: list[float]):
         """fills in points for keys
 
         Args:
@@ -93,7 +106,7 @@ class Positions:
         """
         for ind, key in enumerate(self.keys):
             if landmarks:
-                #print(ind,key)
+                # print(ind,key)
                 self.points[key] = landmarks[ind]
 
     def write_file(self):
