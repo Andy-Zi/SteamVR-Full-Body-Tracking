@@ -10,23 +10,24 @@ import sys
 from threading import Thread
 from tkinter import Tk, Frame, Label, Button  # fix later
 from PIL import ImageTk, Image
+from time import sleep
 
 # posevr modules
 import posevr_client
 
 # vars
-h_x = 0
-h_y = 0
-h_z = 0
-w_x = 0
-w_y = 0
-w_z = 0
-l_x = 0
-l_y = 0
-l_z = 0
-l_x = 0
-l_y = 0
-l_z = 0
+h_x = 0.1
+h_y = 0.1
+h_z = 0.1
+w_x = 0.1
+w_y = 0.1
+w_z = 0.1
+l_x = 0.1
+l_y = 0.1
+l_z = 0.1
+r_x = 0.1
+r_y = 0.1
+r_z = 0.1
 
 # setup pipe
 pipe_name = 'PTSCDriverPipe'
@@ -40,6 +41,38 @@ def calibrate():
     if pipe_connected:
         global calibrating
         calibrating = True
+
+
+def video_stream():
+    global calibrating
+    global initial_calibrating
+    global pipe_connected
+    global prev_time
+    global prev_landmarks
+    try:  # try is attempt to cleanup app after steamvr disconnects
+
+        send = f"head;{h_x};{h_y};{h_z};waist;{w_x};{w_y};{w_z};left_foot;{l_x};{l_y};{l_z};right_foot;{l_x};{l_y};{l_z};"
+        # about 150 chars for 4 positions, rounded 5 decimal points
+        some_data = str.encode(str(send), encoding="ascii")
+
+        sleep(0.03)
+
+        if pipe_connected:
+            print(send)
+            # about 150 chars for 4 positions, rounded 5 decimal points
+            some_data = str.encode(str(send), encoding="ascii")
+            # Send the encoded string to client
+            err, bytes_written = win32file.WriteFile(
+                pipe,
+                some_data,
+                pywintypes.OVERLAPPED()
+            )
+
+        # loops back
+        video_label.after(1, video_stream)
+    except:
+        root.quit()
+        return
 
 
 # tkinter app stuff
@@ -102,34 +135,23 @@ def start_pipe(pipe):
     initial_calibrating = True
 
 
-def video_stream():
-    global calibrating
-    global initial_calibrating
-    global pipe_connected
-    global prev_time
-    global prev_landmarks
-    try:  # try is attempt to cleanup app after steamvr disconnects
+def onKeyPress(event):
+    global w_x
+    global w_y
+    global w_z
 
-        send = f"head;{h_x};{h_y};{h_z};waist;{w_x};{w_y};{w_z};left_foot;{l_x};{l_y};{l_z};right_foot;{l_x};{l_y};{l_z}"
-        # about 150 chars for 4 positions, rounded 5 decimal points
-        some_data = str.encode(str(send), encoding="ascii")
-        # print(send)
-
-        if pipe_connected:
-            # about 150 chars for 4 positions, rounded 5 decimal points
-            some_data = str.encode(str(send), encoding="ascii")
-            # Send the encoded string to client
-            err, bytes_written = win32file.WriteFile(
-                pipe,
-                some_data,
-                pywintypes.OVERLAPPED()
-            )
-
-        # loops back
-        video_label.after(1, video_stream)
-    except:
-        root.quit()
-        return
+    if event.char == 'w':
+        w_x = w_x + 0.1
+    if event.char == 's':
+        w_x = w_x - 0.1
+    if event.char == 'a':
+        w_y = w_y + 0.1
+    if event.char == 'd':
+        w_y = w_y - 0.1
+    if event.char == 'q':
+        w_z = w_z + 0.1
+    if event.char == 'e':
+        w_z = w_z - 0.1
 
 
 if __name__ == '__main__':
@@ -144,21 +166,9 @@ if __name__ == '__main__':
     prev_time = time.time()
 
     root.after(0, video_stream)
+    root.bind('<KeyPress>', onKeyPress)
     root.mainloop()
 
     # ends pipe server by connecting a dummy client pipe and closing
     if not pipe_connected:
         posevr_client.named_pipe_client()
-
-
-# while True:
-#    if keyboard.read_key() == "p":
-#        print("You pressed p")
-#        break
-#
-# while True:
-#    if keyboard.is_pressed("q"):
-#        print("You pressed q")
-#        break
-#
-#keyboard.on_press_key("r", lambda _: print("You pressed r"))

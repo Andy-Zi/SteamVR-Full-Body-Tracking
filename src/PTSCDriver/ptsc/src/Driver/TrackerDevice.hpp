@@ -34,6 +34,12 @@ namespace ptscDriver {
             virtual void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize) override;
             virtual vr::DriverPose_t GetPose() override;
 
+            // PoseVR methods
+            void UpdatePos(double x, double y, double z);
+            void UpdateRot(double w, double x, double y, double z);
+
+            vr::DriverPose_t wanted_pose_ = IVRDevice::MakeDefaultPose();
+
     private:
         vr::TrackedDeviceIndex_t device_index_ = vr::k_unTrackedDeviceIndexInvalid;
         std::string serial_;
@@ -47,6 +53,15 @@ namespace ptscDriver {
 
         vr::VRInputComponentHandle_t system_click_component_ = 0;
         vr::VRInputComponentHandle_t system_touch_component_ = 0;
+
+        /*virtual vr::HmdQuaternion_t get_HMD_rotation(vr::TrackedDevicePose_t hmd_pose);
+        virtual vr::HmdVector3_t get_HMD_absolute_position(vr::TrackedDevicePose_t hmd_pose);*/
+
+        // PoseVR variables
+        /*std::chrono::milliseconds prev_time;*/
+        //const double velocity_smoothing = 0.2;  // lower number, more smoothing (0,1)
+        //const double position_smoothing = 0.2;
+        //const double rotation_smoothing = 0.2;
 
     };
 };

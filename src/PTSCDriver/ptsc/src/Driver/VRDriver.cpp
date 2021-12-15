@@ -4,6 +4,7 @@
 #include <Driver/ControllerDevice.hpp>
 #include <Driver/TrackingReferenceDevice.hpp>
 
+std::mutex mymutex;
 
 vr::EVRInitError ptscDriver::VRDriver::Init(vr::IVRDriverContext* pDriverContext)
 {
@@ -51,9 +52,21 @@ vr::EVRInitError ptscDriver::VRDriver::Init(vr::IVRDriverContext* pDriverContext
     //this->AddDevice(std::make_shared<ControllerDevice>("ptsc_ControllerDevice_Right", ControllerDevice::Handedness::RIGHT));
 
     // Add a tracker
-    this->AddDevice(std::make_shared<TrackerDevice>("waist_TrackerDevice"));
+    /*this->AddDevice(std::make_shared<TrackerDevice>("waist_TrackerDevice"));
     this->AddDevice(std::make_shared<TrackerDevice>("leftfoot_TrackerDevice"));
-    this->AddDevice(std::make_shared<TrackerDevice>("rightfoot_TrackerDevice"));
+    this->AddDevice(std::make_shared<TrackerDevice>("rightfoot_TrackerDevice"));*/
+
+    auto waist_tracker = std::make_shared<TrackerDevice>("0Waist_TrackerDevice");
+    this->AddDevice(waist_tracker);
+    this->trackers_.push_back(waist_tracker);
+
+    auto left_foot_tracker = std::make_shared<TrackerDevice>("1LeftFoot_TrackerDevice");
+    this->AddDevice(left_foot_tracker);
+    this->trackers_.push_back(left_foot_tracker);
+
+    auto right_foot_tracker = std::make_shared<TrackerDevice>("2RightFoot_TrackerDevice");
+    this->AddDevice(right_foot_tracker);
+    this->trackers_.push_back(right_foot_tracker);
 
     // Add a couple tracking references
     //this->AddDevice(std::make_shared<TrackingReferenceDevice>("ptsc_TrackingReference_A"));
@@ -70,23 +83,103 @@ void ptscDriver::VRDriver::Cleanup()
 
 void ptscDriver::VRDriver::RunFrame()
 {
-    // Collect events
-    vr::VREvent_t event;
-    std::vector<vr::VREvent_t> events;
-    while (vr::VRServerDriverHost()->PollNextEvent(&event, sizeof(event)))
+    if (pipe_connected)
     {
-        events.push_back(event);
+        // Collect events
+        vr::VREvent_t event;
+        std::vector<vr::VREvent_t> events;
+        while (vr::VRServerDriverHost()->PollNextEvent(&event, sizeof(event)))
+        {
+            events.push_back(event);
+        }
+        this->openvr_events_ = events;
+
+        // Update frame timing
+        std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+        this->frame_timing_ = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->last_frame_time_);
+        this->last_frame_time_ = now;
+
+        // lock thread to for thread safety
+        std::lock_guard<std::mutex> g(mymutex);
+
+        // update HMD and controllers position
+        //GetCurHMDControllersPose();
+
+        std::vector<double> waist_pos = poseData.get_desired_tracker_position("waist");
+        std::vector<double> left_foot_pos = poseData.get_desired_tracker_position("left_foot");
+        std::vector<double> right_foot_pos = poseData.get_desired_tracker_position("right_foot");
+
+        // vertical correction for depth when player moves forwards or backwards
+        // fix depth correction later
+        /*if (poseData.calibrated1_hmd[1] != 0 && poseData.cur_hmd[1] - poseData.calibrated1_hmd[1] < jump_threshold)
+        {
+            if ((left_foot_pos[1] > 0.1 && right_foot_pos[1] > 0.1))
+            {
+                if (left_foot_pos[1] < right_foot_pos[1])
+                {
+                    left_foot_pos[1] += 0.1 - right_foot_pos[1];
+                    right_foot_pos[1] = 0.1;
+                }
+                else
+                {
+                    left_foot_pos[1] = 0.1;
+                    right_foot_pos[1] += 0.1 - left_foot_pos[1];
+                }
+            }
+            else if (left_foot_pos[1] < 0.1 && right_foot_pos[1] < 0.1)
+            {
+                if (left_foot_pos[1] < right_foot_pos[1])
+                {
+                    left_foot_pos[1] = 0.1;
+                    right_foot_pos[1] += 0.1 - left_foot_pos[1];
+                }
+                else
+                {
+                    left_foot_pos[1] += 0.1 - right_foot_pos[1];
+                    right_foot_pos[1] = 0.1;
+                }
+            }
+        }*/
+
+        // "sitting" detection (elongates legs when player sits down)
+        // TODO: needs to be able to work even if player doesn't directly face forward
+        /*if (std::abs(waist_pos[1] - left_foot_pos[1]) < sit_threshold && std::abs(waist_pos[1] - right_foot_pos[1]) < sit_threshold)
+        {
+            left_foot_pos[2] += (left_foot_pos[2] - waist_pos[2]) * sit_foot_depth_multiplier;
+            right_foot_pos[2] += (left_foot_pos[2] - waist_pos[2]) * sit_foot_depth_multiplier;
+        }*/
+
+        this->trackers_[0]->UpdatePos(waist_pos[0], waist_pos[1], waist_pos[2]);
+        //this->trackers_[0]->UpdateRot(waist_pos[3], waist_pos[4], waist_pos[5], waist_pos[6]);
+        this->trackers_[1]->UpdatePos(left_foot_pos[0], left_foot_pos[1], left_foot_pos[2]);
+        //this->trackers_[1]->UpdateRot(left_foot_pos[3], left_foot_pos[4], left_foot_pos[5], left_foot_pos[6]);
+        this->trackers_[2]->UpdatePos(right_foot_pos[0], right_foot_pos[1], right_foot_pos[2]);
+        //this->trackers_[2]->UpdateRot(right_foot_pos[3], right_foot_pos[4], right_foot_pos[5], right_foot_pos[6]);
+
+        for (auto& device : this->devices_)
+            device->Update();
     }
-    this->openvr_events_ = events;
 
-    // Update frame timing
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-    this->frame_timing_ = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->last_frame_time_);
-    this->last_frame_time_ = now;
 
-    // Update devices
-    for (auto& device : this->devices_)
-        device->Update();
+
+
+    //// Collect events
+    //vr::VREvent_t event;
+    //std::vector<vr::VREvent_t> events;
+    //while (vr::VRServerDriverHost()->PollNextEvent(&event, sizeof(event)))
+    //{
+    //    events.push_back(event);
+    //}
+    //this->openvr_events_ = events;
+
+    //// Update frame timing
+    //std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    //this->frame_timing_ = std::chrono::duration_cast<std::chrono::milliseconds>(now - this->last_frame_time_);
+    //this->last_frame_time_ = now;
+
+    //// Update devices
+    //for (auto& device : this->devices_)
+    //    device->Update();
 }
 
 bool ptscDriver::VRDriver::ShouldBlockStandbyMode()
@@ -197,7 +290,7 @@ void ptscDriver::VRDriver::PipeThread()
     Log("Reading data from pipe...");
 
     // The read operation will block until there is data to read
-    char buffer[512];
+    char buffer[1024];
     DWORD numBytesRead = 0;
     while (true)
     {
@@ -209,7 +302,31 @@ void ptscDriver::VRDriver::PipeThread()
             NULL                // not using overlapped IO
         );
 
-           //TODO PIPE DATA nutzen
+        if (result)
+        {
+            buffer[numBytesRead / sizeof(char)] = '\0'; // null terminate the string
+            switch (buffer[0])
+            {
+            case 'n': //no data
+                break;
+            case 'c': //calibrate
+                //poseData.calibrating1 = true;
+                //poseData.clear_calibration_data();
+                // CLEAR calibration2_data
+                break;
+            default: //
+                std::lock_guard<std::mutex> guard(mymutex);
+                //GetCurHMDControllersPose();
+                poseData.add_data(buffer);
+
+                break;
+            }
+        }
+        else
+        {
+            //wcout << "Failed to read data from the pipe." << endl;
+            break; // maybe not break here? not sure
+        }
     }
     // Close our pipe handle
     CloseHandle(pipe);
@@ -217,4 +334,122 @@ void ptscDriver::VRDriver::PipeThread()
     Log("Closing pipe PoseVR.");
 
     //system("pause");
+}
+
+
+//void ptscDriver::VRDriver::GetCurHMDControllersPose()
+//{
+//    int hmd_idx = 0;
+//
+//    vr::TrackedDevicePose_t hmd_pose[10];
+//    vr::VRServerDriverHost()->GetRawTrackedDevicePoses(0, hmd_pose, 10);
+//
+//    vr::HmdQuaternion_t q_hmd = GetRotation(hmd_pose[hmd_idx].mDeviceToAbsoluteTracking);
+//    vr::HmdVector3_t pos_hmd = GetPosition(hmd_pose[hmd_idx].mDeviceToAbsoluteTracking);
+//
+//    if (pos_hmd.v != NULL)
+//    {
+//        poseData.cur_hmd.clear();
+//        poseData.cur_hmd.push_back(pos_hmd.v[0]);
+//        poseData.cur_hmd.push_back(pos_hmd.v[1]);
+//        poseData.cur_hmd.push_back(pos_hmd.v[2]);
+//        poseData.cur_hmd.push_back(q_hmd.w);
+//        poseData.cur_hmd.push_back(q_hmd.x);
+//        poseData.cur_hmd.push_back(q_hmd.y);
+//        poseData.cur_hmd.push_back(q_hmd.z);
+//    }
+//
+//    //if (!poseData.controller_ids_found)
+//    //{
+//    //    int num_devices = 0; //TODO: temporary fix. may break later if using base stations
+//    //    for (int i = 0; i < 10; i++)
+//    //    {
+//    //        auto props = vr::VRProperties()->TrackedDeviceToPropertyContainer(i);
+//
+//    //        std::string modelNumber = vr::VRProperties()->GetStringProperty(props, vr::Prop_ModelNumber_String);
+//
+//    //        if (modelNumber != "")
+//    //        {
+//    //            num_devices += 1;
+//    //        }
+//    //    }
+//    //    if (prev_num_devices != num_devices)
+//    //    {
+//    //        for (int i = 0; i < 10; i++)
+//    //        {
+//    //            auto props = vr::VRProperties()->TrackedDeviceToPropertyContainer(i);
+//
+//    //            std::string modelNumber = vr::VRProperties()->GetStringProperty(props, vr::Prop_ModelNumber_String);
+//
+//    //            transform(modelNumber.begin(), modelNumber.end(), modelNumber.begin(), std::tolower); // make string lower case
+//
+//    //            if (modelNumber.find("left") != std::string::npos)
+//    //                left_controller_idx = i;
+//    //            if (modelNumber.find("right") != std::string::npos)
+//    //                right_controller_idx = i;
+//    //        }
+//
+//    //        if (left_controller_idx != -1 && right_controller_idx != -1)
+//    //            poseData.controller_ids_found = true;
+//
+//    //        prev_num_devices = num_devices;
+//    //    }
+//    //}
+//    //else
+//    //{
+//    //    if (left_controller_idx == 0 && right_controller_idx == 0)
+//    //    {
+//    //        Log("error: left_controller_idx == 0 or right_controller_idx == 0");
+//    //        return;
+//    //    }
+//
+//    //    //send controller data to posedata
+//    //    vr::HmdQuaternion_t q_left_controller = GetRotation(hmd_pose[left_controller_idx].mDeviceToAbsoluteTracking);
+//    //    vr::HmdVector3_t pos_left_controller = GetPosition(hmd_pose[left_controller_idx].mDeviceToAbsoluteTracking);
+//    //    poseData.cur_left_controller.clear();
+//    //    poseData.cur_left_controller.push_back(pos_left_controller.v[0]);
+//    //    poseData.cur_left_controller.push_back(pos_left_controller.v[1]);
+//    //    poseData.cur_left_controller.push_back(pos_left_controller.v[2]);
+//
+//    //    vr::HmdQuaternion_t q_right_controller = GetRotation(hmd_pose[right_controller_idx].mDeviceToAbsoluteTracking);
+//    //    vr::HmdVector3_t pos_right_controller = GetPosition(hmd_pose[right_controller_idx].mDeviceToAbsoluteTracking);
+//    //    poseData.cur_right_controller.clear();
+//    //    poseData.cur_right_controller.push_back(pos_right_controller.v[0]);
+//    //    poseData.cur_right_controller.push_back(pos_right_controller.v[1]);
+//    //    poseData.cur_right_controller.push_back(pos_right_controller.v[2]);
+//    //}
+//}
+
+//-----------------------------------------------------------------------------
+// Purpose: Calculates quaternion (qw,qx,qy,qz) representing the rotation
+// from: https://github.com/Omnifinity/OpenVR-Tracking-Example/blob/master/HTC%20Lighthouse%20Tracking%20Example/LighthouseTracking.cpp
+//-----------------------------------------------------------------------------
+
+//vr::HmdQuaternion_t ptscDriver::VRDriver::GetRotation(vr::HmdMatrix34_t matrix)
+//{
+//    vr::HmdQuaternion_t q;
+//
+//    q.w = sqrt(fmax(0, 1 + matrix.m[0][0] + matrix.m[1][1] + matrix.m[2][2])) / 2;
+//    q.x = sqrt(fmax(0, 1 + matrix.m[0][0] - matrix.m[1][1] - matrix.m[2][2])) / 2;
+//    q.y = sqrt(fmax(0, 1 - matrix.m[0][0] + matrix.m[1][1] - matrix.m[2][2])) / 2;
+//    q.z = sqrt(fmax(0, 1 - matrix.m[0][0] - matrix.m[1][1] + matrix.m[2][2])) / 2;
+//    q.x = copysign(q.x, matrix.m[2][1] - matrix.m[1][2]);
+//    q.y = copysign(q.y, matrix.m[0][2] - matrix.m[2][0]);
+//    q.z = copysign(q.z, matrix.m[1][0] - matrix.m[0][1]);
+//    return q;
+//}
+//-----------------------------------------------------------------------------
+// Purpose: Extracts position (x,y,z).
+// from: https://github.com/Omnifinity/OpenVR-Tracking-Example/blob/master/HTC%20Lighthouse%20Tracking%20Example/LighthouseTracking.cpp
+//-----------------------------------------------------------------------------
+
+vr::HmdVector3_t ptscDriver::VRDriver::GetPosition(vr::HmdMatrix34_t matrix)
+{
+    vr::HmdVector3_t vector;
+
+    vector.v[0] = matrix.m[0][3];
+    vector.v[1] = matrix.m[1][3];
+    vector.v[2] = matrix.m[2][3];
+
+    return vector;
 }
