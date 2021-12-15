@@ -8,7 +8,7 @@ import sys
 #8192 Json -> rest 0
 #8193-Ende Image
 class NamedPipe():
-    def __init__(self, pipe_name : str = r'\\.\pipe\ModulePipe') -> None:
+    def __init__(self, pipe_name : str = r'\\.\pipe\PTSCModulePipe') -> None:
         self.pipe_name = pipe_name
         self.handle = win32file.CreateFile(self.pipe_name, win32file.GENERIC_WRITE,
                         0, None, win32file.OPEN_EXISTING, win32file.FILE_ATTRIBUTE_NORMAL, None)
