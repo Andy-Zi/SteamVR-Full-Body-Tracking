@@ -1,6 +1,5 @@
 #from typing import dataclass
 import json
-from operator import pos
 import mediapipe as mp
 import numpy as np
 
@@ -9,8 +8,8 @@ class Positions:
     defaultPosition = [0, 0, 0]
     position_visible_threshold: float = 0.5
 
-    def __init__(self, outputfile: str = "../landmarks.txt", inputfile: str = "../keypoints.txt"):
-
+    def __init__(self, outputfile: str = "src/Modules/PoseClassifier/landmarks.txt", inputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/keypoints.txt"):
+        self.use_visibility_threshold = False # don't set values to 0 if not visible
         self.input_file = inputfile
         self.export_file = outputfile
         self.keys = self._read_point_names()
@@ -22,7 +21,7 @@ class Positions:
 
     def manage_points(self, results):
 
-        positions = self._calc_positions(results=results)
+        positions = self._load_positions(results=results)
         # print(f"{positions=}")
         if positions == []:
             return
@@ -31,10 +30,11 @@ class Positions:
         self._prepare_data(landmarks=landmarks)
         self.write_file()
 
-    def _calc_positions(self, results):
-
+    def _load_positions(self, results):
+        """ extracts the landmarks from the result"""
         positions = []
-
+        position = None
+        
         for ind, name in enumerate(self.keys):
 
             try:
@@ -66,7 +66,7 @@ class Positions:
         points = list()
         for i,position in enumerate(positions):
             if position:
-                if position.visibility < self.position_visible_threshold:
+                if self.use_visibility_threshold and position.visibility < self.position_visible_threshold:
                     points.append(self.defaultPosition)
                 else: points.append([position.x, position.y, position.z])#, self.dist(position,index=i)])
             else:
@@ -75,6 +75,7 @@ class Positions:
         return points
     
     def dist(self,position,index)->list:
+        """ calculate the distance of movement for each landmark"""
         if not self.previous_position:
             return 0
         p1 = np.array([position.x, position.y, position.z])
