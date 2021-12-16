@@ -2,22 +2,41 @@ from dataclasses import dataclass, asdict
 
 @dataclass
 class Positions:
-    LEFT_SOULDER    : list = None
-    RIGHT_SHOULDER  : list = None
-    LEFT_ELBOW      : list = None
-    RIGHT_ELBOW     : list = None
-    LEFT_WRIST      : list = None
-    RIGHT_WRIST     : list = None
-    LEFT_HIP        : list = None
-    RIGHT_HIP       : list = None
-    LEFT_KNEE       : list = None
-    RIGHT_KNEE      : list = None
-    LEFT_ANKLE      : list = None
-    RIGHT_ANKLE     : list = None
-    LEFT_HEEL       : list = None
-    RIGHT_HEEL      : list = None
-    LEFT_FOOT       : list = None
-    RIHT_FOOT       : list = None
+    NOSE            : list[float] = []
+    LEFT_EYE_INNER  : list[float] = []
+    LEFT_EYE        : list[float] = []
+    LEFT_EYE_OUTER  : list[float] = []
+    RIGHT_EYE_INNER : list[float] = []
+    RIGHT_EYE       : list[float] = []
+    RIGHT_EYE_OUTER : list[float] = []
+    LEFT_EAR        : list[float] = []
+    RIGHT_EAR       : list[float] = []
+    MOUTH_LEFT      : list[float] = []    
+    MOUTH_RIGHT     : list[float] = []
+    LEFT_SOULDER    : list[float] = []
+    RIGHT_SHOULDER  : list[float] = []
+    LEFT_ELBOW      : list[float] = []
+    RIGHT_ELBOW     : list[float] = []
+    LEFT_WRIST      : list[float] = []
+    RIGHT_WRIST     : list[float] = []
+    LEFT_PINKY      : list[float] = []
+    RIGHT_PINKY     : list[float] = []
+    LEFT_INDEX      : list[float] = []
+    RIGHT_INDEX     : list[float] = []
+    LEFT_THUMB      : list[float] = []
+    RIGHT_THUMB     : list[float] = []
+    LEFT_HIP        : list[float] = []
+    RIGHT_HIP       : list[float] = []
+    LEFT_KNEE       : list[float] = []
+    RIGHT_KNEE      : list[float] = []
+    LEFT_ANKLE      : list[float] = []
+    RIGHT_ANKLE     : list[float] = []
+    LEFT_HEEL       : list[float] = []
+    RIGHT_HEEL      : list[float] = []
+    LEFT_FOOT       : list[float] = []
+    RIHT_FOOT       : list[float] = []
+    LEFT_FOOT_INDEX : list[float] = []
+    RIGHT_FOOT_INDEX: list[float] = []
 
     def serialize(self):
         return asdict(self)
