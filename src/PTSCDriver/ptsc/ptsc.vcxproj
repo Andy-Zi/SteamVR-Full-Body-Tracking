@@ -153,7 +153,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="pipe.cpp" />
+    <ClCompile Include="src\Driver\PoseData.cpp" />
     <ClCompile Include="src\Driver\ControllerDevice.cpp" />
     <ClCompile Include="src\Driver\HMDDevice.cpp" />
     <ClCompile Include="src\Driver\TrackerDevice.cpp" />
@@ -162,7 +162,7 @@
     <ClCompile Include="src\Native\DriverFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pipe.h" />
+    <ClInclude Include="src\Driver\PoseData.hpp" />
     <ClInclude Include="src\Driver\ControllerDevice.hpp" />
     <ClInclude Include="src\Driver\DeviceType.hpp" />
     <ClInclude Include="src\Driver\HMDDevice.hpp" />

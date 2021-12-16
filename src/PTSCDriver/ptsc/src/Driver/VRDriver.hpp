@@ -9,6 +9,8 @@
 #include <Driver/IVRDevice.hpp>
 #include <Driver/TrackerDevice.hpp>
 
+#include "PoseData.hpp"
+
 namespace ptscDriver {
     class VRDriver : public IVRDriver {
     public:
@@ -42,9 +44,27 @@ namespace ptscDriver {
         std::chrono::system_clock::time_point last_frame_time_ = std::chrono::system_clock::now();
         std::string settings_key_ = "driver_ptsc";
 
+
+        // PoseVR methods
+        void PipeThread();  //creates multithreaded named pipe to communicate with PoseVR python application
+        std::vector<std::shared_ptr<TrackerDevice>> trackers_;
+        /*vr::HmdQuaternion_t GetRotation(vr::HmdMatrix34_t matrix);*/
+        vr::HmdVector3_t GetPosition(vr::HmdMatrix34_t matrix);
+        /*void GetCurHMDControllersPose();*/
+
+
+        // PoseVR variables
+        PoseData poseData = PoseData();
         HANDLE pipe;
         bool pipe_connected = true;
+    //    bool tested = false; //only for debugging
+    //    int prev_num_devices = 0;
+    //    int left_controller_idx = -1;
+    //    int right_controller_idx = -1;
 
-        void PipeThread();
+
+    //    double jump_threshold = 0.1;
+    //    double sit_threshold = 0.2;
+    //    double sit_foot_depth_multiplier = 0.4;
     };
 };

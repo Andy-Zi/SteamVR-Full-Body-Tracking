@@ -33,7 +33,7 @@
     <ClCompile Include="src\Driver\VRDriver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="pipe.cpp">
+    <ClCompile Include="src\Driver\PoseData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,7 +65,7 @@
     <ClInclude Include="src\Driver\VRDriver.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pipe.h">
+    <ClInclude Include="src\Driver\PoseData.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
