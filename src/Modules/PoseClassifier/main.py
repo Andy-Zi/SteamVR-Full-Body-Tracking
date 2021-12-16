@@ -23,7 +23,7 @@ def run_media_pipeline():
     
     output = parsed_options["commandline-output"]
     default_value = parsed_options["default-position-value"]
-    
+    pipe = NamedPipe()
     classifier = parsed_options["classifier"](default_value=default_value,options=None)
     
     # get video stream
@@ -44,7 +44,7 @@ def run_media_pipeline():
         results = classifier.classify_image(image, image_id=str(count))
         if results is not None:   
             positions = Positions({key.upper():value for key,value in results.items()})
-            
+            #print(results)
             pipe.SendPositions(positions,image)
             if output:
                 print(positions)
@@ -57,11 +57,11 @@ def parse_options():
     #args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
     parsed_options:dict[str,any] = {"default-position-value":False,"commandline-output":False,"classifier":PoseMP}
     
-    if "-default-position-value" in opts:
+    if "-dv" in opts:
         parsed_options["default-position-value"] = True
-    elif "-commandline-output" in opts:
+    elif "-o" in opts:
         parsed_options["commandline-output"] = True
-    elif "-mediapipe" in opts:
+    elif "-mp" in opts:
         parsed_options["classifier"] = PoseMP  
 
     return parsed_options
