@@ -8,7 +8,7 @@ class Positions:
     defaultPosition: list[float] = [.0, .0, .0]
     position_visible_threshold: float = 0.5
 
-    def __init__(self, outputfile: str = "src/Modules/PoseClassifier/landmarks.txt", inputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/keypoints.txt"):
+    def __init__(self, outputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/landmarks.txt", inputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/keypoints.txt"):
         # settings
         self.use_visibility_threshold = False  # don't set values to 0 if not visible
         self.input_file = inputfile
@@ -17,7 +17,7 @@ class Positions:
 
         # helping vars
         self.not_visible_names: list[str] = []
-        self.points: dict[str, list[str]] = {key: [] for key in self.keys}
+        self.points: dict[str, list[float]] = {key: [] for key in self.keys}
         self.num_landmarks = len(self.keys)
 
         self.previous_positions: list[list[float]] = []
@@ -31,7 +31,7 @@ class Positions:
         if positions == []:
             return
         landmarks = self._calc_landmarks(positions=positions)
-
+        
         self._prepare_data(landmarks=landmarks)
         self.write_file()
 
@@ -39,9 +39,11 @@ class Positions:
         """ extracts the landmarks from the result"""
         positions: list[list[float]] = []
         position: list[float] = []
-
+        #PoseLandmarks = [str(x).split(".")[1].lower() for x in self.mp_pose.PoseLandmark]
+        #print(f"{PoseLandmarks}")
         for ind, name in enumerate(self.keys):
-
+            
+            
             try:
                 position = results.pose_world_landmarks.landmark[self.mp_pose.PoseLandmark[name.upper(
                 )]]
@@ -56,6 +58,7 @@ class Positions:
 
         assert len(positions) == len(self.keys)
         #self.previous_positions = self.current
+        
         return positions
 
     def _set_name_warning(self, name: str):
@@ -78,10 +81,10 @@ class Positions:
         for i, position in enumerate(positions):
             if position:
                 if self.use_visibility_threshold and position.visibility < self.position_visible_threshold:
-                    landmarks.extend(self.defaultPosition)
+                    landmarks.append(self.defaultPosition)
                 else:
                     # , self.dist(position,index=i)])
-                    landmarks.extend([position.x, position.y, position.z])
+                    landmarks.append([position.x, position.y, position.z])
             else:
                 continue
         self.previous_position = landmarks
@@ -98,11 +101,11 @@ class Positions:
 
         return dist
 
-    def _prepare_data(self, landmarks: list[float]):
+    def _prepare_data(self, landmarks: list[list[float]]):
         """fills in points for keys
 
         Args:
-            landmarks ([list]): [list of points: x,y,z]
+            landmarks (list[float]): [list of points: x,y,z]
         """
         for ind, key in enumerate(self.keys):
             if landmarks:
