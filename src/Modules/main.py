@@ -1,18 +1,19 @@
 
 import cv2
-from MediaPipe.classifier.pose import PoseMP
+from PoseClassifier.MediaPipe.classifier.pose import PoseMP
 import sys
 import os
+from dataclasses import fields
 from inspect import getsourcefile
 
 current_path = os.path.abspath(getsourcefile(lambda:0))
 current_dir = os.path.dirname(current_path)
 parent_dir = current_dir[:current_dir.rfind(os.path.sep)]
-
+print(f"{sys.path=}\n and appended {parent_dir}")
 sys.path.insert(0, parent_dir)
 
 from ModulePipe.positions_dataclass import Positions
-from ModulePipe.pipe_client import NamedPipe
+#from ModulePipe.pipe_client import NamedPipe
 
 
 
@@ -23,8 +24,10 @@ def run_media_pipeline():
     
     output = parsed_options["commandline-output"]
     default_value = parsed_options["default-position-value"]
-    pipe = NamedPipe()
-    classifier = parsed_options["classifier"](default_value=default_value,options=None)
+    #pipe = NamedPipe()
+    keypoints = [field.name for field in fields(Positions)]
+    print(keypoints)
+    classifier = parsed_options["classifier"](default_value=default_value,options=None,keypoints=keypoints)
     
     # get video stream
     count = 0
@@ -43,11 +46,11 @@ def run_media_pipeline():
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         results = classifier.classify_image(image, image_id=str(count))
         if results is not None:   
-            positions = Positions({key.upper():value for key,value in results.items()})
+            #positions = Positions({key.upper():value for key,value in results.items()})
             #print(results)
-            pipe.SendPositions(positions,image)
+            #pipe.SendPositions(positions,image)
             if output:
-                print(positions)
+                print(results)
             
         
     
