@@ -21,6 +21,8 @@ class PositionHandler:
     def __init__(self, ignore_hidden_points: Optional[bool] = False, outputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/landmarks.txt", inputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/keypoints.txt"):
         # settings
         self.use_visibility_threshold = ignore_hidden_points
+        if self.use_visibility_threshold:
+            print("set small values to 0")
         self.input_file = inputfile
         self.export_file = outputfile
 
@@ -65,10 +67,6 @@ class PositionHandler:
             return
         
         for key, value in landmarks.items():
-            print(f"{key=}\t{value=}")
-            if not self.positions:
-                print("Key not in positions, continuing ...")
-                break
             if value:
                 if self.use_visibility_threshold and value.visibility < self.position_visible_threshold:
                     self.positions[key] = self.defaultPosition
