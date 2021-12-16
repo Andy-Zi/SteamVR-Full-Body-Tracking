@@ -1,14 +1,14 @@
 import mediapipe as mp
 import cv2
-from MediaPipe.utils_mp.positions import Positions
+from ..utils_mp.positions import PositionHandler
 import numpy as np
-from typing import Union,Optional
+from typing import Union, Optional
 
 
 class PoseMP:
 
     def __init__(self, default_value:bool = False, options: Optional[dict[str,Union[str,float,bool]]] = None):
-        self.points = Positions(ignore_hidden_points=default_value)
+        self.points = PositionHandler(ignore_hidden_points=default_value)
 
         if options is not None:
             estimator_options = options
