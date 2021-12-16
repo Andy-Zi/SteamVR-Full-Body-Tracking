@@ -32,8 +32,8 @@ def plot_landmarks(x,y,z,names):
     
     
 def main():
-    
-    x,y,z,names = read_file("/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/PoseClassifier/src/landmarks.txt")
+    file ="/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/landmarks.txt"
+    x,y,z,names = read_file(file)
     plot_landmarks(x,y,z,names)
     str = [f"{name}: {xi},{yi},{zi}" for xi,yi,zi,name in zip(x,y,z,names)]
     print("\n".join(str))

@@ -1,4 +1,4 @@
-#from typing import dataclass
+from typing import Optional
 import json
 import mediapipe as mp
 import numpy as np
@@ -8,9 +8,9 @@ class Positions:
     defaultPosition: list[float] = [.0, .0, .0]
     position_visible_threshold: float = 0.5
 
-    def __init__(self, outputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/landmarks.txt", inputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/keypoints.txt"):
+    def __init__(self, ignore_hidden_points:Optional[bool]=False, outputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/landmarks.txt", inputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/keypoints.txt"):
         # settings
-        self.use_visibility_threshold = False  # don't set values to 0 if not visible
+        self.use_visibility_threshold = ignore_hidden_points   
         self.input_file = inputfile
         self.export_file = outputfile
         self.keys = self._read_point_names()
@@ -24,7 +24,8 @@ class Positions:
         self.mp_pose = mp.solutions.pose
         self.current_positions: list[str] = []
 
-    def manage_points(self, results):
+    def manage_points(self, results)-> dict[str, list[float]]:
+        """loads keypoint names from keypoints.txt and fills them with values"""
 
         positions = self._load_positions(results=results)
 
@@ -33,7 +34,9 @@ class Positions:
         landmarks = self._calc_landmarks(positions=positions)
         
         self._prepare_data(landmarks=landmarks)
-        self.write_file()
+        
+        return self.points
+        # self.write_file()
 
     def _load_positions(self, results):
         """ extracts the landmarks from the result"""
@@ -42,8 +45,6 @@ class Positions:
         #PoseLandmarks = [str(x).split(".")[1].lower() for x in self.mp_pose.PoseLandmark]
         #print(f"{PoseLandmarks}")
         for ind, name in enumerate(self.keys):
-            
-            
             try:
                 position = results.pose_world_landmarks.landmark[self.mp_pose.PoseLandmark[name.upper(
                 )]]
@@ -57,7 +58,6 @@ class Positions:
                 positions.append(position)
 
         assert len(positions) == len(self.keys)
-        #self.previous_positions = self.current
         
         return positions
 
@@ -77,7 +77,7 @@ class Positions:
         # position.visibility<self.position_visibility_threshold setzt einen default wert
         if not positions:
             return
-        landmarks: list[float] = []
+        landmarks: list[list[float]] = []
         for i, position in enumerate(positions):
             if position:
                 if self.use_visibility_threshold and position.visibility < self.position_visible_threshold:
@@ -90,18 +90,9 @@ class Positions:
         self.previous_position = landmarks
         return landmarks
 
-    def dist(self, position: list[float], index: int) -> float:
-        """ calculate the distance of movement for each landmark"""
-        if not self.previous_position:
-            return 0
-        p1 = np.array([position.x, position.y, position.z])
-        p2 = np.array([self.previous_positions[index][:3]])
 
-        dist = np.linalg.norm(p1 - p2)
 
-        return dist
-
-    def _prepare_data(self, landmarks: list[list[float]]):
+    def _prepare_data(self, landmarks: list[list[float]]) -> dict[str,Optional[list[float]]]:
         """fills in points for keys
 
         Args:
@@ -109,7 +100,6 @@ class Positions:
         """
         for ind, key in enumerate(self.keys):
             if landmarks:
-                # print(ind,key)
                 self.points[key] = landmarks[ind]
 
     def write_file(self):
