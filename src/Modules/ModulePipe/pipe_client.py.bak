@@ -2,7 +2,7 @@ import win32file, json
 import cv2
 import numpy as np
 from win32pipe import error
-from ModulePipe.positions_dataclass import Positions
+from positions_dataclass import Positions
 import sys
 
 #8192 Json -> rest 0
