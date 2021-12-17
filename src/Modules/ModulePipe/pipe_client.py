@@ -48,7 +48,7 @@ if __name__ == "__main__":
     sys.stdout.flush()
     pipe = NamedPipe()
     while True:
-        pipe.SendPositions(Positions(LEFT_ANKLE=[1,3,4], RIGHT_ANKLE=[8,5,4]),img)
+        pipe.SendPositions(Positions(LEFT_ANKLE=[1,3,4], RIGHT_ANKLE=[8,5,4], LEFT_HIP=[-2,-1,-1], RIGHT_HIP=[1,2,3]),img)
 
 """
 {

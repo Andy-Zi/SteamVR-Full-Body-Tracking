@@ -7,7 +7,7 @@ from ModulePipe.positions_dataclass import Positions
 #8192 Json -> rest 0
 #8193-Ende Image
 class NamedPipe():
-    def __init__(self, pipe_name : str = r'\\.\pipe\ModulePipe') -> None:
+    def __init__(self, pipe_name : str = r'\\.\pipe\PTSCModulePipe') -> None:
         self.pipe_name = pipe_name
         self.handle = win32file.CreateFile(self.pipe_name, win32file.GENERIC_WRITE,
                         0, None, win32file.OPEN_EXISTING, win32file.FILE_ATTRIBUTE_NORMAL, None)
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     img = cv2.imread('No-Signal-TV.jpg')
     pipe = NamedPipe()
     while True:
-        pipe.SendPositions(Positions(LEFT_ANKLE=[1,3,4], RIGHT_ANKLE=[8,5,4]),img)
+        pipe.SendPositions(Positions(LEFT_ANKLE=[1,3,4], RIGHT_ANKLE=[8,5,4], LEFT_HIP=[0,0,0], RIGHT_HIP=[1,2,3]),img)
 
 """
 {

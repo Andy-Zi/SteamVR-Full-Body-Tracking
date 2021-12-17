@@ -10,37 +10,43 @@ namespace PTSC.Communication.Controller
     public class DataController
     {
         [Dependency] public ILogger Logger { get; set; }
+        public string seperator = ";";
 
-        public string SerializeDriverData(object obj)
+        public string SerializeDriverData(IDriverDataModel driverData)
         {
             string serialOutput = string.Empty;
-            IList<PropertyInfo> props = new List<PropertyInfo>(obj.GetType().GetProperties()); // list of object properties
 
-            foreach (var prop in props)
+            // add x, y, z coordinates after keyword
+            serialOutput += SerializeProperty("head", driverData.head);
+            serialOutput += SerializeProperty("waist", driverData.waist);
+            serialOutput += SerializeProperty("left_foot", driverData.left_foot);
+            serialOutput += SerializeProperty("right_foot", driverData.right_foot);
+            return serialOutput;
+        }
+
+        public string SerializeProperty(string keyWord, List<double> coordinates)
+        {
+            string serializedProperty = string.Empty;
+            // add coordinate values to serialized string if they are not null
+            if (coordinates != null)
             {
-                // check if property is of enumerable type
-                if (prop.PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(prop.PropertyType))
+                serializedProperty = keyWord + seperator;
+                foreach (var coord in coordinates)
                 {
-                    IList values = prop.GetValue(obj, null) as IList;
-                    serialOutput += prop.Name + ";";
-                    foreach (var val in values)
-                    {
-                        serialOutput += val.ToString() + ";";
-                    }
-                }
-                else
-                {
-                    serialOutput += prop.Name + ";";
-                    serialOutput += prop.GetValue(obj, null).ToString() + ";";
+                    serializedProperty += coord.ToString() + seperator;
+
                 }
             }
-            Logger.Log("Serialized data: " + serialOutput);
-            return serialOutput;
+            return serializedProperty;
         }
 
         public ModuleDataModel DeserializeModuleData(string jsonString)
         {
-            return JsonSerializer.Deserialize<ModuleDataModel>(jsonString);
+            if (jsonString != string.Empty)
+            {
+                return JsonSerializer.Deserialize<ModuleDataModel>(jsonString.Replace("\0", string.Empty));
+            }
+            return null;
         }
     }
 }

@@ -15,13 +15,9 @@ namespace PTSC.Ui.Controller
     {
         [Dependency] public ILogger Logger { get; set; }
         //Lazy Dependency Injection
-        [Dependency] public Lazy<PipeClientController> PipeClient { get; set; }
-
-
-
-        [Dependency] public Lazy<PipeServerController> PipeServer { get; set; }
+        [Dependency] public Lazy<DriverPipeServerController> DriverPipeServer { get; set; }
+        [Dependency] public Lazy<ModulePipeServerController> ModulePipeServer { get; set; }
         [Dependency] public Lazy<ProcessingPipeline> ProcessingPipeline { get; set; }
-        [Dependency] public Lazy<PipeClientController> PipeClientController { get; set; }
         [Dependency] public Lazy<ModuleWrapper> ModuleWrapper { get; set; }
         [Dependency] public ModuleRepository ModuleRepository { get; set; }
 
@@ -42,11 +38,11 @@ namespace PTSC.Ui.Controller
         public override BaseController<MainModel, MainView> Initialize()
         {
             BindData();
-            PipeServer.Value.FPSLimit = 30;
-            PipeServer.Value.RetrieveImage = true;
-            PipeServer.Value.Start();
+            ModulePipeServer.Value.FPSLimit = 30;
+            ModulePipeServer.Value.RetrieveImage = true;
+            ModulePipeServer.Value.Start();
             ProcessingPipeline.Value.Start();
-            PipeClientController.Value.Start();
+            DriverPipeServer.Value.Start();
             Subscribe();
             return base.Initialize();
         }
@@ -95,9 +91,9 @@ namespace PTSC.Ui.Controller
 
         public override void Dispose()
         {
-            PipeServer.Value.Stop();
+            ModulePipeServer.Value.Stop();
             ProcessingPipeline.Value.Stop();
-            PipeClientController.Value.Stop();
+            DriverPipeServer.Value.Stop();
             base.Dispose();
         }
 
@@ -112,7 +108,7 @@ namespace PTSC.Ui.Controller
             //Disable Image-Processing if the Module doesnt support it 
             if(ModuleWrapper.Value.CurrentDetectionModule != null)
             {
-                PipeServer.Value.RetrieveImage = ModuleWrapper.Value.CurrentDetectionModule.SupportsImage;
+                ModulePipeServer.Value.RetrieveImage = ModuleWrapper.Value.CurrentDetectionModule.SupportsImage;
             }
         }
 

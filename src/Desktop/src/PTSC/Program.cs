@@ -46,8 +46,8 @@ namespace PTSC
             container.RegisterType<MainController, MainController>();
 
 
-            container.RegisterType<PipeClientController, PipeClientController>(new ContainerControlledLifetimeManager());
-            container.RegisterType<PipeClientController, PipeClientController>(new ContainerControlledLifetimeManager());
+            container.RegisterType<DriverPipeServerController, DriverPipeServerController>(new ContainerControlledLifetimeManager());
+            container.RegisterType<DriverPipeServerController, DriverPipeServerController>(new ContainerControlledLifetimeManager());
             container.RegisterType<ProcessingPipeline, ProcessingPipeline>(new ContainerControlledLifetimeManager());
             container.RegisterType<ModuleWrapper, ModuleWrapper>(new ContainerControlledLifetimeManager());
             
