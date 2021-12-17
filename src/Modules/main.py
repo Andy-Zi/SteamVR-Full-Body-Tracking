@@ -43,7 +43,7 @@ def parse_options():
     opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
     #args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
     parsed_options: dict[str, Union[bool,Callable]] = {
-        "default-position-value": False, "commandline-output": False, "classifier": None}
+        "default-position-value": False, "commandline-output": False, "classifier": PoseMP}
 
     if "-dv" in opts:
         parsed_options["default-position-value"] = True
@@ -51,8 +51,8 @@ def parse_options():
         parsed_options["commandline-output"] = True
     if "-mp" in opts:
         parsed_options["classifier"] = PoseMP
-    else:
-        raise ValueError("Select a classifier (e.g. '-mp')")
+    #else:
+        #raise ValueError("Select a classifier (e.g. '-mp')")
 
     return parsed_options
 
