@@ -3,7 +3,7 @@ import cv2
 from PoseClassifier.MediaPipe.classifier.pose import PoseMP
 import sys
 from typing import Union,Callable
-from ModulePipe.pipe_client import NamedPipe
+#from ModulePipe.pipe_client import NamedPipe
 
 
 def run_media_pipeline():
@@ -13,7 +13,7 @@ def run_media_pipeline():
 
     output = parsed_options["commandline-output"]
     default_value = parsed_options["default-position-value"]
-    pipe = NamedPipe()
+    #pipe = NamedPipe()
 
     classifier = parsed_options["classifier"](
         default_value=default_value, options=None)
@@ -33,9 +33,12 @@ def run_media_pipeline():
         image.flags.writeable = False
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         results = classifier.classify_image(image, image_id=str(count))
-        if results is not None:
-            pipe.SendPositions(results, image)
-            if output:
+        
+        if results is not None and image is not None:
+            #pipe.SendPositions(results, image)
+            
+            #print results every 2 seconds
+            if output and (count%40) == 0:
                 print(results)
 
 
