@@ -64,12 +64,39 @@ namespace PTSC.Pipeline
 
         async Task<IDriverDataModel> ProcessData(DataRecievedPayload payload)
         {
-            //TODO Filter and Convert Data;
             return await Task.Run(() =>
             {
                 var moduledata = payload.ModuleDataModel;
-                return new DriverDataModel();
+                moduledata = FilterData(moduledata);
+                return MapData(moduledata);
             });
+        }
+
+        private IDriverDataModel MapData(IModuleDataModel moduledata)
+        {
+            List<double> zeroList = new List<double> { 0.0f, 0.0f, 0.0f };
+            DriverDataModel driverData = new DriverDataModel();
+            // set nose as head for driver
+            driverData.head = moduledata.NOSE ?? zeroList;
+            // set center point of hips as the waist point fro driver
+            driverData.waist = CalculateCenter3D(moduledata.LEFT_HIP ?? zeroList, moduledata.RIGHT_HIP ?? zeroList);
+            // set ancles as foots for driver
+            driverData.left_foot = moduledata.LEFT_ANKLE ?? zeroList;
+            driverData.right_foot = moduledata.RIGHT_ANKLE ?? zeroList;
+            return driverData;
+        }
+
+        private IModuleDataModel FilterData(IModuleDataModel moduledata)
+        {
+            return moduledata;
+        }
+
+        private static List<double> CalculateCenter3D(List<double> point1, List<double> point2)
+        {
+            var x_new = (point1[0] + point2[0]) / 2;
+            var y_new = (point1[1] + point2[1]) / 2;
+            var z_new = (point1[2] + point2[2]) / 2;
+            return new List<double> { x_new, y_new, z_new };
         }
     }
 }
