@@ -14,7 +14,7 @@ class NamedPipe():
                         0, None, win32file.OPEN_EXISTING, win32file.FILE_ATTRIBUTE_NORMAL, None)
 
     def __del__(self):
-        if hasattr(self, 'handle'):
+        if self.handle:
             win32file.CloseHandle(self.handle)
 
     def SendPositions(self, positions: Positions, image: np.ndarray = None):
