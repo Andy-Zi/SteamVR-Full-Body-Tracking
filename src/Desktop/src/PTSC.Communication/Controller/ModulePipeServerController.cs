@@ -7,6 +7,7 @@ using PTSC.PubSub;
 using System.Diagnostics;
 using System.IO.Pipes;
 using System.Text;
+using System.Text.Json;
 using Unity;
 
 namespace PTSC.Communication.Controller
@@ -14,7 +15,7 @@ namespace PTSC.Communication.Controller
     /// <summary>
     /// Hosts the pipe-server that accepts the connections from the Detection-Modules
     /// </summary>
-    public class PipeServerController
+    public class ModulePipeServerController
     {
         [Dependency] public ILogger Logger { get; set; }
         [Dependency] public DataController DataController { get; set; }
@@ -95,8 +96,10 @@ namespace PTSC.Communication.Controller
                     }
 
                     var jsondata = message[..ModulePipeDataModel.JsonBufferSize];
-                    moduleDataModel = HandleJsonData(jsondata);
 
+                    moduleDataModel = HandleJsonData(jsondata);
+                    //Logger.Log(JsonSerializer.Serialize(moduleDataModel.LEFT_ANKLE));
+                    //Logger.Log(JsonSerializer.Serialize(moduleDataModel.RIGHT_ANKLE));
                     //Dispatch Processing to different Thread
                     dataRecievedEvent.Publish(new DataRecievedPayload(moduleDataModel, image));
                 }
@@ -122,8 +125,7 @@ namespace PTSC.Communication.Controller
         {
 
             string receivedData = Encoding.UTF8.GetString(jsonData);
-            //TODO Deserialize
-            return new ModuleDataModel();
+            return DataController.DeserializeModuleData(receivedData);
         }
         protected Mat HandleImageData(Span<byte> imageData)
         {
