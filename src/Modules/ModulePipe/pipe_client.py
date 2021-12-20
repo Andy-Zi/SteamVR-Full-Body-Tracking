@@ -2,7 +2,7 @@ import win32file, json
 import cv2
 import numpy as np
 from win32pipe import error
-from positions_dataclass import Positions
+from ModulePipe.positions_dataclass import Positions
 import sys
 
 #8192 Json -> rest 0
@@ -14,7 +14,7 @@ class NamedPipe():
                         0, None, win32file.OPEN_EXISTING, win32file.FILE_ATTRIBUTE_NORMAL, None)
 
     def __del__(self):
-        if self.handle:
+        if hasattr(self, 'handle'):
             win32file.CloseHandle(self.handle)
 
     def SendPositions(self, positions: Positions, image: np.ndarray = None):
