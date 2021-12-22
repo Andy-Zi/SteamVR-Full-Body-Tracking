@@ -57,6 +57,9 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PTSC.Interfaces\PTSC.Interfaces.csproj" />
+  </ItemGroup>
   <!--<ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="4.6.0-preview.19073.11" />
     <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />

@@ -56,11 +56,19 @@ namespace PTSC.Pipeline
         {
             //TODO Paint skeleton on Image + Flip and Resize Image
             return await Task.Run(() => {
-                var moduledata = payload.ModuleDataModel;
-                var img = payload.Image;
-                var bitmap = OpenCVService.Mat2Bitmap(img);
-                img.Dispose();
-                return bitmap;
+                try
+                {
+                    var moduledata = payload.ModuleDataModel;
+                    var img = payload.Image;
+                    var bitmap = OpenCVService.Mat2Bitmap(img);
+                    img.Dispose();
+                    return bitmap;
+                }
+                catch
+                {
+                    return default;
+                }
+
                 }
             );
         }
