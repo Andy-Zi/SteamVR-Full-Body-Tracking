@@ -61,4 +61,6 @@ def parse_options():
 
 
 if __name__ == "__main__":
+    #TODO  landmarks overlay picture
+    # Head as 0,0,0
     run_media_pipeline()
