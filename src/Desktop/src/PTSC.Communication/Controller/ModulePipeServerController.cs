@@ -7,7 +7,6 @@ using PTSC.PubSub;
 using System.Diagnostics;
 using System.IO.Pipes;
 using System.Text;
-using System.Text.Json;
 using Unity;
 
 namespace PTSC.Communication.Controller
@@ -30,7 +29,18 @@ namespace PTSC.Communication.Controller
         /// <summary>
         /// Not retrieving an image saves a lot of CPU-Resources.
         /// </summary>
-        public bool RetrieveImage { get; set; } = true;
+        /// 
+        
+        public bool RetrieveImage {
+            get => retrieveImage;
+            set {
+                retrieveImage = value;
+                if (!retrieveImage)
+                    image = null;
+            } 
+        } 
+
+        bool retrieveImage = true;
 
         private int fpsLimit = -1;
 
@@ -71,6 +81,7 @@ namespace PTSC.Communication.Controller
             Task.Run(ServerFunction, CancellationToken);
         }
 
+        Mat image = null;
         protected void ServerFunction()
         {
             //Wait for a Client
@@ -78,7 +89,7 @@ namespace PTSC.Communication.Controller
             var message = new Span<byte>(new byte[ModulePipeDataModel.BufferSize]);
             Stopwatch stopwatch = new Stopwatch();
             IModuleDataModel moduleDataModel = null;
-            Mat image = null;
+            
             while (server.IsConnected)
             {
                 if (shouldLimit)
@@ -98,8 +109,7 @@ namespace PTSC.Communication.Controller
                     var jsondata = message[..ModulePipeDataModel.JsonBufferSize];
 
                     moduleDataModel = HandleJsonData(jsondata);
-                    //Logger.Log(JsonSerializer.Serialize(moduleDataModel.LEFT_ANKLE));
-                    //Logger.Log(JsonSerializer.Serialize(moduleDataModel.RIGHT_ANKLE));
+
                     //Dispatch Processing to different Thread
                     dataRecievedEvent.Publish(new DataRecievedPayload(moduleDataModel, image));
                 }

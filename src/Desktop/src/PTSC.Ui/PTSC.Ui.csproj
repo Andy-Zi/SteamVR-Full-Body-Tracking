@@ -20,6 +20,7 @@
     <ProjectReference Include="..\PTSC.Interfaces\PTSC.Interfaces.csproj" />
     <ProjectReference Include="..\PTSC.Nameservice\PTSC.Nameservice.csproj" />
     <ProjectReference Include="..\PTSC.Pipeline\PTSC.Pipeline.csproj" />
+    <ProjectReference Include="..\System.Windows.Forms.DataVisualization\ChartWin.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -14,6 +14,7 @@
     <ProjectReference Include="..\PTSC.Interfaces\PTSC.Interfaces.csproj" />
     <ProjectReference Include="..\PTSC.OpenCV\PTSC.OpenCV.csproj" />
     <ProjectReference Include="..\PTSC.PubSub\PTSC.PubSub.csproj" />
+    <ProjectReference Include="..\System.Windows.Forms.DataVisualization\ChartWin.csproj" />
   </ItemGroup>
 
 </Project>

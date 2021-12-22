@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PTSC.Pipeline", "src\PTSC.P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PTSC.Modules", "src\PTSC.Modules\PTSC.Modules.csproj", "{E9AB78CE-3C6F-415E-B6B7-6F1C5C4432EF}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChartWin", "src\System.Windows.Forms.DataVisualization\ChartWin.csproj", "{A6026062-3E99-4CB3-88D3-0DE96E409661}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{E9AB78CE-3C6F-415E-B6B7-6F1C5C4432EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E9AB78CE-3C6F-415E-B6B7-6F1C5C4432EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E9AB78CE-3C6F-415E-B6B7-6F1C5C4432EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6026062-3E99-4CB3-88D3-0DE96E409661}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6026062-3E99-4CB3-88D3-0DE96E409661}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6026062-3E99-4CB3-88D3-0DE96E409661}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6026062-3E99-4CB3-88D3-0DE96E409661}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

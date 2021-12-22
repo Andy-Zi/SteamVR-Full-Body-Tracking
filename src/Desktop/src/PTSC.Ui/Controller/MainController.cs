@@ -8,6 +8,7 @@ using Prism.Events;
 using PTSC.PubSub;
 using PTSC.Modules;
 using System.ComponentModel;
+using ChartWin;
 
 namespace PTSC.Ui.Controller
 {
@@ -22,7 +23,12 @@ namespace PTSC.Ui.Controller
         [Dependency] public ModuleRepository ModuleRepository { get; set; }
 
 
+
+        List<SubscriptionToken> SubscriptionTokens = new();
         public IEventAggregator EventAggregator { get; set; }
+
+        bool shouldPlot3DGraph = false;
+
         public MainController(MainView view) : base(view)
         {
 
@@ -37,6 +43,7 @@ namespace PTSC.Ui.Controller
         }
         public override BaseController<MainModel, MainView> Initialize()
         {
+
             BindData();
             ModulePipeServer.Value.FPSLimit = 30;
             ModulePipeServer.Value.RetrieveImage = true;
@@ -49,9 +56,34 @@ namespace PTSC.Ui.Controller
 
         private void Subscribe()
         {
-            EventAggregator.GetEvent<ImageProcessedEvent>().Subscribe(DisplayImage, ThreadOption.UIThread, false);
+            SubscriptionTokens.Add(EventAggregator.GetEvent<ImageProcessedEvent>().Subscribe(DisplayImage, ThreadOption.UIThread, false));
+            SubscriptionTokens.Add(EventAggregator.GetEvent<ModuleDataProcessedEvent>().Subscribe(Plot3DGraph, ThreadOption.UIThread, false));
             ModuleWrapper.Value.OnError += ModuleWrapper_OnMessage;
             ModuleWrapper.Value.OnMessage += ModuleWrapper_OnMessage;
+            this.View.tabControlModuleView.Selected += TabControlModuleView_TabIndexChanged;
+        }
+
+        private void TabControlModuleView_TabIndexChanged(object sender, EventArgs e)
+        {
+            if(this.View.tabControlModuleView.SelectedTab.Text == "Module Output")
+            {
+                shouldPlot3DGraph = false;
+                ModulePipeServer.Value.RetrieveImage = ModuleWrapper.Value.CurrentDetectionModule?.SupportsImage ?? true;
+            }
+            else
+            {
+                //Skeleton Page
+                shouldPlot3DGraph = true;
+                ModulePipeServer.Value.RetrieveImage = false;
+            }
+        }
+
+        private void Plot3DGraph(ModuleDataProcessedPayload obj)
+        {
+            if (shouldPlot3DGraph)
+            {
+                this.View.Graph3D.Plot(obj.ModuleDataModel);
+            }
         }
 
         private void ModuleWrapper_OnMessage(string message)
@@ -91,9 +123,13 @@ namespace PTSC.Ui.Controller
 
         public override void Dispose()
         {
+            foreach(var token in SubscriptionTokens)
+                token.Dispose();
             ModulePipeServer.Value.Stop();
             ProcessingPipeline.Value.Stop();
             DriverPipeServer.Value.Stop();
+
+            Task.Delay(50).Wait();
             base.Dispose();
         }
 

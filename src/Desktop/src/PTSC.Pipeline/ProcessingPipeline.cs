@@ -1,4 +1,5 @@
-﻿using Prism.Events;
+﻿using OpenCvSharp;
+using Prism.Events;
 using PTSC.Communication.Model;
 using PTSC.Interfaces;
 using PTSC.OpenCV;
@@ -23,12 +24,13 @@ namespace PTSC.Pipeline
         protected SubscriptionToken SubscriptionToken;
         protected ImageProcessedEvent ImageProcessedEvent;
         protected DataProcessedEvent DataProcessedEvent;
-
+        protected ModuleDataProcessedEvent ModuleDataProcessedEvent;
         public void Start()
         {
             SubscriptionToken = EventAggregator.GetEvent<DataRecievedEvent>().Subscribe(async (payload) =>  await Process(payload));
             ImageProcessedEvent = EventAggregator.GetEvent<ImageProcessedEvent>();
             DataProcessedEvent = EventAggregator.GetEvent<DataProcessedEvent>();
+            ModuleDataProcessedEvent = EventAggregator.GetEvent<ModuleDataProcessedEvent>();
         }
 
         public void Stop()
@@ -54,10 +56,19 @@ namespace PTSC.Pipeline
         {
             //TODO Paint skeleton on Image + Flip and Resize Image
             return await Task.Run(() => {
-                var moduledata = payload.ModuleDataModel;
-                var bitmap = OpenCVService.Mat2Bitmap(payload.Image);
-                payload.Image.Dispose();
-                return bitmap;
+                try
+                {
+                    var moduledata = payload.ModuleDataModel;
+                    var img = payload.Image;
+                    var bitmap = OpenCVService.Mat2Bitmap(img);
+                    img.Dispose();
+                    return bitmap;
+                }
+                catch
+                {
+                    return default;
+                }
+
                 }
             );
         }
@@ -68,6 +79,8 @@ namespace PTSC.Pipeline
             {
                 var moduledata = payload.ModuleDataModel;
                 moduledata = FilterData(moduledata);
+
+                Task.Run(() => ModuleDataProcessedEvent.Publish(new(moduledata)));
                 return MapData(moduledata);
             });
         }

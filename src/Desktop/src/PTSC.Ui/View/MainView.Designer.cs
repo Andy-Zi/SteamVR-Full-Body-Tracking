@@ -31,19 +31,24 @@
             this.tabControl = new System.Windows.Forms.TabControl();
             this.ModuleTab = new System.Windows.Forms.TabPage();
             this.splitContainerModule = new System.Windows.Forms.SplitContainer();
+            this.tabControlModuleView = new System.Windows.Forms.TabControl();
+            this.tabPageModuleView = new System.Windows.Forms.TabPage();
             this.pictureBoxImage = new System.Windows.Forms.PictureBox();
+            this.tabPageSkeleton = new System.Windows.Forms.TabPage();
+            this.richTextBoxModule = new System.Windows.Forms.RichTextBox();
             this.groupBoxModule = new System.Windows.Forms.GroupBox();
             this.buttonStopModule = new System.Windows.Forms.Button();
             this.buttonStartModule = new System.Windows.Forms.Button();
             this.comboBoxModule = new System.Windows.Forms.ComboBox();
             this.SettingsTab = new System.Windows.Forms.TabPage();
-            this.richTextBoxModule = new System.Windows.Forms.RichTextBox();
             this.tabControl.SuspendLayout();
             this.ModuleTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerModule)).BeginInit();
             this.splitContainerModule.Panel1.SuspendLayout();
             this.splitContainerModule.Panel2.SuspendLayout();
             this.splitContainerModule.SuspendLayout();
+            this.tabControlModuleView.SuspendLayout();
+            this.tabPageModuleView.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).BeginInit();
             this.groupBoxModule.SuspendLayout();
             this.SuspendLayout();
@@ -80,7 +85,7 @@
             // 
             // splitContainerModule.Panel1
             // 
-            this.splitContainerModule.Panel1.Controls.Add(this.pictureBoxImage);
+            this.splitContainerModule.Panel1.Controls.Add(this.tabControlModuleView);
             // 
             // splitContainerModule.Panel2
             // 
@@ -90,15 +95,56 @@
             this.splitContainerModule.SplitterDistance = 817;
             this.splitContainerModule.TabIndex = 0;
             // 
+            // tabControlModuleView
+            // 
+            this.tabControlModuleView.Controls.Add(this.tabPageModuleView);
+            this.tabControlModuleView.Controls.Add(this.tabPageSkeleton);
+            this.tabControlModuleView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabControlModuleView.Location = new System.Drawing.Point(0, 0);
+            this.tabControlModuleView.Name = "tabControlModuleView";
+            this.tabControlModuleView.SelectedIndex = 0;
+            this.tabControlModuleView.Size = new System.Drawing.Size(813, 768);
+            this.tabControlModuleView.TabIndex = 1;
+            // 
+            // tabPageModuleView
+            // 
+            this.tabPageModuleView.Controls.Add(this.pictureBoxImage);
+            this.tabPageModuleView.Location = new System.Drawing.Point(4, 24);
+            this.tabPageModuleView.Name = "tabPageModuleView";
+            this.tabPageModuleView.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageModuleView.Size = new System.Drawing.Size(805, 740);
+            this.tabPageModuleView.TabIndex = 0;
+            this.tabPageModuleView.Text = "Module Output";
+            this.tabPageModuleView.UseVisualStyleBackColor = true;
+            // 
             // pictureBoxImage
             // 
             this.pictureBoxImage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBoxImage.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxImage.Location = new System.Drawing.Point(3, 3);
             this.pictureBoxImage.Name = "pictureBoxImage";
-            this.pictureBoxImage.Size = new System.Drawing.Size(813, 768);
+            this.pictureBoxImage.Size = new System.Drawing.Size(799, 734);
             this.pictureBoxImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBoxImage.TabIndex = 0;
             this.pictureBoxImage.TabStop = false;
+            // 
+            // tabPageSkeleton
+            // 
+            this.tabPageSkeleton.Location = new System.Drawing.Point(4, 24);
+            this.tabPageSkeleton.Name = "tabPageSkeleton";
+            this.tabPageSkeleton.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageSkeleton.Size = new System.Drawing.Size(805, 740);
+            this.tabPageSkeleton.TabIndex = 1;
+            this.tabPageSkeleton.Text = "Skeleton View";
+            this.tabPageSkeleton.UseVisualStyleBackColor = true;
+            // 
+            // richTextBoxModule
+            // 
+            this.richTextBoxModule.Location = new System.Drawing.Point(3, 112);
+            this.richTextBoxModule.Name = "richTextBoxModule";
+            this.richTextBoxModule.ReadOnly = true;
+            this.richTextBoxModule.Size = new System.Drawing.Size(349, 653);
+            this.richTextBoxModule.TabIndex = 1;
+            this.richTextBoxModule.Text = "";
             // 
             // groupBoxModule
             // 
@@ -150,15 +196,6 @@
             this.SettingsTab.Text = "Settings";
             this.SettingsTab.UseVisualStyleBackColor = true;
             // 
-            // richTextBoxModule
-            // 
-            this.richTextBoxModule.Location = new System.Drawing.Point(3, 112);
-            this.richTextBoxModule.Name = "richTextBoxModule";
-            this.richTextBoxModule.ReadOnly = true;
-            this.richTextBoxModule.Size = new System.Drawing.Size(349, 653);
-            this.richTextBoxModule.TabIndex = 1;
-            this.richTextBoxModule.Text = "";
-            // 
             // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -173,6 +210,8 @@
             this.splitContainerModule.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerModule)).EndInit();
             this.splitContainerModule.ResumeLayout(false);
+            this.tabControlModuleView.ResumeLayout(false);
+            this.tabPageModuleView.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).EndInit();
             this.groupBoxModule.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -191,5 +230,8 @@
         private Button buttonStopModule;
         private Button buttonStartModule;
         public RichTextBox richTextBoxModule;
+        private TabPage tabPageModuleView;
+        private TabPage tabPageSkeleton;
+        public TabControl tabControlModuleView;
     }
 }

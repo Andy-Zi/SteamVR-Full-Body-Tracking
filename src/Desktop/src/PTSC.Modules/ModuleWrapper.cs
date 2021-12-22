@@ -40,6 +40,7 @@ namespace PTSC.Modules
                 FileName = detectionModule.Process,
                 Arguments = detectionModule.Arguments,
             };
+
             CurrentProcess = new Process();
             CurrentProcess.StartInfo = startinfo;
             CurrentProcess.ErrorDataReceived += CurrentProcess_ErrorDataReceived;

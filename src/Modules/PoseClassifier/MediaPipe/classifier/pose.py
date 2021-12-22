@@ -2,12 +2,12 @@ import mediapipe as mp
 import cv2
 from ..utils_mp.positions import PositionHandler
 import numpy as np
-from typing import Union, Optional
+from typing import Union, Optional,Dict
 
 
 class PoseMP:
 
-    def __init__(self, default_value:bool = False, options: Optional[dict[str,Union[str,float,bool]]] = None):
+    def __init__(self, default_value:bool = False, options: Optional[Dict[str,Union[str,float,bool]]] = None):
         self.points = PositionHandler(ignore_hidden_points=default_value)
 
         if options is not None:
