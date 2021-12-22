@@ -4,3 +4,5 @@
 src/PTSCDriver/x64/
 src/PTSCDriver/ptsc/x64/
 src/PTSCDriver/.vs
+__pycache__
+venv
