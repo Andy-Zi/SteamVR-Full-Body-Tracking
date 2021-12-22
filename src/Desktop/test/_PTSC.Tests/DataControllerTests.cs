@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using PTSC.Communication.Controller;
@@ -83,7 +79,7 @@ namespace _PTSC.Tests
             List<double> right_shoulder_coordinates = new List<double> { 0.4f, 0.5f, 0.6f };
             string left_shoulder_data = JsonConvert.SerializeObject(left_shoulder_coordinates);
             string right_shoulder_data = JsonConvert.SerializeObject(right_shoulder_coordinates);
-            string data = "{ \"left_shoulder\": " + left_shoulder_data.ToString() + ", \"right_shoulder\": " + right_shoulder_data.ToString() + "}";
+            string data = "{ \"LEFT_SHOULDER\": " + left_shoulder_data.ToString() + ", \"RIGHT_SHOULDER\": " + right_shoulder_data.ToString() + "}";
             ModuleDataModel moduleData = new ModuleDataModel();
             Assert.DoesNotThrow(() =>
             {

@@ -8,6 +8,7 @@ using Prism.Events;
 using PTSC.PubSub;
 using PTSC.Modules;
 using System.ComponentModel;
+using ChartWin;
 
 namespace PTSC.Ui.Controller
 {
@@ -21,7 +22,7 @@ namespace PTSC.Ui.Controller
         [Dependency] public Lazy<ModuleWrapper> ModuleWrapper { get; set; }
         [Dependency] public ModuleRepository ModuleRepository { get; set; }
 
-
+        Graph3D chart;
         public IEventAggregator EventAggregator { get; set; }
         public MainController(MainView view) : base(view)
         {
@@ -37,6 +38,9 @@ namespace PTSC.Ui.Controller
         }
         public override BaseController<MainModel, MainView> Initialize()
         {
+            chart = new();
+            this.View.tabControl.TabPages[1].Controls.Add(chart);
+            chart.Dock = DockStyle.Fill;
             BindData();
             ModulePipeServer.Value.FPSLimit = 30;
             ModulePipeServer.Value.RetrieveImage = true;
@@ -50,8 +54,23 @@ namespace PTSC.Ui.Controller
         private void Subscribe()
         {
             EventAggregator.GetEvent<ImageProcessedEvent>().Subscribe(DisplayImage, ThreadOption.UIThread, false);
+            EventAggregator.GetEvent<ModuleDataProcessedEvent>().Subscribe(Plot3DGraph, ThreadOption.UIThread, false);
             ModuleWrapper.Value.OnError += ModuleWrapper_OnMessage;
             ModuleWrapper.Value.OnMessage += ModuleWrapper_OnMessage;
+        }
+
+        private void Plot3DGraph(ModuleDataProcessedPayload obj)
+        {
+            chart.Chard3DSeries.Points?.Clear();
+            var data = obj.ModuleDataModel;
+            
+            foreach(var row in data.GetData().Values)
+            {
+                if (row == null)
+                    continue;
+                chart.AddXY3d(-row[0], -row[1], -row[2]);
+            }
+            chart.Refresh();
         }
 
         private void ModuleWrapper_OnMessage(string message)

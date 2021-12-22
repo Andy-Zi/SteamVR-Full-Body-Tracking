@@ -32,12 +32,12 @@
             this.ModuleTab = new System.Windows.Forms.TabPage();
             this.splitContainerModule = new System.Windows.Forms.SplitContainer();
             this.pictureBoxImage = new System.Windows.Forms.PictureBox();
+            this.richTextBoxModule = new System.Windows.Forms.RichTextBox();
             this.groupBoxModule = new System.Windows.Forms.GroupBox();
             this.buttonStopModule = new System.Windows.Forms.Button();
             this.buttonStartModule = new System.Windows.Forms.Button();
             this.comboBoxModule = new System.Windows.Forms.ComboBox();
             this.SettingsTab = new System.Windows.Forms.TabPage();
-            this.richTextBoxModule = new System.Windows.Forms.RichTextBox();
             this.tabControl.SuspendLayout();
             this.ModuleTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerModule)).BeginInit();
@@ -100,6 +100,15 @@
             this.pictureBoxImage.TabIndex = 0;
             this.pictureBoxImage.TabStop = false;
             // 
+            // richTextBoxModule
+            // 
+            this.richTextBoxModule.Location = new System.Drawing.Point(3, 112);
+            this.richTextBoxModule.Name = "richTextBoxModule";
+            this.richTextBoxModule.ReadOnly = true;
+            this.richTextBoxModule.Size = new System.Drawing.Size(349, 653);
+            this.richTextBoxModule.TabIndex = 1;
+            this.richTextBoxModule.Text = "";
+            // 
             // groupBoxModule
             // 
             this.groupBoxModule.Controls.Add(this.buttonStopModule);
@@ -149,15 +158,6 @@
             this.SettingsTab.TabIndex = 1;
             this.SettingsTab.Text = "Settings";
             this.SettingsTab.UseVisualStyleBackColor = true;
-            // 
-            // richTextBoxModule
-            // 
-            this.richTextBoxModule.Location = new System.Drawing.Point(3, 112);
-            this.richTextBoxModule.Name = "richTextBoxModule";
-            this.richTextBoxModule.ReadOnly = true;
-            this.richTextBoxModule.Size = new System.Drawing.Size(349, 653);
-            this.richTextBoxModule.TabIndex = 1;
-            this.richTextBoxModule.Text = "";
             // 
             // MainView
             // 

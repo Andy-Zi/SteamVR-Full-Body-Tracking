@@ -7,7 +7,6 @@ using PTSC.PubSub;
 using System.Diagnostics;
 using System.IO.Pipes;
 using System.Text;
-using System.Text.Json;
 using Unity;
 
 namespace PTSC.Communication.Controller

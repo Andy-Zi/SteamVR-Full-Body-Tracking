@@ -1,9 +1,12 @@
 
 import cv2
-from PoseClassifier.MediaPipe.classifier.pose import PoseMP
+from MediaPipe.classifier.pose import PoseMP
 import sys
 from typing import Union,Callable
-#from ModulePipe.pipe_client import NamedPipe
+try:
+    from ModulePipe.pipe_client import NamedPipe
+except:
+    pass
 
 
 def run_media_pipeline():
@@ -13,7 +16,11 @@ def run_media_pipeline():
 
     output = parsed_options["commandline-output"]
     default_value = parsed_options["default-position-value"]
-    #pipe = NamedPipe()
+    pipe = None
+    try:
+        pipe = NamedPipe()
+    except:
+        pass
 
     classifier = parsed_options["classifier"](
         default_value=default_value, options=None)
@@ -30,12 +37,13 @@ def run_media_pipeline():
             continue
 
     # calssify positions
-        image.flags.writeable = False
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        results = classifier.classify_image(image, image_id=str(count))
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image_rgb.flags.writeable = False
+        results = classifier.classify_image(image_rgb, image_id=str(count))
         
         if results is not None and image is not None:
-            #pipe.SendPositions(results, image)
+            if pipe:
+                pipe.SendPositions(results, image)
             
             #print results every 2 seconds
             if output and (count%40) == 0:

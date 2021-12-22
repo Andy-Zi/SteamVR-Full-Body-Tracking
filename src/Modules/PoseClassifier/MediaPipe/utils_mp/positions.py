@@ -1,7 +1,7 @@
-from typing import Optional
+from typing import Optional,List,Dict
 import json
 import mediapipe as mp
-from ...utils.positions_dataclass import Positions
+from utils.positions_dataclass import Positions
 from dataclasses import fields
 
 
@@ -9,11 +9,11 @@ class PositionHandler:
     """ use keys from Positions-Class to extract positions from classification
 
     Returns:
-        [Postisions]: [Dataclass with elemets as landmarks ans values of type list[float]]
+        [Postisions]: [Dataclass with elemets as landmarks ans values of type List[float]]
     """
-    defaultPosition: list[float] = [.0, .0, .0]
+    defaultPosition: List[float] = [.0, .0, .0]
     position_visible_threshold: float = 0.5
-    positions:dict[str,list[float]] = {field.name:[] for field in fields(Positions())}
+    positions:Dict[str,List[float]] = {field.name:[] for field in fields(Positions())}
     previous_positions: Positions = Positions()
     current_positions: Positions = Positions()
     
@@ -27,7 +27,7 @@ class PositionHandler:
         self.export_file = outputfile
 
         # keep track of not visible points (error message in VR: "body part is not visible from camera")
-        self.not_visible_names: list[str] = []
+        self.not_visible_names: List[str] = []
 
         self.mp_pose = mp.solutions.pose
 
@@ -43,7 +43,7 @@ class PositionHandler:
 
     def _load_positions(self, results):
         """ extracts the landmarks from the result"""
-        positions: dict[str,list[float]] = {}
+        positions: ict[str,List[float]] = {}
         for field in fields(Positions):
             positions[field.name] =  results.pose_world_landmarks.landmark[self.mp_pose.PoseLandmark[field.name]]
         return positions
@@ -54,10 +54,10 @@ class PositionHandler:
         print(f"{name=} caused an AttributeError \n")
 
     def _calc_landmarks(self, landmarks):
-        """listify positions
+        """Listify positions
 
         Returns:
-            [list]: [list of lists of self.current_position [x,y,z]]
+            [List]: [List of Lists of self.current_position [x,y,z]]
         """
 
         # werte von der Sichtbarkeit abhängig:

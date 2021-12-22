@@ -10,6 +10,7 @@ namespace PTSC.Communication.Controller
     public class DataController
     {
         [Dependency] public ILogger Logger { get; set; }
+
         public string seperator = ";";
 
         public string SerializeDriverData(IDriverDataModel driverData)
