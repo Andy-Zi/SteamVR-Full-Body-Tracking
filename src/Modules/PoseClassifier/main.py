@@ -1,6 +1,7 @@
 
 import cv2
 from MediaPipe.classifier.pose import PoseMP
+
 import sys
 from typing import Union,Callable
 try:
@@ -36,11 +37,19 @@ def run_media_pipeline():
             # ignore empty frames
             continue
 
-    # calssify positions
-        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image_rgb.flags.writeable = False
-        results = classifier.classify_image(image_rgb, image_id=str(count))
+        # calssify positions
         
+        image.flags.writeable = False
+        results = classifier.classify_image(image, image_id=str(count))
+        
+        if output:
+            
+            
+            cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
+            if cv2.waitKey(5) & 0xFF == 27:
+                break
+
+        #image_rgb.flags.writeable = False
         if results is not None and image is not None:
             if pipe:
                 pipe.SendPositions(results, image)
