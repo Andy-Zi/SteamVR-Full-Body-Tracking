@@ -14,8 +14,7 @@ namespace PTSC.Modules
         public string Process { get; set; }
         public string Arguments { get; set; }
         public string WorkingDirectory { get; set; }
+        public string InstallationScript { get; set; }
         public string InstallationDirectory { get; set; }
-        public string InstallationArguments{ get; set; }
-
     }
 }
