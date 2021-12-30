@@ -3,6 +3,8 @@ import json
 import mediapipe as mp
 from utils.positions_dataclass import Positions
 from dataclasses import fields
+from utils.distance import dist
+import numpy as np
 
 
 class PositionHandler:
@@ -31,27 +33,48 @@ class PositionHandler:
 
         self.mp_pose = mp.solutions.pose
 
-    def manage_points(self, results) -> Positions:
+    def manage_points(self, results) -> Optional[Positions]:
         """loads keypoint names from dataclass Positions and fills them with values"""
         self.last_positions = self.current_positions
-        landmarks = self._load_positions(results=results)
+        positions = self._load_positions(results=results)
+        
 
-        self._calc_landmarks(landmarks)
+        self._calc_landmarks(positions)
         if self.positions:
+            self._norm_position_to_nose()
             self.current_positions = Positions(**self.positions)
+            self.write_file()
             return self.current_positions
 
     def _load_positions(self, results):
         """ extracts the landmarks from the result"""
-        positions: ict[str,List[float]] = {}
+        positions: dict[str,List[float]] = {}
         for field in fields(Positions):
-            positions[field.name] =  results.pose_world_landmarks.landmark[self.mp_pose.PoseLandmark[field.name]]
+            positions[field.name] = results.pose_world_landmarks.landmark[self.mp_pose.PoseLandmark[field.name]]
         return positions
 
     def _set_name_warning(self, name: str):
         """keep track of landmarks that cause trouble"""
         self.not_visible_names.append(name)
         print(f"{name=} caused an AttributeError \n")
+        
+    def _get_pose_center(self):
+        """Calculates pose center as point between hips."""
+        
+        left_hip = np.array(self.positions["LEFT_HIP"]) # left hip
+        right_hip = np.array(self.positions["RIGHT_HIP"]) # right hip
+        center = (left_hip + right_hip) * 0.5
+        return center
+    
+    def _norm_position_to_nose(self):
+        """Normalizes landmarks translation and scale."""
+        #calculate distane between nose and center
+        #pose_center = self._get_pose_center()
+        distance = self.positions["NOSE"]
+        
+        for key,values in self.positions.items():
+            self.positions[key] = [ values[i]-distance[i] if i <= 2 else values[i] for i in range(4) ]
+        
 
     def _calc_landmarks(self, landmarks):
         """Listify positions
@@ -78,7 +101,7 @@ class PositionHandler:
 
     def write_file(self):
         with open(self.export_file, "w+") as f:
-            json.dump(self.current_positions, f, indent=4)
+            json.dump(self.positions, f, indent=4)
 
     def _read_point_names(self):
         """
