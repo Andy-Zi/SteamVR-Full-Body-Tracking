@@ -1,7 +1,6 @@
 import mediapipe as mp
 import cv2
 from ..utils_mp.positions import PositionHandler
-from ..utils_mp.plot_landmarks import plot_results_on_image
 import numpy as np
 from typing import Union, Optional,Dict
 
