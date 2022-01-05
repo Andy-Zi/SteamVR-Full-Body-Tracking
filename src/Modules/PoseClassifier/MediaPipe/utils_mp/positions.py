@@ -43,7 +43,6 @@ class PositionHandler:
         if self.positions:
             self._norm_position_to_nose()
             self.current_positions = Positions(**self.positions)
-            self.write_file()
             return self.current_positions
 
     def _load_positions(self, results):

@@ -23,7 +23,7 @@ namespace PTSC.Pipeline
         KalmanFilter RIGHT_KNEE;
         KalmanFilter LEFT_ANKLE;
         KalmanFilter RIGHT_ANKLE;
-        public KalmanFilterModel(double dt = 1/60, double std_X = 0.005, double std_Y = 0.005, double std_Z = 0.005, double std_V = 1)
+        public KalmanFilterModel(double dt = 1.0/60, double std_X = 0.005, double std_Y = 0.005, double std_Z = 0.005, double std_V = 1)
         {
             this.NOSE           = new KalmanFilter(dt, std_X, std_Y, std_Z, std_V);
             this.LEFT_EYE       = new KalmanFilter(dt, std_X, std_Y, std_Z, std_V);

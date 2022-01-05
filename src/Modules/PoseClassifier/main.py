@@ -1,7 +1,7 @@
 
 import cv2
 from MediaPipe.classifier.pose import PoseMP
-from MoveNet.classify import MoveNetModel
+#from MoveNet.classify import MoveNetModel
 import sys
 from typing import Union,Callable
 from utils.positions_dataclass import Positions

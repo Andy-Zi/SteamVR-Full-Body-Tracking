@@ -8,7 +8,6 @@ using Prism.Events;
 using PTSC.PubSub;
 using PTSC.Modules;
 using System.ComponentModel;
-using ChartWin;
 
 namespace PTSC.Ui.Controller
 {
@@ -43,7 +42,6 @@ namespace PTSC.Ui.Controller
         }
         public override BaseController<MainModel, MainView> Initialize()
         {
-
             BindData();
             ModulePipeServer.Value.FPSLimit = 30;
             ModulePipeServer.Value.RetrieveImage = true;
@@ -138,6 +136,7 @@ namespace PTSC.Ui.Controller
             var selectedModule  = this.View.comboBoxModule.SelectedItem as IDetectionModule;
             if (selectedModule != null)
             {
+                this.View.richTextBoxModule.Clear();
                 ModuleWrapper.Value.Start(selectedModule);
             }
 
