@@ -3,7 +3,6 @@ import json
 import mediapipe as mp
 from utils.positions_dataclass import Positions
 from dataclasses import fields
-from utils.distance import dist
 import numpy as np
 
 
@@ -20,12 +19,16 @@ class PositionHandler:
     current_positions: Positions = Positions()
     
 
-    def __init__(self, ignore_hidden_points: Optional[bool] = False, outputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/landmarks.txt", inputfile: str = "/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/keypoints.txt"):
+    def __init__(self, ignore_hidden_points: Optional[bool] = False, 
+                 output_to_file: bool = False,
+                 outputfile: str = "landmarks.txt", 
+                 ):
         # settings
         self.use_visibility_threshold = ignore_hidden_points
         if self.use_visibility_threshold:
             print("set small values to 0")
-        self.input_file = inputfile
+            
+        self.file_output = output_to_file
         self.export_file = outputfile
 
         # keep track of not visible points (error message in VR: "body part is not visible from camera")
@@ -43,6 +46,8 @@ class PositionHandler:
         if self.positions:
             self._norm_position_to_nose()
             self.current_positions = Positions(**self.positions)
+            if self.file_output:
+                self.write_file()
             return self.current_positions
 
     def _load_positions(self, results):
@@ -81,10 +86,6 @@ class PositionHandler:
         Returns:
             [List]: [List of Lists of self.current_position [x,y,z]]
         """
-
-        # werte von der Sichtbarkeit abhängig:
-        # position.visibility<self.position_visibility_threshold setzt einen default wert
-        
         if not landmarks:
             return
         
@@ -102,11 +103,4 @@ class PositionHandler:
         with open(self.export_file, "w+") as f:
             json.dump(self.positions, f, indent=4)
 
-    def _read_point_names(self):
-        """
-        read landmark names to keep track of
-        """
-
-        with open(self.input_file, "r") as f:
-            lines = f.read().split("\n")
-            return lines
+ 
