@@ -3,5 +3,5 @@
     "Description": "Estimates body position and rotation from webcam",
     "SupportsImage" : true,
     "Process" : "python",
-    "Arguments" : "main.py"
+    "Arguments" : "main.py -mp" 
 }
