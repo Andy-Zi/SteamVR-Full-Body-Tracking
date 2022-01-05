@@ -1,14 +1,14 @@
 # set variables for setup
-$ModuleDirectory = $args[0]
-$VenvName = "venv"
+$ModuleDirectory = "SimpleWebcam"
+$VenvName = "venv" # args[0]
 $ActivateScript = ".\$VenvName\Scripts\Activate.ps1"
 
 # setup python environment
-Set-Location -Path $ModuleDirectory
 Write-Host "Creating virtual environment for module $ModuleDirectory"
 python -m venv $VenvName
-& $ActivateScript # .\venv\Scripts\Activate.ps1
+Write-Host "Activating virtual environment"
+& $ActivateScript
 Write-Host "Installing requirements for module $ModuleDirectory"
 pip install -r requirements.txt
 Write-Host "Finished environment setup"
-Set-Location $PSScriptRoot
+

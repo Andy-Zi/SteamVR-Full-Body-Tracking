@@ -2,6 +2,8 @@
     "Name": "Mediapipe Pose",
     "Description": "Estimates body position and rotation from webcam",
     "SupportsImage" : true,
-    "Process" : "python",
-    "Arguments" : "main.py"
+    "Process" : "venv\\Scripts\\python.exe",
+    "Arguments" : "main.py",
+    "InstallationScript": ".\\setupVenv.ps1 ",
+    "InstallationDirectory": "venv"
 }

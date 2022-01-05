@@ -2,3 +2,4 @@ numpy
 mediapipe
 opencv-python
 matplotlib
+PyWin32

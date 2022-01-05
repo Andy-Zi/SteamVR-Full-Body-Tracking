@@ -1,7 +1,6 @@
 import mediapipe as mp
 import cv2
 from ..utils_mp.positions import PositionHandler
-from ..utils_mp.plot_landmarks import plot_results_on_image
 import numpy as np
 from typing import Union, Optional,Dict
 
@@ -10,6 +9,7 @@ from typing import Union, Optional,Dict
 class PoseMP:
 
     def __init__(self, default_value:bool = False, options: Optional[Dict[str,Union[str,float,bool]]] = None):
+        
         self.points = PositionHandler(ignore_hidden_points=default_value)
 
         if options is not None:
@@ -29,7 +29,7 @@ class PoseMP:
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_drawing_styles = mp.solutions.drawing_styles
 
-    def classify_image(self, image: np.ndarray, image_id: str = "000"):
+    def classify_image(self, image: np.ndarray):
         
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         pose = self._get_pose(image_rgb)
@@ -38,9 +38,9 @@ class PoseMP:
         if pose is not None and pose.pose_world_landmarks is not None:
             result = self.points.manage_points(pose)
             self._draw_landmarks(image,pose)
-            return result
+            return result, image
         else:
-            return None
+            return None, None
         
     def _draw_landmarks(self,image,pose):
         self.mp_drawing.draw_landmarks(
