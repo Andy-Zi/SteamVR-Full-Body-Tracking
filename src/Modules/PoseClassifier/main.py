@@ -1,9 +1,10 @@
 
 import cv2
 from MediaPipe.classifier.pose import PoseMP
-
+from MoveNet.classify import MoveNetModel
 import sys
 from typing import Union,Callable
+from utils.positions_dataclass import Positions
 try:
     from ModulePipe.pipe_client import NamedPipe
 except:
@@ -26,7 +27,6 @@ def run_media_pipeline():
     classifier = parsed_options["classifier"](
         default_value=default_value, options=None)
 
-    # get video stream
     count = 0
     cap = cv2.VideoCapture(0)
     while cap.isOpened():
@@ -36,27 +36,25 @@ def run_media_pipeline():
         if not success:
             # ignore empty frames
             continue
-
-        # calssify positions
         
         image.flags.writeable = False
-        results = classifier.classify_image(image, image_id=str(count))
-        
-        if output:
-            
-            
-            cv2.imshow('MediaPipe Pose', cv2.flip(image, 1))
-            if cv2.waitKey(5) & 0xFF == 27:
-                break
+        results, image = classifier.classify_image(image)
 
-        #image_rgb.flags.writeable = False
         if results is not None and image is not None:
             if pipe:
                 pipe.SendPositions(results, image)
             
-            #print results every 2 seconds
-            if output and (count%40) == 0:
-                print(results)
+            # show prediction
+            if output:
+                cv2.imshow('Pose', cv2.flip(image, 1))
+                if cv2.waitKey(5) & 0xFF == 27:
+                    break
+                
+                #print results
+                if (count%40) == 0:
+                    print(f"{results=}")
+        else:
+            print("no results")
 
 
 def parse_options():
@@ -71,9 +69,8 @@ def parse_options():
         parsed_options["commandline-output"] = True
     if "-mp" in opts:
         parsed_options["classifier"] = PoseMP
-    #else:
-        #raise ValueError("Select a classifier (e.g. '-mp')")
-
+    if "-mv" in opts:
+        parsed_options["classifier"] = MoveNetModel
     return parsed_options
 
 
