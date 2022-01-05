@@ -17,12 +17,18 @@ namespace PTSC.Communication.Controller
         {
             string serialOutput = string.Empty;
 
+            // invert z axis
+            //driverData.head[2] = -driverData.head[2];
+            driverData.waist[2] = -driverData.waist[2];
+            driverData.left_foot[2] = -driverData.left_foot[2];
+            driverData.right_foot[2] = -driverData.right_foot[2];
+
             // add x, y, z coordinates after keyword
             serialOutput += SerializeProperty("head", driverData.head);
             serialOutput += SerializeProperty("waist", driverData.waist);
             serialOutput += SerializeProperty("left_foot", driverData.left_foot);
             serialOutput += SerializeProperty("right_foot", driverData.right_foot);
-            return serialOutput;
+            return serialOutput.Replace(",", ".");
         }
 
         public string SerializeProperty(string keyWord, List<double> coordinates)
@@ -32,7 +38,7 @@ namespace PTSC.Communication.Controller
             if (coordinates != null)
             {
                 serializedProperty = keyWord + seperator;
-                foreach (var coord in coordinates)
+                foreach (var coord in coordinates.Take(3))
                 {
                     serializedProperty += coord.ToString() + seperator;
 

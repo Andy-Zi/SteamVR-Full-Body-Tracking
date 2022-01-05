@@ -54,8 +54,8 @@ namespace ptscDriver {
         vr::VRInputComponentHandle_t system_click_component_ = 0;
         vr::VRInputComponentHandle_t system_touch_component_ = 0;
 
-        /*virtual vr::HmdQuaternion_t get_HMD_rotation(vr::TrackedDevicePose_t hmd_pose);
-        virtual vr::HmdVector3_t get_HMD_absolute_position(vr::TrackedDevicePose_t hmd_pose);*/
+        virtual vr::HmdQuaternion_t get_HMD_rotation(vr::TrackedDevicePose_t hmd_pose);
+        virtual vr::HmdVector3_t get_HMD_absolute_position(vr::TrackedDevicePose_t hmd_pose);
 
         // PoseVR variables
         /*std::chrono::milliseconds prev_time;*/
