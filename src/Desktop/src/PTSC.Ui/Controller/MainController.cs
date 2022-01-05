@@ -21,6 +21,7 @@ namespace PTSC.Ui.Controller
         [Dependency] public Lazy<ModuleWrapper> ModuleWrapper { get; set; }
         [Dependency] public ModuleRepository ModuleRepository { get; set; }
 
+        [Dependency] public IKalmanFilterModel KalmanFilterModel { get; set; }
 
 
         List<SubscriptionToken> SubscriptionTokens = new();
@@ -43,8 +44,13 @@ namespace PTSC.Ui.Controller
         public override BaseController<MainModel, MainView> Initialize()
         {
             BindData();
+            //TODO Load Data 
+            
             ModulePipeServer.Value.FPSLimit = 30;
             ModulePipeServer.Value.RetrieveImage = true;
+
+            KalmanFilterModel.Initialize(1.0/ModulePipeServer.Value.FPSLimit);
+
             ModulePipeServer.Value.Start();
             ProcessingPipeline.Value.Start();
             DriverPipeServer.Value.Start();

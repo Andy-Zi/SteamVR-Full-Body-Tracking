@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Pipes;
-using System.Linq;
+﻿using System.IO.Pipes;
 using System.Text;
-using System.Threading.Tasks;
 using PTSC.Interfaces;
 using Unity;
 using PTSC.Communication.Model;
