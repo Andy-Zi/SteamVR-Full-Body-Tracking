@@ -19,7 +19,8 @@ namespace PTSC.Pipeline
 
         public ProcessingPipeline()
         {
-
+            const double dt = 0.01677;
+            this.FilterModel = new KalmanFilterModel(dt);
         }
         protected SubscriptionToken SubscriptionToken;
         protected ImageProcessedEvent ImageProcessedEvent;
@@ -99,9 +100,11 @@ namespace PTSC.Pipeline
             return driverData;
         }
 
+        protected KalmanFilterModel FilterModel;
         private IModuleDataModel FilterData(IModuleDataModel moduledata)
         {
-            return moduledata;
+
+            return this.FilterModel.update(moduledata); ;
         }
 
         private static List<double> CalculateCenter3D(List<double> point1, List<double> point2)
