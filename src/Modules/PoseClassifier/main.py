@@ -53,8 +53,8 @@ def run_media_pipeline():
                 #print results
                 if (count%40) == 0:
                     print(f"{results=}")
-        else:
-            print("no results")
+        #else:
+        #    print("no results")
 
 
 def parse_options():
