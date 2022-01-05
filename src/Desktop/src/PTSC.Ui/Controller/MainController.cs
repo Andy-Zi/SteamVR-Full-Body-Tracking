@@ -90,7 +90,7 @@ namespace PTSC.Ui.Controller
         {
             this.View.Invoke(() =>
             {
-                this.View.richTextBoxModule.Text += message;
+                this.View.richTextBoxModule.Text += message + "\n";
             });
         }
 
