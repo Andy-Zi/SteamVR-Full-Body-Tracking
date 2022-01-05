@@ -3,6 +3,7 @@ using Prism.Events;
 using PTSC.Communication.Model;
 using PTSC.Interfaces;
 using PTSC.OpenCV;
+using PTSC.Pipeline.Kalman;
 using PTSC.PubSub;
 using System.Drawing;
 using Unity;
@@ -16,11 +17,10 @@ namespace PTSC.Pipeline
     {
 
         [Dependency] public IEventAggregator EventAggregator { get; set; }
-
+        [Dependency] public IKalmanFilterModel IKalmanFilterModel { get; set; }
         public ProcessingPipeline()
         {
-            const double dt = 0.01677;
-            this.FilterModel = new KalmanFilterModel(dt);
+
         }
         protected SubscriptionToken SubscriptionToken;
         protected ImageProcessedEvent ImageProcessedEvent;
@@ -100,11 +100,10 @@ namespace PTSC.Pipeline
             return driverData;
         }
 
-        protected KalmanFilterModel FilterModel;
+
         private IModuleDataModel FilterData(IModuleDataModel moduledata)
         {
-
-            return this.FilterModel.update(moduledata); ;
+            return IKalmanFilterModel.Update(moduledata);
         }
 
         private static List<double> CalculateCenter3D(List<double> point1, List<double> point2)
