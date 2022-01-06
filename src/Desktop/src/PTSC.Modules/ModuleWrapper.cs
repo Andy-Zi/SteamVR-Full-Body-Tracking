@@ -32,7 +32,7 @@ namespace PTSC.Modules
 
             // Check for venv folder
             string venvPath = Path.Combine(detectionModule.WorkingDirectory, detectionModule.InstallationDirectory);
-            if (!Directory.Exists(venvPath) || !File.Exists(detectionModule.Process))
+            if (!Directory.Exists(venvPath))
             {
                 var setupStartInfo = new ProcessStartInfo()
                 {

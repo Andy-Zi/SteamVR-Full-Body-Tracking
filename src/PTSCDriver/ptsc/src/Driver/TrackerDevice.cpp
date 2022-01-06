@@ -38,13 +38,13 @@ void ptscDriver::TrackerDevice::Update()
         }
     }
 
-    //// Setup pose for this frame
+    // Setup pose for this frame
     //auto pose = IVRDevice::MakeDefaultPose();
 
-    //vr::TrackedDevicePose_t hmd_pose;
-    //vr::VRServerDriverHost()->GetRawTrackedDevicePoses(0, &hmd_pose, 1);
-    //vr::HmdQuaternion_t q = get_HMD_rotation(hmd_pose);
-    //vr::HmdVector3_t vector = get_HMD_absolute_position(hmd_pose);
+    vr::TrackedDevicePose_t hmd_pose;
+    vr::VRServerDriverHost()->GetRawTrackedDevicePoses(0, &hmd_pose, 1);
+    vr::HmdQuaternion_t q = get_HMD_rotation(hmd_pose);
+    vr::HmdVector3_t vector = get_HMD_absolute_position(hmd_pose);
 
 
     //// Here we setup some transforms so our controllers are offset from the headset by a small amount so we can see them
@@ -80,6 +80,12 @@ void ptscDriver::TrackerDevice::Update()
 
     // Setup pose for this frame
     auto pose = this->wanted_pose_;
+    pose.vecPosition[0] = pose.vecPosition[0] + vector.v[0];
+    pose.vecPosition[1] = -pose.vecPosition[1] + vector.v[1];
+    pose.vecPosition[2] = pose.vecPosition[2] + vector.v[2];
+    //this->wanted_pose_.vecPosition[0] += vector[0];//position_smoothing * x + (1 - position_smoothing) * this->wanted_pose_.vecPosition[0];  //can do some motion smoothing here?
+    //this->wanted_pose_.vecPosition[1] += vector[1];//position_smoothing * y + (1 - position_smoothing) * this->wanted_pose_.vecPosition[1];
+    //this->wanted_pose_.vecPosition[2] += vector[2];//position_smoothing * z + (1 - position_smoothing) * this->wanted_pose_.vecPosition[2];
 
     // TODO: velocity for linear interpolation?
     //pose.vecVelocity[0] = velocity_smoothing * ((wanted_pose_.vecPosition[0] - last_pose_.vecPosition[0]) / delta_time) + (1 - velocity_smoothing) * pose.vecVelocity[0];
@@ -192,36 +198,35 @@ vr::DriverPose_t ptscDriver::TrackerDevice::GetPose()
     return last_pose_;
 }
 
-//vr::HmdQuaternion_t ptscDriver::TrackerDevice::get_HMD_rotation(vr::TrackedDevicePose_t hmd_pose)
-//{
-//    vr::HmdQuaternion_t q;
-//
-//    q.w = sqrt(fmax(0, 1 + hmd_pose.mDeviceToAbsoluteTracking.m[0][0] + hmd_pose.mDeviceToAbsoluteTracking.m[1][1] + hmd_pose.mDeviceToAbsoluteTracking.m[2][2])) / 2;
-//    q.x = sqrt(fmax(0, 1 + hmd_pose.mDeviceToAbsoluteTracking.m[0][0] - hmd_pose.mDeviceToAbsoluteTracking.m[1][1] - hmd_pose.mDeviceToAbsoluteTracking.m[2][2])) / 2;
-//    q.y = sqrt(fmax(0, 1 - hmd_pose.mDeviceToAbsoluteTracking.m[0][0] + hmd_pose.mDeviceToAbsoluteTracking.m[1][1] - hmd_pose.mDeviceToAbsoluteTracking.m[2][2])) / 2;
-//    q.z = sqrt(fmax(0, 1 - hmd_pose.mDeviceToAbsoluteTracking.m[0][0] - hmd_pose.mDeviceToAbsoluteTracking.m[1][1] + hmd_pose.mDeviceToAbsoluteTracking.m[2][2])) / 2;
-//    q.x = copysign(q.x, hmd_pose.mDeviceToAbsoluteTracking.m[2][1] - hmd_pose.mDeviceToAbsoluteTracking.m[1][2]);
-//    q.y = copysign(q.y, hmd_pose.mDeviceToAbsoluteTracking.m[0][2] - hmd_pose.mDeviceToAbsoluteTracking.m[2][0]);
-//    q.z = copysign(q.z, hmd_pose.mDeviceToAbsoluteTracking.m[1][0] - hmd_pose.mDeviceToAbsoluteTracking.m[0][1]);
-//
-//    return q;
-//}
-//
-//vr::HmdVector3_t ptscDriver::TrackerDevice::get_HMD_absolute_position(vr::TrackedDevicePose_t hmd_pose)
-//{
-//    vr::HmdVector3_t vector;
-//
-//    vector.v[0] = hmd_pose.mDeviceToAbsoluteTracking.m[0][3];
-//    vector.v[1] = hmd_pose.mDeviceToAbsoluteTracking.m[1][3];
-//    vector.v[2] = hmd_pose.mDeviceToAbsoluteTracking.m[2][3];
-//
-//    return vector;
-//}
+vr::HmdQuaternion_t ptscDriver::TrackerDevice::get_HMD_rotation(vr::TrackedDevicePose_t hmd_pose)
+{
+    vr::HmdQuaternion_t q;
+
+    q.w = sqrt(fmax(0, 1 + hmd_pose.mDeviceToAbsoluteTracking.m[0][0] + hmd_pose.mDeviceToAbsoluteTracking.m[1][1] + hmd_pose.mDeviceToAbsoluteTracking.m[2][2])) / 2;
+    q.x = sqrt(fmax(0, 1 + hmd_pose.mDeviceToAbsoluteTracking.m[0][0] - hmd_pose.mDeviceToAbsoluteTracking.m[1][1] - hmd_pose.mDeviceToAbsoluteTracking.m[2][2])) / 2;
+    q.y = sqrt(fmax(0, 1 - hmd_pose.mDeviceToAbsoluteTracking.m[0][0] + hmd_pose.mDeviceToAbsoluteTracking.m[1][1] - hmd_pose.mDeviceToAbsoluteTracking.m[2][2])) / 2;
+    q.z = sqrt(fmax(0, 1 - hmd_pose.mDeviceToAbsoluteTracking.m[0][0] - hmd_pose.mDeviceToAbsoluteTracking.m[1][1] + hmd_pose.mDeviceToAbsoluteTracking.m[2][2])) / 2;
+    q.x = copysign(q.x, hmd_pose.mDeviceToAbsoluteTracking.m[2][1] - hmd_pose.mDeviceToAbsoluteTracking.m[1][2]);
+    q.y = copysign(q.y, hmd_pose.mDeviceToAbsoluteTracking.m[0][2] - hmd_pose.mDeviceToAbsoluteTracking.m[2][0]);
+    q.z = copysign(q.z, hmd_pose.mDeviceToAbsoluteTracking.m[1][0] - hmd_pose.mDeviceToAbsoluteTracking.m[0][1]);
+
+    return q;
+}
+
+vr::HmdVector3_t ptscDriver::TrackerDevice::get_HMD_absolute_position(vr::TrackedDevicePose_t hmd_pose)
+{
+    vr::HmdVector3_t vector;
+
+    vector.v[0] = hmd_pose.mDeviceToAbsoluteTracking.m[0][3];
+    vector.v[1] = hmd_pose.mDeviceToAbsoluteTracking.m[1][3];
+    vector.v[2] = hmd_pose.mDeviceToAbsoluteTracking.m[2][3];
+
+    return vector;
+}
 
 // PoseVR methods
 void ptscDriver::TrackerDevice::UpdatePos(double x, double y, double z)
 {
-
     this->wanted_pose_.vecPosition[0] = x;//position_smoothing * x + (1 - position_smoothing) * this->wanted_pose_.vecPosition[0];  //can do some motion smoothing here?
     this->wanted_pose_.vecPosition[1] = y;//position_smoothing * y + (1 - position_smoothing) * this->wanted_pose_.vecPosition[1];
     this->wanted_pose_.vecPosition[2] = z;//position_smoothing * z + (1 - position_smoothing) * this->wanted_pose_.vecPosition[2];

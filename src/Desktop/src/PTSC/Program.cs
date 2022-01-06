@@ -2,6 +2,7 @@ using PTSC.Communication.Controller;
 using PTSC.Interfaces;
 using PTSC.Modules;
 using PTSC.Pipeline;
+using PTSC.Pipeline.Kalman;
 using PTSC.Ui.Controller;
 using PTSC.Ui.View;
 using Unity;
@@ -50,7 +51,8 @@ namespace PTSC
             container.RegisterType<DriverPipeServerController, DriverPipeServerController>(new ContainerControlledLifetimeManager());
             container.RegisterType<ProcessingPipeline, ProcessingPipeline>(new ContainerControlledLifetimeManager());
             container.RegisterType<ModuleWrapper, ModuleWrapper>(new ContainerControlledLifetimeManager());
-            
+            container.RegisterInstance<IKalmanFilterModel>(new KalmanFilterModel());
+
             ApplicationConfiguration.Initialize();
             var controller = container.Resolve<MainController>();
             Application.Run(controller.RegisterEventAggregator(container).Initialize().View);
