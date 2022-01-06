@@ -78,5 +78,10 @@ namespace PTSC.Ui.View
         {
             (this.Controller as MainController).StopModule();
         }
+
+        private void buttonApplicationSettings_Click(object sender, EventArgs e)
+        {
+            (this.Controller as MainController).ShowOptions();
+        }
     }
 }

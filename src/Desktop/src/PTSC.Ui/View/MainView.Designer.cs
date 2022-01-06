@@ -293,6 +293,7 @@
             this.buttonApplicationSettings.Size = new System.Drawing.Size(44, 40);
             this.buttonApplicationSettings.TabIndex = 5;
             this.buttonApplicationSettings.UseVisualStyleBackColor = true;
+            this.buttonApplicationSettings.Click += new System.EventHandler(this.buttonApplicationSettings_Click);
             // 
             // MainView
             // 

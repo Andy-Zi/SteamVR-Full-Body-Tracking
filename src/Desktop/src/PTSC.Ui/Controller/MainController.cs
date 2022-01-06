@@ -13,6 +13,8 @@ namespace PTSC.Ui.Controller
 {
     public class MainController : BaseController<MainModel, MainView>
     {
+        public IUnityContainer UnityContainer { get; private set; }
+        [Dependency] public IApplicationEnvironment ApplicationEnvironment { get; set; }
         [Dependency] public ILogger Logger { get; set; }
         //Lazy Dependency Injection
         [Dependency] public Lazy<DriverPipeServerController> DriverPipeServer { get; set; }
@@ -37,19 +39,20 @@ namespace PTSC.Ui.Controller
         public BaseController<MainModel, MainView> RegisterEventAggregator(IUnityContainer container)
         {
             //This need to be consturcted on the UI-Thread to enable the Publish on UI-Thread option!
+            UnityContainer = container;
             EventAggregator = new EventAggregator();
             container.RegisterInstance<IEventAggregator>(EventAggregator);
             return this;
         }
         public override BaseController<MainModel, MainView> Initialize()
         {
-            BindData();
-            //TODO Load Data 
-            
-            ModulePipeServer.Value.FPSLimit = 30;
-            ModulePipeServer.Value.RetrieveImage = true;
 
-            KalmanFilterModel.Initialize(1.0/ModulePipeServer.Value.FPSLimit);
+            ModulePipeServer.Value.FPSLimit = ApplicationEnvironment.Settings.FPSLimit;
+            ModulePipeServer.Value.RetrieveImage = ApplicationEnvironment.Settings.SupportModuleImage;
+
+            KalmanFilterModel.Initialize(ApplicationEnvironment.Settings);
+
+            ProcessingPipeline.Value.UseKalmanFilter = ApplicationEnvironment.Settings.UseKalmanFilter;
 
             ModulePipeServer.Value.Start();
             ProcessingPipeline.Value.Start();
@@ -74,6 +77,11 @@ namespace PTSC.Ui.Controller
         private void OnDriverConnected(ConnectionPayload obj)
         {
             this.View.labelDriverStateValue.Text = obj.IsConnected ? "Connected" : "Disconnected";
+        }
+
+        internal void ShowOptions()
+        {
+            UnityContainer.Resolve<SettingsController>().Initialize().View.ShowDialog();
         }
 
         private void OnModuleConnected(ConnectionPayload obj)
@@ -108,7 +116,7 @@ namespace PTSC.Ui.Controller
             if(this.View.tabControlModuleView.SelectedTab.Text == "Module Output")
             {
                 shouldPlot3DGraph = false;
-                ModulePipeServer.Value.RetrieveImage = ModuleWrapper.Value.CurrentDetectionModule?.SupportsImage ?? true;
+                ModulePipeServer.Value.RetrieveImage = ModuleWrapper.Value.CurrentDetectionModule?.SupportsImage ?? true && ApplicationEnvironment.Settings.SupportModuleImage;
             }
             else
             {
@@ -134,7 +142,7 @@ namespace PTSC.Ui.Controller
             });
         }
 
-        private void BindData()
+        protected override void BindData()
         {
             var availableModules = new BindingList<IDetectionModule>(ModuleRepository.Values.ToList());
             this.View.comboBoxModule.ValueMember = null;
@@ -190,7 +198,7 @@ namespace PTSC.Ui.Controller
             //Disable Image-Processing if the Module doesnt support it 
             if(ModuleWrapper.Value.CurrentDetectionModule != null)
             {
-                ModulePipeServer.Value.RetrieveImage = ModuleWrapper.Value.CurrentDetectionModule.SupportsImage;
+                ModulePipeServer.Value.RetrieveImage = ModuleWrapper.Value.CurrentDetectionModule.SupportsImage && ApplicationEnvironment.Settings.SupportModuleImage;
             }
         }
 

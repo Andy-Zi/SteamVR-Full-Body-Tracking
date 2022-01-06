@@ -11,13 +11,13 @@ namespace PTSC
     public class Logger : Interfaces.ILogger
     {
         Serilog.Core.Logger serilogLogger;
+        public string LoggingPath { get; protected set; }
         public Logger(string path,string logFileName = "log.txt")
         {
+            LoggingPath = Path.Combine(path, logFileName);
             serilogLogger = new LoggerConfiguration()
-                .WriteTo.File(Path.Combine(path, logFileName))
-                .CreateLogger();
-
-            
+                .WriteTo.File(LoggingPath)
+                .CreateLogger();      
         }
 
         public void Log(string message,LogEventLevel logLevel = LogEventLevel.Information)

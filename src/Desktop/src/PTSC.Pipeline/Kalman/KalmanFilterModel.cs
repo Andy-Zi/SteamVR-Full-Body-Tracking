@@ -83,5 +83,10 @@ namespace PTSC.Pipeline.Kalman
             }
             return moduledata;
         }
+
+        public void Initialize(IApplicationSettings settings)
+        {
+            Initialize(1.0 / settings.KalmanFPS, settings.KalmanXError, settings.KalmanYError, settings.KalmanZError, settings.KalmanVelocityError);
+        }
     }
 }

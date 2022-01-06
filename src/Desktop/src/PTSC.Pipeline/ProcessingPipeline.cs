@@ -16,7 +16,7 @@ namespace PTSC.Pipeline
     /// </summary>
     public class ProcessingPipeline
     {
-
+        public bool UseKalmanFilter;
         [Dependency] public IEventAggregator EventAggregator { get; set; }
         [Dependency] public IKalmanFilterModel IKalmanFilterModel { get; set; }
         public ProcessingPipeline()
@@ -110,7 +110,9 @@ namespace PTSC.Pipeline
 
         private IModuleDataModel FilterData(IModuleDataModel moduledata)
         {
-            return IKalmanFilterModel.Update(moduledata);
+            if(UseKalmanFilter)
+                return IKalmanFilterModel.Update(moduledata);
+            return moduledata;
         }
 
         private static List<double> CalculateCenter3D(List<double> point1, List<double> point2)

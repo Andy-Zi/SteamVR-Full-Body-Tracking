@@ -17,8 +17,15 @@ namespace PTSC.Ui.Controller
             //Close Stuff here
         }
 
+
+        protected virtual void BindData()
+        {
+
+        }
+
         public virtual BaseController<TModel, TView> Initialize()
         {
+            BindData();
             View.Initialize(this);
             return this;
         }

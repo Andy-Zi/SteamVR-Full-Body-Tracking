@@ -121,15 +121,17 @@ namespace PTSC.Communication.Controller
 
 
                 stopwatch.Stop();
-                ModuleLatencyEvent.Publish(new (stopwatch.ElapsedMilliseconds));
+    
+                ModuleLatencyEvent.Publish(new(stopwatch.ElapsedMilliseconds));
+   
                 if (shouldLimit)
                 {
                     //Delay Loop if necessary 
                     var delta = (int)(targetExecutionTime - stopwatch.ElapsedMilliseconds);
                     if (delta > 0)
                         Task.Delay(delta).Wait();
-                    stopwatch.Reset();
                 }
+                stopwatch.Reset();
             }
             server.Close();
             moduleConnectionEvent.Publish(new ConnectionPayload(false));
