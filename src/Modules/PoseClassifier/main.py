@@ -1,7 +1,7 @@
 
 import cv2
 from MediaPipe.classifier.pose import PoseMP
-from MoveNet.classify import MoveNetModel
+#from MoveNet.classify import MoveNetModel
 import sys
 from typing import Union,Callable
 from utils.positions_dataclass import Positions
@@ -69,8 +69,8 @@ def parse_options():
         parsed_options["commandline-output"] = True
     if "-mp" in opts:
         parsed_options["classifier"] = PoseMP
-    if "-mv" in opts:
-        parsed_options["classifier"] = MoveNetModel
+    #if "-mv" in opts:
+    #    parsed_options["classifier"] = MoveNetModel
     return parsed_options
 
 
