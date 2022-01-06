@@ -30,7 +30,6 @@ namespace ChartWin
     /// </summary>
     public class Graph3D : Chart
     {
-        const float MaxValues = 1.25f;
         const float Interval = 0.5f;
         const float JointSize = 15;
 
@@ -61,7 +60,7 @@ namespace ChartWin
             new(new() { "LEFT_SHOULDER", "LEFT_ELBOW", "LEFT_WRIST"}, Color.Red),
             new(new() { "RIGHT_SHOULDER", "RIGHT_ELBOW", "RIGHT_WRIST"}, Color.Blue),
             new(new() { "RIGHT_HIP", "RIGHT_KNEE", "RIGHT_ANKLE" }, Color.Yellow),
-            new(new() { "LEFT_HIP", "LEFT_KNEE", "LEFT_ANKLE" }, Color.Blue),
+            new(new() { "LEFT_HIP", "LEFT_KNEE", "LEFT_ANKLE" }, Color.Violet),
             new(new() { "LEFT_EAR", "LEFT_EYE", "NOSE" , "RIGHT_EYE", "RIGHT_EAR"}, Color.Green),
         };
         public ChartArea ChartArea3D { get; protected set; }
@@ -76,18 +75,15 @@ namespace ChartWin
             ChartArea3D.Area3DStyle.Enable3D = true;// set the chartarea to 3D!
             ChartArea3D.Area3DStyle.Rotation = 15;
             ChartArea3D.Area3DStyle.Inclination = 50;
-            ChartArea3D.AxisX.Minimum = -MaxValues;
-            ChartArea3D.AxisY.Minimum = -MaxValues;
-            ChartArea3D.AxisX.Maximum = MaxValues;
-            ChartArea3D.AxisY.Maximum = MaxValues;
-            ChartArea3D.AxisX.Interval = Interval;
-            ChartArea3D.AxisY.Interval = Interval;
-            ChartArea3D.AxisX.MajorGrid.Interval = MaxValues;
-            ChartArea3D.AxisY.MajorGrid.Interval = MaxValues;
-            ChartArea3D.AxisX.MinorGrid.Enabled = true;
-            ChartArea3D.AxisY.MinorGrid.Enabled = true;
-            ChartArea3D.AxisX.MinorGrid.Interval = Interval;
-            ChartArea3D.AxisY.MinorGrid.Interval = Interval;
+            ChartArea3D.AxisX.Minimum = -1;
+            ChartArea3D.AxisX.Maximum = 1;
+
+
+            ChartArea3D.AxisX.MajorGrid.Enabled = false;
+            ChartArea3D.AxisY.MajorGrid.Enabled = false;
+            ChartArea3D.AxisX.MinorGrid.Enabled = false;
+            ChartArea3D.AxisY.MinorGrid.Enabled = false;
+
             ChartArea3D.AxisX.MinorGrid.LineColor = Color.White;
             ChartArea3D.AxisY.MinorGrid.LineColor = Color.White;
 
@@ -117,9 +113,8 @@ namespace ChartWin
         {
             try
             {
-                var data = moduleDataModel.GetData();
 
-                Build3DPoints(data);
+                Build3DPoints(moduleDataModel.GetData());
 
                 this.Refresh();
             }
@@ -174,6 +169,7 @@ namespace ChartWin
 
         }
 
+
         void renderBodies(Graphics graphics)
         {
 
@@ -193,6 +189,21 @@ namespace ChartWin
 
             }
         }
+
+        public void Clear()
+        {
+            try
+            {
+                this.Chard3DSeries.Points.Clear();
+                this.Points.Clear();
+
+                this.Refresh();
+            }
+            catch
+            {
+
+            }
+        } 
     }
 }
 

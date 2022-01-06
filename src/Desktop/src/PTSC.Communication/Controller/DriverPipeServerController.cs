@@ -23,6 +23,7 @@ namespace PTSC.Communication.Controller
         [Dependency] public IEventAggregator EventAggregator { get; set; }
 
         protected SubscriptionToken subscriptionToken;
+        private DriverConnectionEvent driverConnectionEvent;
         protected NamedPipeServerStream server;
         protected CancellationTokenSource cancellationTokenSource;
         protected DataProcessedEvent dataProcessedEvent;
@@ -33,7 +34,8 @@ namespace PTSC.Communication.Controller
             try
             {
                 dataProcessedEvent = EventAggregator.GetEvent<DataProcessedEvent>();
-                subscriptionToken = EventAggregator.GetEvent<DataProcessedEvent>().Subscribe(SendData, ThreadOption.BackgroundThread);
+                subscriptionToken = dataProcessedEvent.Subscribe(SendData, ThreadOption.BackgroundThread);
+                driverConnectionEvent = EventAggregator.GetEvent<DriverConnectionEvent>();
                 server = new NamedPipeServerStream(DriverPipeDataModel.PipeName, PipeDirection.Out, 1, PipeTransmissionMode.Byte);
                 WaitForConnection();
             }
@@ -52,6 +54,7 @@ namespace PTSC.Communication.Controller
                 server.WaitForConnection();
                 Logger.Log("Driver pipe server: client connected.");
                 isClientConnected = true;
+                driverConnectionEvent.Publish(new ConnectionPayload(true));
             });
         }
 
@@ -72,6 +75,7 @@ namespace PTSC.Communication.Controller
                 {
                     //Restart the Server on Error 
                     server?.Close();
+                    driverConnectionEvent.Publish(new ConnectionPayload(true));
                     server = new NamedPipeServerStream(DriverPipeDataModel.PipeName, PipeDirection.Out, 1, PipeTransmissionMode.Byte);
                     WaitForConnection();
                 }

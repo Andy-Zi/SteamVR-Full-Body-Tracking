@@ -5,6 +5,7 @@ using PTSC.Interfaces;
 using PTSC.OpenCV;
 using PTSC.Pipeline.Kalman;
 using PTSC.PubSub;
+using System.Diagnostics;
 using System.Drawing;
 using Unity;
 
@@ -26,12 +27,15 @@ namespace PTSC.Pipeline
         protected ImageProcessedEvent ImageProcessedEvent;
         protected DataProcessedEvent DataProcessedEvent;
         protected ModuleDataProcessedEvent ModuleDataProcessedEvent;
+        protected PipelineLatencyEvent PipelineLatencyEvent;
+
         public void Start()
         {
             SubscriptionToken = EventAggregator.GetEvent<DataRecievedEvent>().Subscribe(async (payload) =>  await Process(payload));
             ImageProcessedEvent = EventAggregator.GetEvent<ImageProcessedEvent>();
             DataProcessedEvent = EventAggregator.GetEvent<DataProcessedEvent>();
             ModuleDataProcessedEvent = EventAggregator.GetEvent<ModuleDataProcessedEvent>();
+            PipelineLatencyEvent = EventAggregator.GetEvent<PipelineLatencyEvent>();
         }
 
         public void Stop()
@@ -41,6 +45,7 @@ namespace PTSC.Pipeline
 
         async Task Process(DataRecievedPayload payload)
         {
+            var watch = Stopwatch.StartNew();
             Bitmap processedImage = null;
             if(payload.Image != null)
             {
@@ -51,6 +56,8 @@ namespace PTSC.Pipeline
 
             await Task.Run(() => ImageProcessedEvent.Publish(new ImageProcessedPayload(processedImage)));
             await Task.Run(() => DataProcessedEvent.Publish(new DataProcessedPayload(processedData)));
+            watch.Stop();
+            await Task.Run(() => PipelineLatencyEvent.Publish(new LatencyPayload(watch.ElapsedMilliseconds)));
         }
 
         async Task<Bitmap> ProcessImage(DataRecievedPayload payload)

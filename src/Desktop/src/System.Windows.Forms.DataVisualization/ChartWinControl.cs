@@ -584,7 +584,7 @@ namespace System.Windows.Forms.DataVisualization.Charting
 			// Clear bitmap used to improve the performance of elements
 			// like cursors and annotations
 			// NOTE: Fixes issue #4157
-			if(this.chartPicture.nonTopLevelChartBuffer != null)
+			if(this.chartPicture?.nonTopLevelChartBuffer != null)
 			{
 				this.chartPicture.nonTopLevelChartBuffer.Dispose();
 				this.chartPicture.nonTopLevelChartBuffer = null;

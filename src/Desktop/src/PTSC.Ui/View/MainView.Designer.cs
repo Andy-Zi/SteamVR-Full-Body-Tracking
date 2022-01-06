@@ -28,8 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.tabControl = new System.Windows.Forms.TabControl();
-            this.ModuleTab = new System.Windows.Forms.TabPage();
             this.groupBoxVisualization = new System.Windows.Forms.GroupBox();
             this.tabControlModuleView = new System.Windows.Forms.TabControl();
             this.tabPageModuleView = new System.Windows.Forms.TabPage();
@@ -43,50 +41,30 @@
             this.buttonStartModule = new System.Windows.Forms.Button();
             this.comboBoxModule = new System.Windows.Forms.ComboBox();
             this.groupBoxDriver = new System.Windows.Forms.GroupBox();
-            this.SettingsTab = new System.Windows.Forms.TabPage();
-            this.labelFpsLimit = new System.Windows.Forms.Label();
-            this.numericUpDownFps = new System.Windows.Forms.NumericUpDown();
-            this.tabControl.SuspendLayout();
-            this.ModuleTab.SuspendLayout();
+            this.panelModuleContainer = new System.Windows.Forms.Panel();
+            this.panelPipelineContainer = new System.Windows.Forms.Panel();
+            this.labelModuleStateValue = new System.Windows.Forms.Label();
+            this.labelDriverStateValue = new System.Windows.Forms.Label();
+            this.labelModuleLatency = new System.Windows.Forms.Label();
+            this.labelPipelineLatency = new System.Windows.Forms.Label();
+            this.labelModuleState = new System.Windows.Forms.Label();
+            this.labelDriverState = new System.Windows.Forms.Label();
+            this.labelApplicationSettings = new System.Windows.Forms.Label();
+            this.buttonApplicationSettings = new System.Windows.Forms.Button();
             this.groupBoxVisualization.SuspendLayout();
             this.tabControlModuleView.SuspendLayout();
             this.tabPageModuleView.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).BeginInit();
             this.groupBoxModule.SuspendLayout();
-            this.SettingsTab.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownFps)).BeginInit();
+            this.groupBoxDriver.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // tabControl
-            // 
-            this.tabControl.Controls.Add(this.ModuleTab);
-            this.tabControl.Controls.Add(this.SettingsTab);
-            this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabControl.Location = new System.Drawing.Point(0, 0);
-            this.tabControl.Name = "tabControl";
-            this.tabControl.SelectedIndex = 0;
-            this.tabControl.Size = new System.Drawing.Size(1194, 806);
-            this.tabControl.TabIndex = 0;
-            // 
-            // ModuleTab
-            // 
-            this.ModuleTab.Controls.Add(this.groupBoxVisualization);
-            this.ModuleTab.Controls.Add(this.groupBoxModule);
-            this.ModuleTab.Controls.Add(this.groupBoxDriver);
-            this.ModuleTab.Location = new System.Drawing.Point(4, 24);
-            this.ModuleTab.Name = "ModuleTab";
-            this.ModuleTab.Padding = new System.Windows.Forms.Padding(3);
-            this.ModuleTab.Size = new System.Drawing.Size(1186, 778);
-            this.ModuleTab.TabIndex = 0;
-            this.ModuleTab.Text = "Module";
-            this.ModuleTab.UseVisualStyleBackColor = true;
             // 
             // groupBoxVisualization
             // 
             this.groupBoxVisualization.Controls.Add(this.tabControlModuleView);
-            this.groupBoxVisualization.Location = new System.Drawing.Point(8, 6);
+            this.groupBoxVisualization.Location = new System.Drawing.Point(2, 0);
             this.groupBoxVisualization.Name = "groupBoxVisualization";
-            this.groupBoxVisualization.Size = new System.Drawing.Size(820, 764);
+            this.groupBoxVisualization.Size = new System.Drawing.Size(857, 806);
             this.groupBoxVisualization.TabIndex = 2;
             this.groupBoxVisualization.TabStop = false;
             this.groupBoxVisualization.Text = "Visualization";
@@ -99,7 +77,7 @@
             this.tabControlModuleView.Location = new System.Drawing.Point(3, 19);
             this.tabControlModuleView.Name = "tabControlModuleView";
             this.tabControlModuleView.SelectedIndex = 0;
-            this.tabControlModuleView.Size = new System.Drawing.Size(814, 742);
+            this.tabControlModuleView.Size = new System.Drawing.Size(851, 784);
             this.tabControlModuleView.TabIndex = 1;
             // 
             // tabPageModuleView
@@ -108,7 +86,7 @@
             this.tabPageModuleView.Location = new System.Drawing.Point(4, 24);
             this.tabPageModuleView.Name = "tabPageModuleView";
             this.tabPageModuleView.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageModuleView.Size = new System.Drawing.Size(806, 714);
+            this.tabPageModuleView.Size = new System.Drawing.Size(843, 756);
             this.tabPageModuleView.TabIndex = 0;
             this.tabPageModuleView.Text = "Module Output";
             this.tabPageModuleView.UseVisualStyleBackColor = true;
@@ -118,7 +96,7 @@
             this.pictureBoxImage.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBoxImage.Location = new System.Drawing.Point(3, 3);
             this.pictureBoxImage.Name = "pictureBoxImage";
-            this.pictureBoxImage.Size = new System.Drawing.Size(800, 708);
+            this.pictureBoxImage.Size = new System.Drawing.Size(837, 750);
             this.pictureBoxImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBoxImage.TabIndex = 0;
             this.pictureBoxImage.TabStop = false;
@@ -128,7 +106,7 @@
             this.tabPageSkeleton.Location = new System.Drawing.Point(4, 24);
             this.tabPageSkeleton.Name = "tabPageSkeleton";
             this.tabPageSkeleton.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageSkeleton.Size = new System.Drawing.Size(806, 714);
+            this.tabPageSkeleton.Size = new System.Drawing.Size(843, 756);
             this.tabPageSkeleton.TabIndex = 1;
             this.tabPageSkeleton.Text = "Skeleton View";
             this.tabPageSkeleton.UseVisualStyleBackColor = true;
@@ -141,9 +119,9 @@
             this.groupBoxModule.Controls.Add(this.buttonStopModule);
             this.groupBoxModule.Controls.Add(this.buttonStartModule);
             this.groupBoxModule.Controls.Add(this.comboBoxModule);
-            this.groupBoxModule.Location = new System.Drawing.Point(834, 6);
+            this.groupBoxModule.Location = new System.Drawing.Point(865, 0);
             this.groupBoxModule.Name = "groupBoxModule";
-            this.groupBoxModule.Size = new System.Drawing.Size(349, 371);
+            this.groupBoxModule.Size = new System.Drawing.Size(349, 288);
             this.groupBoxModule.TabIndex = 0;
             this.groupBoxModule.TabStop = false;
             this.groupBoxModule.Text = "Module";
@@ -163,7 +141,7 @@
             this.richTextBoxModule.Location = new System.Drawing.Point(6, 95);
             this.richTextBoxModule.Name = "richTextBoxModule";
             this.richTextBoxModule.ReadOnly = true;
-            this.richTextBoxModule.Size = new System.Drawing.Size(337, 270);
+            this.richTextBoxModule.Size = new System.Drawing.Size(337, 187);
             this.richTextBoxModule.TabIndex = 1;
             this.richTextBoxModule.Text = "";
             // 
@@ -207,80 +185,141 @@
             // 
             // groupBoxDriver
             // 
-            this.groupBoxDriver.Location = new System.Drawing.Point(834, 377);
+            this.groupBoxDriver.Controls.Add(this.panelModuleContainer);
+            this.groupBoxDriver.Controls.Add(this.panelPipelineContainer);
+            this.groupBoxDriver.Controls.Add(this.labelModuleStateValue);
+            this.groupBoxDriver.Controls.Add(this.labelDriverStateValue);
+            this.groupBoxDriver.Controls.Add(this.labelModuleLatency);
+            this.groupBoxDriver.Controls.Add(this.labelPipelineLatency);
+            this.groupBoxDriver.Controls.Add(this.labelModuleState);
+            this.groupBoxDriver.Controls.Add(this.labelDriverState);
+            this.groupBoxDriver.Location = new System.Drawing.Point(865, 294);
             this.groupBoxDriver.Name = "groupBoxDriver";
-            this.groupBoxDriver.Size = new System.Drawing.Size(351, 393);
+            this.groupBoxDriver.Size = new System.Drawing.Size(349, 463);
             this.groupBoxDriver.TabIndex = 1;
             this.groupBoxDriver.TabStop = false;
             this.groupBoxDriver.Text = "VR Driver";
             // 
-            // SettingsTab
+            // panelModuleContainer
             // 
-            this.SettingsTab.Controls.Add(this.numericUpDownFps);
-            this.SettingsTab.Controls.Add(this.labelFpsLimit);
-            this.SettingsTab.Location = new System.Drawing.Point(4, 24);
-            this.SettingsTab.Name = "SettingsTab";
-            this.SettingsTab.Padding = new System.Windows.Forms.Padding(3);
-            this.SettingsTab.Size = new System.Drawing.Size(1186, 778);
-            this.SettingsTab.TabIndex = 1;
-            this.SettingsTab.Text = "Settings";
-            this.SettingsTab.UseVisualStyleBackColor = true;
+            this.panelModuleContainer.Location = new System.Drawing.Point(6, 305);
+            this.panelModuleContainer.Name = "panelModuleContainer";
+            this.panelModuleContainer.Size = new System.Drawing.Size(337, 152);
+            this.panelModuleContainer.TabIndex = 7;
             // 
-            // labelFpsLimit
+            // panelPipelineContainer
             // 
-            this.labelFpsLimit.AutoSize = true;
-            this.labelFpsLimit.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.labelFpsLimit.Location = new System.Drawing.Point(8, 12);
-            this.labelFpsLimit.Name = "labelFpsLimit";
-            this.labelFpsLimit.Size = new System.Drawing.Size(72, 20);
-            this.labelFpsLimit.TabIndex = 0;
-            this.labelFpsLimit.Text = "FPS Limit:";
+            this.panelPipelineContainer.Location = new System.Drawing.Point(6, 119);
+            this.panelPipelineContainer.Name = "panelPipelineContainer";
+            this.panelPipelineContainer.Size = new System.Drawing.Size(337, 159);
+            this.panelPipelineContainer.TabIndex = 6;
             // 
-            // numericUpDownFps
+            // labelModuleStateValue
             // 
-            this.numericUpDownFps.Location = new System.Drawing.Point(86, 12);
-            this.numericUpDownFps.Maximum = new decimal(new int[] {
-            240,
-            0,
-            0,
-            0});
-            this.numericUpDownFps.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            -2147483648});
-            this.numericUpDownFps.Name = "numericUpDownFps";
-            this.numericUpDownFps.Size = new System.Drawing.Size(120, 23);
-            this.numericUpDownFps.TabIndex = 1;
+            this.labelModuleStateValue.AutoSize = true;
+            this.labelModuleStateValue.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labelModuleStateValue.Location = new System.Drawing.Point(120, 53);
+            this.labelModuleStateValue.Name = "labelModuleStateValue";
+            this.labelModuleStateValue.Size = new System.Drawing.Size(103, 21);
+            this.labelModuleStateValue.TabIndex = 5;
+            this.labelModuleStateValue.Text = "Disconnected";
+            // 
+            // labelDriverStateValue
+            // 
+            this.labelDriverStateValue.AutoSize = true;
+            this.labelDriverStateValue.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labelDriverStateValue.Location = new System.Drawing.Point(120, 19);
+            this.labelDriverStateValue.Name = "labelDriverStateValue";
+            this.labelDriverStateValue.Size = new System.Drawing.Size(103, 21);
+            this.labelDriverStateValue.TabIndex = 4;
+            this.labelDriverStateValue.Text = "Disconnected";
+            // 
+            // labelModuleLatency
+            // 
+            this.labelModuleLatency.AutoSize = true;
+            this.labelModuleLatency.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labelModuleLatency.Location = new System.Drawing.Point(6, 281);
+            this.labelModuleLatency.Name = "labelModuleLatency";
+            this.labelModuleLatency.Size = new System.Drawing.Size(127, 21);
+            this.labelModuleLatency.TabIndex = 3;
+            this.labelModuleLatency.Text = "Module Latency :";
+            // 
+            // labelPipelineLatency
+            // 
+            this.labelPipelineLatency.AutoSize = true;
+            this.labelPipelineLatency.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labelPipelineLatency.Location = new System.Drawing.Point(6, 93);
+            this.labelPipelineLatency.Name = "labelPipelineLatency";
+            this.labelPipelineLatency.Size = new System.Drawing.Size(129, 21);
+            this.labelPipelineLatency.TabIndex = 2;
+            this.labelPipelineLatency.Text = "Pipeline Latency :";
+            // 
+            // labelModuleState
+            // 
+            this.labelModuleState.AutoSize = true;
+            this.labelModuleState.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labelModuleState.Location = new System.Drawing.Point(6, 53);
+            this.labelModuleState.Name = "labelModuleState";
+            this.labelModuleState.Size = new System.Drawing.Size(108, 21);
+            this.labelModuleState.TabIndex = 1;
+            this.labelModuleState.Text = "Module State :";
+            // 
+            // labelDriverState
+            // 
+            this.labelDriverState.AutoSize = true;
+            this.labelDriverState.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labelDriverState.Location = new System.Drawing.Point(6, 19);
+            this.labelDriverState.Name = "labelDriverState";
+            this.labelDriverState.Size = new System.Drawing.Size(98, 21);
+            this.labelDriverState.TabIndex = 0;
+            this.labelDriverState.Text = "Driver State :";
+            // 
+            // labelApplicationSettings
+            // 
+            this.labelApplicationSettings.AutoSize = true;
+            this.labelApplicationSettings.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.labelApplicationSettings.Location = new System.Drawing.Point(1010, 768);
+            this.labelApplicationSettings.Name = "labelApplicationSettings";
+            this.labelApplicationSettings.Size = new System.Drawing.Size(159, 21);
+            this.labelApplicationSettings.TabIndex = 3;
+            this.labelApplicationSettings.Text = "Application Settings : ";
+            // 
+            // buttonApplicationSettings
+            // 
+            this.buttonApplicationSettings.BackgroundImage = global::PTSC.Ui.Properties.Resources.gear;
+            this.buttonApplicationSettings.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.buttonApplicationSettings.Location = new System.Drawing.Point(1164, 760);
+            this.buttonApplicationSettings.Name = "buttonApplicationSettings";
+            this.buttonApplicationSettings.Size = new System.Drawing.Size(44, 40);
+            this.buttonApplicationSettings.TabIndex = 5;
+            this.buttonApplicationSettings.UseVisualStyleBackColor = true;
             // 
             // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1194, 806);
-            this.Controls.Add(this.tabControl);
+            this.ClientSize = new System.Drawing.Size(1216, 806);
+            this.Controls.Add(this.buttonApplicationSettings);
+            this.Controls.Add(this.labelApplicationSettings);
+            this.Controls.Add(this.groupBoxVisualization);
+            this.Controls.Add(this.groupBoxDriver);
+            this.Controls.Add(this.groupBoxModule);
             this.Name = "MainView";
             this.Text = "PTSC";
-            this.tabControl.ResumeLayout(false);
-            this.ModuleTab.ResumeLayout(false);
             this.groupBoxVisualization.ResumeLayout(false);
             this.tabControlModuleView.ResumeLayout(false);
             this.tabPageModuleView.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxImage)).EndInit();
             this.groupBoxModule.ResumeLayout(false);
             this.groupBoxModule.PerformLayout();
-            this.SettingsTab.ResumeLayout(false);
-            this.SettingsTab.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownFps)).EndInit();
+            this.groupBoxDriver.ResumeLayout(false);
+            this.groupBoxDriver.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
-
-        public TabControl tabControl;
-        public TabPage ModuleTab;
-        public TabPage SettingsTab;
         public PictureBox pictureBoxImage;
         private GroupBox groupBoxModule;
         public ComboBox comboBoxModule;
@@ -294,7 +333,15 @@
         private Label labelModuleLog;
         private GroupBox groupBoxDriver;
         private GroupBox groupBoxVisualization;
-        private NumericUpDown numericUpDownFps;
-        private Label labelFpsLimit;
+        private Label labelApplicationSettings;
+        private Button buttonApplicationSettings;
+        private Label labelModuleLatency;
+        private Label labelPipelineLatency;
+        private Label labelModuleState;
+        private Label labelDriverState;
+        private Panel panelModuleContainer;
+        private Panel panelPipelineContainer;
+        public Label labelDriverStateValue;
+        public Label labelModuleStateValue;
     }
 }

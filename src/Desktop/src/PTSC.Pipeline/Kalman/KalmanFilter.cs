@@ -140,7 +140,7 @@ namespace PTSC.Pipeline.Kalman
             predict();
 
 
-            return new List<double>() { x[0][0], x[2][0], x[4][0], temp_measureND[3] };
+            return new List<double>() { x[0][0], x[2][0], x[4][0], measure.Last() };
         }
     }
 }

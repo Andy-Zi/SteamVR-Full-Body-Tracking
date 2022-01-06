@@ -7,15 +7,26 @@ namespace PTSC.Ui.View
     {
 
         public Graph3D Graph3D;
+        public LatencyGraph PiplineLatencyGraph;
+        public LatencyGraph ModuleLatencyGraph;
         public MainView()
         {
             InitializeComponent();
             Graph3D = new();
             this.tabPageSkeleton.Controls.Add(Graph3D);
             Graph3D.Dock = DockStyle.Fill;
-            this.groupBoxDriver.Paint += GroupBox_Paint;
-            this.groupBoxModule.Paint += GroupBox_Paint;
-            this.groupBoxVisualization.Paint += GroupBox_Paint;
+
+            PiplineLatencyGraph = new();
+            this.panelPipelineContainer.Controls.Add(PiplineLatencyGraph);
+            PiplineLatencyGraph.Dock = DockStyle.Fill;
+
+            ModuleLatencyGraph = new();
+            this.panelModuleContainer.Controls.Add(ModuleLatencyGraph);
+            this.ModuleLatencyGraph.Dock = DockStyle.Fill;
+
+            //this.groupBoxDriver.Paint += GroupBox_Paint;
+            //this.groupBoxModule.Paint += GroupBox_Paint;
+            //this.groupBoxVisualization.Paint += GroupBox_Paint;
         }
 
         private void GroupBox_Paint(object sender, PaintEventArgs e)

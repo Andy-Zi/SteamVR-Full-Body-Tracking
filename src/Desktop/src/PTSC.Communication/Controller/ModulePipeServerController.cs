@@ -24,6 +24,9 @@ namespace PTSC.Communication.Controller
         protected NamedPipeServerStream server;
         protected CancellationTokenSource cancellationTokenSource;
         protected DataRecievedEvent dataRecievedEvent;
+        protected ModuleLatencyEvent ModuleLatencyEvent;
+        private ModuleConnectionEvent moduleConnectionEvent;
+
         public CancellationToken CancellationToken { get; protected set; }
 
         /// <summary>
@@ -66,6 +69,9 @@ namespace PTSC.Communication.Controller
             cancellationTokenSource = new CancellationTokenSource();
             CancellationToken = cancellationTokenSource.Token;
             dataRecievedEvent = EventAggregator.GetEvent<DataRecievedEvent>();
+            ModuleLatencyEvent = EventAggregator.GetEvent<ModuleLatencyEvent>();
+            moduleConnectionEvent = EventAggregator.GetEvent<ModuleConnectionEvent>();
+            
             StartServer();
 
         }
@@ -89,13 +95,11 @@ namespace PTSC.Communication.Controller
             var message = new Span<byte>(new byte[ModulePipeDataModel.BufferSize]);
             Stopwatch stopwatch = new Stopwatch();
             IModuleDataModel moduleDataModel = null;
-            
+            moduleConnectionEvent.Publish(new ConnectionPayload(true));
             while (server.IsConnected)
             {
-                if (shouldLimit)
-                {
-                    stopwatch.Start();
-                }
+                stopwatch.Start();
+             
                 var lenght = server.Read(message);
                 if (lenght > 0)
                 {
@@ -111,14 +115,16 @@ namespace PTSC.Communication.Controller
                     moduleDataModel = HandleJsonData(jsondata);
 
                     //Dispatch Processing to different Thread
-                    dataRecievedEvent.Publish(new DataRecievedPayload(moduleDataModel, image));
+                    Task.Run(() => { dataRecievedEvent.Publish(new DataRecievedPayload(moduleDataModel, image)); });
                 }
                 message.Clear();
 
-                if(shouldLimit)
+
+                stopwatch.Stop();
+                ModuleLatencyEvent.Publish(new (stopwatch.ElapsedMilliseconds));
+                if (shouldLimit)
                 {
-                    //Delay Loop if necessary
-                    stopwatch.Stop();
+                    //Delay Loop if necessary 
                     var delta = (int)(targetExecutionTime - stopwatch.ElapsedMilliseconds);
                     if (delta > 0)
                         Task.Delay(delta).Wait();
@@ -126,7 +132,7 @@ namespace PTSC.Communication.Controller
                 }
             }
             server.Close();
-
+            moduleConnectionEvent.Publish(new ConnectionPayload(false));
             //Restart the Server if it wasnt Cancelled!
             if (!CancellationToken.IsCancellationRequested)
                 StartServer();

@@ -62,9 +62,45 @@ namespace PTSC.Ui.Controller
         {
             SubscriptionTokens.Add(EventAggregator.GetEvent<ImageProcessedEvent>().Subscribe(DisplayImage, ThreadOption.UIThread, false));
             SubscriptionTokens.Add(EventAggregator.GetEvent<ModuleDataProcessedEvent>().Subscribe(Plot3DGraph, ThreadOption.UIThread, false));
+            SubscriptionTokens.Add(EventAggregator.GetEvent<PipelineLatencyEvent>().Subscribe(PlotPipelineLatency, ThreadOption.UIThread, false));
+            SubscriptionTokens.Add(EventAggregator.GetEvent<ModuleLatencyEvent>().Subscribe(PlotModuleLatency, ThreadOption.UIThread, false));
+            SubscriptionTokens.Add(EventAggregator.GetEvent<ModuleConnectionEvent>().Subscribe(OnModuleConnected, ThreadOption.UIThread, false));
+            SubscriptionTokens.Add(EventAggregator.GetEvent<DriverConnectionEvent>().Subscribe(OnDriverConnected, ThreadOption.UIThread, false));
             ModuleWrapper.Value.OnError += ModuleWrapper_OnMessage;
             ModuleWrapper.Value.OnMessage += ModuleWrapper_OnMessage;
             this.View.tabControlModuleView.Selected += TabControlModuleView_TabIndexChanged;
+        }
+
+        private void OnDriverConnected(ConnectionPayload obj)
+        {
+            this.View.labelDriverStateValue.Text = obj.IsConnected ? "Connected" : "Disconnected";
+        }
+
+        private void OnModuleConnected(ConnectionPayload obj)
+        {
+            this.View.labelModuleStateValue.Text = obj.IsConnected ? "Connected" : "Disconnected";
+
+            if (!obj.IsConnected)
+            {
+                this.View.richTextBoxModule.Clear();
+                this.View.ModuleLatencyGraph.Clear();
+                this.View.PiplineLatencyGraph.Clear();
+                this.View.Graph3D.Clear();
+                this.View.pictureBoxImage.SuspendLayout();
+                this.View.pictureBoxImage.Image = null;
+                this.View.pictureBoxImage.Refresh();
+                this.View.pictureBoxImage.ResumeLayout();
+            }
+        }
+
+        private void PlotModuleLatency(LatencyPayload obj)
+        {
+            this.View.ModuleLatencyGraph.Update(obj.Latency);
+        }
+
+        private void PlotPipelineLatency(LatencyPayload obj)
+        {
+            this.View.PiplineLatencyGraph.Update(obj.Latency);
         }
 
         private void TabControlModuleView_TabIndexChanged(object sender, EventArgs e)
@@ -142,7 +178,12 @@ namespace PTSC.Ui.Controller
             var selectedModule  = this.View.comboBoxModule.SelectedItem as IDetectionModule;
             if (selectedModule != null)
             {
-                this.View.richTextBoxModule.Clear();
+
+                if (ModuleWrapper.Value.CurrentDetectionModule != null)
+                {
+                    if (!ModuleWrapper.Value.CurrentDetectionModule.Name.Equals(selectedModule.Name))
+                        StopModule();
+                }
                 ModuleWrapper.Value.Start(selectedModule);
             }
 
@@ -155,7 +196,6 @@ namespace PTSC.Ui.Controller
 
         internal void StopModule()
         {
-            this.View.richTextBoxModule.Clear();
             ModuleWrapper.Value.Stop();
         }
     }

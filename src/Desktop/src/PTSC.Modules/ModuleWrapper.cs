@@ -21,15 +21,6 @@ namespace PTSC.Modules
 
         public void Start(IDetectionModule detectionModule)
         {
-            if(CurrentDetectionModule != null)
-            {
-                if (CurrentDetectionModule.Name.Equals(detectionModule.Name))
-                    return;
-
-                Stop();
-                CurrentProcess?.WaitForExit();
-            }
-
             // Check for venv folder
             string venvPath = Path.Combine(detectionModule.WorkingDirectory, detectionModule.InstallationDirectory);
             if (!Directory.Exists(venvPath))
