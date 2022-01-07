@@ -86,6 +86,7 @@ namespace PTSC.Pipeline
             return await Task.Run(() =>
             {
                 var moduledata = payload.ModuleDataModel;
+                moduledata = correctYAxis(moduledata);
                 moduledata = FilterData(moduledata);
 
                 Task.Run(() => ModuleDataProcessedEvent.Publish(new(moduledata)));
@@ -121,6 +122,17 @@ namespace PTSC.Pipeline
             var y_new = (point1[1] + point2[1]) / 2;
             var z_new = (point1[2] + point2[2]) / 2;
             return new List<double> { x_new, y_new, z_new };
+        }
+
+        private static IModuleDataModel correctYAxis(IModuleDataModel moduledata)
+        {
+            foreach(var propertyInfo in ModuleDataModel.Properties)
+            {
+                var value = (List<double>)propertyInfo.GetValue(moduledata);
+                value[1] = -value[1];
+                propertyInfo.SetValue(moduledata, value);
+            }
+            return moduledata;
         }
     }
 }

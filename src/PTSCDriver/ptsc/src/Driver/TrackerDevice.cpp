@@ -81,7 +81,7 @@ void ptscDriver::TrackerDevice::Update()
     // Setup pose for this frame
     auto pose = this->wanted_pose_;
     pose.vecPosition[0] = pose.vecPosition[0] + vector.v[0];
-    pose.vecPosition[1] = -pose.vecPosition[1] + vector.v[1];
+    pose.vecPosition[1] = pose.vecPosition[1] + vector.v[1];
     pose.vecPosition[2] = pose.vecPosition[2] + vector.v[2];
     //this->wanted_pose_.vecPosition[0] += vector[0];//position_smoothing * x + (1 - position_smoothing) * this->wanted_pose_.vecPosition[0];  //can do some motion smoothing here?
     //this->wanted_pose_.vecPosition[1] += vector[1];//position_smoothing * y + (1 - position_smoothing) * this->wanted_pose_.vecPosition[1];

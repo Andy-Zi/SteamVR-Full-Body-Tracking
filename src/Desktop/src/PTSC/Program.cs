@@ -75,6 +75,7 @@ namespace PTSC
 
             container.RegisterType<DriverPipeServerController, DriverPipeServerController>(new ContainerControlledLifetimeManager());
             container.RegisterType<DriverPipeServerController, DriverPipeServerController>(new ContainerControlledLifetimeManager());
+            container.RegisterType<DataController, DataController>(new ContainerControlledLifetimeManager());
             container.RegisterType<ProcessingPipeline, ProcessingPipeline>(new ContainerControlledLifetimeManager());
             container.RegisterType<ModuleWrapper, ModuleWrapper>(new ContainerControlledLifetimeManager());
             container.RegisterInstance<IKalmanFilterModel>(new KalmanFilterModel());

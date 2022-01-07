@@ -1,4 +1,5 @@
 ﻿using PTSC.Interfaces;
+using System.Reflection;
 using System.Windows.Forms.DataVisualization.Charting;
 
 namespace PTSC.Communication.Model
@@ -6,6 +7,9 @@ namespace PTSC.Communication.Model
 
     public class ModuleDataModel : IModuleDataModel
     {
+
+        public static PropertyInfo[] Properties = typeof(ModuleDataModel).GetProperties();
+
         public List<double> NOSE { get; set; }
 
         public List<double> LEFT_EYE { get; set; }

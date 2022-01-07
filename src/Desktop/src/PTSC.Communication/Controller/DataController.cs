@@ -13,7 +13,11 @@ namespace PTSC.Communication.Controller
         [Dependency] public ILogger Logger { get; set; }
         [Dependency] public IApplicationEnvironment ApplicationEnvironment { get; set; }
 
-        public string seperator = ";";
+
+
+        public const string seperator = ";";
+        public double RotationOffset = 0;
+        public double ScalingOffset = 1;
 
         public string SerializeDriverData(IDriverDataModel driverData)
         {
@@ -39,15 +43,13 @@ namespace PTSC.Communication.Controller
             // add coordinate values to serialized string if they are not null
             if (coordinates != null)
             {
-                serializedProperty = keyWord + seperator;
                 // scale coordinate before serializing
                 coordinates = ScaleCoordinates(coordinates);
                 // rotate coordinate before serializing
                 coordinates = RotateCoordinates(coordinates);
-                foreach (var coord in coordinates.Take(3))
-                {
-                    serializedProperty += coord.ToString() + seperator;
-                }
+
+                serializedProperty += $"{keyWord}{seperator}{coordinates[0]}{seperator}{coordinates[2]}{seperator}{coordinates[1]}{seperator}";
+                
             }
             return serializedProperty;
         }
@@ -64,10 +66,9 @@ namespace PTSC.Communication.Controller
         private List<double> ScaleCoordinates(List<double> coordinates)
         {
             List<double> resultingCoordinate = new List<double>();
-            double Scaling = ApplicationEnvironment.Settings.Scaling;
             foreach (var coord in coordinates.Take(3))
             {
-                double newCoordinate = coord * Scaling;
+                double newCoordinate = coord * ScalingOffset;
                 resultingCoordinate.Add(newCoordinate);
             }
             return resultingCoordinate;
@@ -75,12 +76,12 @@ namespace PTSC.Communication.Controller
 
         private List<double> RotateCoordinates(List<double> coordinates)
         {
-            double Rotation = ToRadians(ApplicationEnvironment.Settings.Rotation);
+            double Rotation = ToRadians(RotationOffset);
             double x = coordinates[0];
-            double y = coordinates[1];
+            double y = coordinates[2];
             double newX = Math.Cos(Rotation) * x - Math.Sin(Rotation) * y;
             double newY = Math.Sin(Rotation) * x + Math.Cos(Rotation) * y;
-            double newZ = coordinates[2];
+            double newZ = coordinates[1];
             return new List<double> { newX, newY, newZ };
         }
 

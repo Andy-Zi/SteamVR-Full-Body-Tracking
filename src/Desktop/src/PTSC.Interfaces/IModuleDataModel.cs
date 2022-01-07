@@ -1,7 +1,12 @@
-﻿namespace PTSC.Interfaces
+﻿using System.Reflection;
+
+namespace PTSC.Interfaces
 {
      public interface IModuleDataModel
     {
+
+        static PropertyInfo[] Properties;
+
          List<double> NOSE { get; set; }
 
          List<double> LEFT_EYE { get; set; }

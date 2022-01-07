@@ -131,7 +131,7 @@ namespace ChartWin
                 if (value == null)
                     continue;
 
-                Points.Add(key, new(key, new((float)-value[0], (float)-value[1], (float)-value[2])));
+                Points.Add(key, new(key, new((float)-value[0], (float)value[1], (float)-value[2])));
 
                 var p = Chard3DSeries.Points?.AddXY((float)-value[0], (float)-value[1], (float)-value[2]);
                 if(Chard3DSeries.Points != null)

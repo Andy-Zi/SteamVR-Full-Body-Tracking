@@ -13,7 +13,7 @@ namespace PTSC.Ui.Controller
 
         [Dependency] public ModulePipeServerController ModulePipeServer { get; set; }
         [Dependency] public ProcessingPipeline ProcessingPipeline { get; set; }
-
+        [Dependency] public DataController DataController { get; set; }
         [Dependency] public IKalmanFilterModel KalmanFilterModel { get; set; }
 
         [Dependency] public IApplicationEnvironment ApplicationEnvironment { get; set; }
@@ -95,6 +95,7 @@ namespace PTSC.Ui.Controller
             UpdateModuleServer();
             UpdateKalman();
             UpdatePipeline();
+            UpdateDataController();
 
         }
         private void UpdateModuleServer()
@@ -111,7 +112,13 @@ namespace PTSC.Ui.Controller
         private void UpdatePipeline()
         {
             ProcessingPipeline.UseKalmanFilter = Model.UseKalmanFilter;
-            //TODO Sacling and Rotation
+        }
+
+        private void UpdateDataController()
+        {
+            DataController.ScalingOffset = Model.Scaling;
+            DataController.RotationOffset = Model.Rotation;
+
         }
     }
 }
