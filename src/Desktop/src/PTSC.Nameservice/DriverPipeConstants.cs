@@ -1,6 +1,6 @@
-﻿namespace PTSC.Communication.Model
+﻿namespace PTSC.Nameservice
 {
-    public static class DriverPipeDataModel
+    public static class DriverPipeConstants
     {
         public const string PipeName = "PTSCDriverPipe";
         public const int BufferSize = 1000; // 1000 Bytes

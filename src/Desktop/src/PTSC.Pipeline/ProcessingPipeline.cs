@@ -2,6 +2,7 @@
 using Prism.Events;
 using PTSC.Communication.Model;
 using PTSC.Interfaces;
+using PTSC.Nameservice;
 using PTSC.OpenCV;
 using PTSC.Pipeline.Kalman;
 using PTSC.PubSub;
@@ -18,7 +19,7 @@ namespace PTSC.Pipeline
     {
         public bool UseKalmanFilter;
         [Dependency] public IEventAggregator EventAggregator { get; set; }
-        [Dependency] public IKalmanFilterModel IKalmanFilterModel { get; set; }
+        [Dependency] public IKalmanFilterModel KalmanFilterModel { get; set; }
         public ProcessingPipeline()
         {
 
@@ -66,7 +67,7 @@ namespace PTSC.Pipeline
             return await Task.Run(() => {
                 try
                 {
-                    var moduledata = payload.ModuleDataModel;
+                    var moduledata = payload.ModuleData;
                     var img = payload.Image;
                     var bitmap = OpenCVService.Mat2Bitmap(img);
                     img.Dispose();
@@ -83,54 +84,55 @@ namespace PTSC.Pipeline
 
         async Task<IDriverDataModel> ProcessData(DataRecievedPayload payload)
         {
-            return await Task.Run(() =>
+            return await Task.Run(async () =>
             {
-                var moduledata = payload.ModuleDataModel;
+                var moduledata = payload.ModuleData;
                 moduledata = correctYAxis(moduledata);
-                moduledata = FilterData(moduledata);
+                moduledata = await FilterData(moduledata);
 
-                Task.Run(() => ModuleDataProcessedEvent.Publish(new(moduledata)));
+                await Task.Run(() => ModuleDataProcessedEvent.Publish(new(moduledata)));
                 return MapData(moduledata);
             });
         }
 
-        private IDriverDataModel MapData(IModuleDataModel moduledata)
+        private IDriverDataModel MapData(IModuleData moduledata)
         {
-            List<double> zeroList = new List<double> { 0.0f, 0.0f, 0.0f };
+            var zeroList = new List<double>() { 0.0, 0.0, 0.0};
             DriverDataModel driverData = new DriverDataModel();
             // set nose as head for driver
-            driverData.head = moduledata.NOSE ?? zeroList;
+            driverData.head = moduledata["NOSE"].GetValues() ?? zeroList;
             // set center point of hips as the waist point fro driver
-            driverData.waist = CalculateCenter3D(moduledata.LEFT_HIP ?? zeroList, moduledata.RIGHT_HIP ?? zeroList);
+            driverData.waist = CalculateCenter3D(moduledata["LEFT_HIP"].GetValues() ?? zeroList, moduledata["RIGHT_HIP"].GetValues() ?? zeroList);
             // set ancles as foots for driver
-            driverData.left_foot = moduledata.LEFT_ANKLE ?? zeroList;
-            driverData.right_foot = moduledata.RIGHT_ANKLE ?? zeroList;
+            driverData.left_foot = moduledata["LEFT_ANKLE"].GetValues() ?? zeroList;
+            driverData.right_foot = moduledata["RIGHT_ANKLE"].GetValues() ?? zeroList;
             return driverData;
         }
+       
 
 
-        private IModuleDataModel FilterData(IModuleDataModel moduledata)
+        private async Task<IModuleData> FilterData(IModuleData moduledata)
         {
             if(UseKalmanFilter)
-                return IKalmanFilterModel.Update(moduledata);
+                return await KalmanFilterModel.Update(moduledata);
             return moduledata;
         }
 
         private static List<double> CalculateCenter3D(List<double> point1, List<double> point2)
         {
+            if(point1.Count < 3|| point2.Count < 3)
+                return new List<double>() { 0.0,0.0,0.0};
             var x_new = (point1[0] + point2[0]) / 2;
             var y_new = (point1[1] + point2[1]) / 2;
             var z_new = (point1[2] + point2[2]) / 2;
             return new List<double> { x_new, y_new, z_new };
         }
 
-        private static IModuleDataModel correctYAxis(IModuleDataModel moduledata)
+        private static IModuleData correctYAxis(IModuleData moduledata)
         {
-            foreach(var propertyInfo in ModuleDataModel.Properties)
+            foreach (var key in ModulePipeConstants.SkeletonParts)
             {
-                var value = (List<double>)propertyInfo.GetValue(moduledata);
-                value[1] = -value[1];
-                propertyInfo.SetValue(moduledata, value);
+                moduledata[key].Y = -moduledata[key].Y;
             }
             return moduledata;
         }

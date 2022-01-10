@@ -2,6 +2,7 @@
 using Prism.Events;
 using PTSC.Communication.Model;
 using PTSC.Interfaces;
+using PTSC.Nameservice;
 using PTSC.OpenCV;
 using PTSC.PubSub;
 using System.Diagnostics;
@@ -83,7 +84,7 @@ namespace PTSC.Communication.Controller
 
         protected void StartServer()
         {
-            server = new NamedPipeServerStream(ModulePipeDataModel.PipeName, PipeDirection.In, 1, PipeTransmissionMode.Byte);
+            server = new NamedPipeServerStream(ModulePipeConstants.PipeName, PipeDirection.In, 1, PipeTransmissionMode.Byte);
             Task.Run(ServerFunction, CancellationToken);
         }
 
@@ -92,9 +93,9 @@ namespace PTSC.Communication.Controller
         {
             //Wait for a Client
             server.WaitForConnection();
-            var message = new Span<byte>(new byte[ModulePipeDataModel.BufferSize]);
+            var message = new Span<byte>(new byte[ModulePipeConstants.BufferSize]);
             Stopwatch stopwatch = new Stopwatch();
-            IModuleDataModel moduleDataModel = null;
+            ModuleDataModel moduleDataModel = null;
             moduleConnectionEvent.Publish(new ConnectionPayload(true));
             while (server.IsConnected)
             {
@@ -104,18 +105,18 @@ namespace PTSC.Communication.Controller
                 if (lenght > 0)
                 {
                     //This has to be executed in Series because Span<T> can't be split between Tasks
-                    if (RetrieveImage && lenght > ModulePipeDataModel.JsonBufferSize )
+                    if (RetrieveImage && lenght > ModulePipeConstants.JsonBufferSize )
                     {
-                        var imagedata = message[ModulePipeDataModel.JsonBufferSize..lenght];
+                        var imagedata = message[ModulePipeConstants.JsonBufferSize..lenght];
                         image = HandleImageData(imagedata);
                     }
 
-                    var jsondata = message[..ModulePipeDataModel.JsonBufferSize];
+                    var jsondata = message[..ModulePipeConstants.JsonBufferSize];
 
                     moduleDataModel = HandleJsonData(jsondata);
 
                     //Dispatch Processing to different Thread
-                    Task.Run(() => { dataRecievedEvent.Publish(new DataRecievedPayload(moduleDataModel, image)); });
+                    Task.Run(() => { dataRecievedEvent.Publish(new DataRecievedPayload(new ModuleData(moduleDataModel), image)); });
                 }
                 message.Clear();
 
@@ -139,7 +140,7 @@ namespace PTSC.Communication.Controller
             if (!CancellationToken.IsCancellationRequested)
                 StartServer();
         }
-        protected IModuleDataModel HandleJsonData(Span<byte> jsonData)
+        protected ModuleDataModel HandleJsonData(Span<byte> jsonData)
         {
 
             string receivedData = Encoding.UTF8.GetString(jsonData);

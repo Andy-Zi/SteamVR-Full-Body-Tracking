@@ -10,12 +10,12 @@ namespace PTSC.PubSub
 
     public class ModuleDataProcessedPayload
     {
-        public ModuleDataProcessedPayload(IModuleDataModel moduleDataModel)
+        public ModuleDataProcessedPayload(IModuleData moduleData)
         {
-            ModuleDataModel = moduleDataModel;
+            ModuleData = moduleData;
         }
 
-        public IModuleDataModel ModuleDataModel { get; }
+        public IModuleData ModuleData { get; }
     }
 
     public class ModuleDataProcessedEvent : Prism.Events.PubSubEvent<ModuleDataProcessedPayload>

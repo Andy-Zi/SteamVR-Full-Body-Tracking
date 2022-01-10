@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Reflection;
-using System.Text.Json;
+﻿using System.Text.Json;
 using PTSC.Communication.Model;
 using PTSC.Interfaces;
 using Unity;
-using System;
 
 namespace PTSC.Communication.Controller
 {

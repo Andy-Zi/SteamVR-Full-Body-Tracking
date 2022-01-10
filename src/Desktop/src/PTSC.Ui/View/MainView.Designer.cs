@@ -36,7 +36,7 @@
             this.groupBoxModule = new System.Windows.Forms.GroupBox();
             this.labelModuleLog = new System.Windows.Forms.Label();
             this.richTextBoxModule = new System.Windows.Forms.RichTextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.button_moduleSettings = new System.Windows.Forms.Button();
             this.buttonStopModule = new System.Windows.Forms.Button();
             this.buttonStartModule = new System.Windows.Forms.Button();
             this.comboBoxModule = new System.Windows.Forms.ComboBox();
@@ -115,7 +115,7 @@
             // 
             this.groupBoxModule.Controls.Add(this.labelModuleLog);
             this.groupBoxModule.Controls.Add(this.richTextBoxModule);
-            this.groupBoxModule.Controls.Add(this.button1);
+            this.groupBoxModule.Controls.Add(this.button_moduleSettings);
             this.groupBoxModule.Controls.Add(this.buttonStopModule);
             this.groupBoxModule.Controls.Add(this.buttonStartModule);
             this.groupBoxModule.Controls.Add(this.comboBoxModule);
@@ -145,15 +145,16 @@
             this.richTextBoxModule.TabIndex = 1;
             this.richTextBoxModule.Text = "";
             // 
-            // button1
+            // button_moduleSettings
             // 
-            this.button1.BackgroundImage = global::PTSC.Ui.Properties.Resources.gear;
-            this.button1.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.button1.Location = new System.Drawing.Point(318, 21);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(25, 25);
-            this.button1.TabIndex = 3;
-            this.button1.UseVisualStyleBackColor = true;
+            this.button_moduleSettings.BackgroundImage = global::PTSC.Ui.Properties.Resources.gear;
+            this.button_moduleSettings.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.button_moduleSettings.Location = new System.Drawing.Point(318, 21);
+            this.button_moduleSettings.Name = "button_moduleSettings";
+            this.button_moduleSettings.Size = new System.Drawing.Size(25, 25);
+            this.button_moduleSettings.TabIndex = 3;
+            this.button_moduleSettings.UseVisualStyleBackColor = true;
+            this.button_moduleSettings.Click += new System.EventHandler(this.button_moduleSettings_Click);
             // 
             // buttonStopModule
             // 
@@ -330,7 +331,7 @@
         private TabPage tabPageModuleView;
         private TabPage tabPageSkeleton;
         public TabControl tabControlModuleView;
-        private Button button1;
+        private Button button_moduleSettings;
         private Label labelModuleLog;
         private GroupBox groupBoxDriver;
         private GroupBox groupBoxVisualization;

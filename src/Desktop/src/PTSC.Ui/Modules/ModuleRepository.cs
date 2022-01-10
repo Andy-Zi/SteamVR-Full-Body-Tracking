@@ -1,7 +1,8 @@
 ﻿using PTSC.Interfaces;
+using PTSC.Ui.Model;
 using System.Text.Json;
 
-namespace PTSC.Modules
+namespace PTSC.Ui.Modules
 {
     public class ModuleRepository : Dictionary<string, IDetectionModule>
     {
@@ -16,11 +17,12 @@ namespace PTSC.Modules
         }
         public void Load()
         {
-            foreach(var file in Directory.GetFiles(moduleDirectory, "*.ptsc", SearchOption.AllDirectories))
+            foreach (var file in Directory.GetFiles(moduleDirectory, "*.ptsc", SearchOption.AllDirectories))
             {
-                var module = JsonSerializer.Deserialize<Module>(File.ReadAllText(file));
+                var module = JsonSerializer.Deserialize<ModuleModel>(File.ReadAllText(file));
+                module.ModuleFile = file;
                 module.WorkingDirectory = Path.GetDirectoryName(file);
-                this.Add(module.Name, module);
+                Add(module.Name, module);
             }
         }
     }

@@ -1,10 +1,10 @@
 using PTSC.Communication.Controller;
 using PTSC.Interfaces;
-using PTSC.Modules;
 using PTSC.Pipeline;
 using PTSC.Pipeline.Kalman;
 using PTSC.Ui.Controller;
 using PTSC.Ui.Model;
+using PTSC.Ui.Modules;
 using PTSC.Ui.View;
 using System.Text.Json;
 using Unity;

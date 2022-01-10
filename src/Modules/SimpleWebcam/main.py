@@ -2,7 +2,7 @@ import cv2
 from ModulePipe.pipe_client import NamedPipe
 from ModulePipe.positions_dataclass import Positions
 import sys
-
+import argparse
 import time
 
 def WriteToStd(message):
@@ -11,17 +11,19 @@ def WriteToStd(message):
 
 if __name__ == "__main__":
     time.sleep(0.4)
-    args = sys.argv[1:]
+    
+    parser = argparse.ArgumentParser(description='Start a Webcam Stream')
+    parser.add_argument('-w', dest='webcam', type=int,
+                    help='device number of the webcam to use', default=0)
+    args = parser.parse_args()
     pipe = NamedPipe()
     WriteToStd("Create Pipe!\n")
     
-    if(len(args) > 0):
-        WriteToStd(f"Using Webcam {args[0]} \n")
-        cap = cv2.VideoCapture(args[0])
+   
+    WriteToStd(f"Using Webcam {args.webcam} \n")
+    cap = cv2.VideoCapture(args.webcam)
 
-    else:
-        WriteToStd(f"Using Webcam 0")
-        cap = cv2.VideoCapture(0)
+
     
     if not cap.isOpened():
         WriteToStd("Cant open Webcam!")

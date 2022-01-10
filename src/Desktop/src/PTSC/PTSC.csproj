@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PTSC.Interfaces\PTSC.Interfaces.csproj" />
-    <ProjectReference Include="..\PTSC.Modules\PTSC.Modules.csproj" />
     <ProjectReference Include="..\PTSC.Ui\PTSC.Ui.csproj" />
   </ItemGroup>
 

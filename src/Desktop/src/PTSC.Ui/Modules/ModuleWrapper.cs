@@ -1,7 +1,7 @@
 ﻿using PTSC.Interfaces;
 using System.Diagnostics;
 
-namespace PTSC.Modules
+namespace PTSC.Ui.Modules
 {
     public class ModuleWrapper : IDisposable
     {
@@ -13,7 +13,7 @@ namespace PTSC.Modules
 
         public Process CurrentProcess { get; protected set; }
         public IDetectionModule CurrentDetectionModule { get; protected set; }
-        private Task ModuleTask;
+        private Task InstallationTask;
         public ModuleWrapper()
         {
 
@@ -37,13 +37,13 @@ namespace PTSC.Modules
                     Arguments = detectionModule.InstallationScript,
                 };
                 // Start new Task Chain
-                ModuleTask =  Task.Factory.StartNew(() => StartProcess(detectionModule, setupStartInfo, true));
+                InstallationTask = Task.Run(() => { StartProcess(detectionModule, setupStartInfo, true); });
             }
 
             var runStartInfo = new ProcessStartInfo()
             {
                 WorkingDirectory = detectionModule.WorkingDirectory,
-                CreateNoWindow = true,  
+                CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
@@ -52,18 +52,17 @@ namespace PTSC.Modules
                 Arguments = detectionModule.Arguments,
             };
 
-            // Virtual environment existing, only execute module
-            if (ModuleTask == null)
+            if(InstallationTask != null)
             {
-                ModuleTask = Task.Factory.StartNew(() => StartProcess(detectionModule, runStartInfo, false));
+                InstallationTask.ContinueWith((task) => { StartProcess(detectionModule, runStartInfo); });
             }
-            else // After environment setup continute with module execution
-            {
-                ModuleTask.ContinueWith(t => StartProcess(detectionModule, runStartInfo, false), TaskScheduler.FromCurrentSynchronizationContext());
+            else{
+                StartProcess(detectionModule, runStartInfo);
             }
+            
         }
 
-        private void StartProcess(IDetectionModule detectionModule, ProcessStartInfo startInfo, bool waitForExit)
+        private void StartProcess(IDetectionModule detectionModule, ProcessStartInfo startInfo, bool waitForExit=false)
         {
             CurrentProcess = new Process();
             CurrentProcess.StartInfo = startInfo;

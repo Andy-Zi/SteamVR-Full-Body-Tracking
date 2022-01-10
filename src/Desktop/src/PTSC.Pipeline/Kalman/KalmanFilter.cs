@@ -1,5 +1,6 @@
 ﻿
 using NumSharp;
+using PTSC.Interfaces;
 
 namespace PTSC.Pipeline.Kalman
 {
@@ -83,50 +84,52 @@ namespace PTSC.Pipeline.Kalman
             P = np.dot(F, np.dot(P, F.T)) + Q;
         }
 
-        public List<double> Update(List<double> measure)
+        public async Task Update(IModuleDataPoint dataPoint)
         {
-            if (measure == null)
-                return default;
+            if (dataPoint == null)
+                return;
 
-            NDArray measureND = np.array(measure);
-            NDArray temp_measureND = np.copy(measureND);
-            measureND = measureND["0:3"];
-            measureND = measureND.reshape(new int[] { 3, 1 });
-
-            // calculate Kalman Gain
-
-            var inverse = np.dot(H, np.dot(P, H.T)) + R;          // np.linalg.inv buggy = return null ; known problem
-            inverse = np.eye(inverse.shape[1]) / inverse;
-
-            var iter = inverse.AsIterator<double>();
-            var iter2 = inverse.AsIterator<double>();
-            while (iter.HasNext())
+            await Task.Run(() =>
             {
-                var val = iter.MoveNext();
-                if (val.Equals(np.nan))
+                NDArray measureND = np.array(new double[] { dataPoint.X, dataPoint.Y, dataPoint.Z });
+                measureND = measureND.reshape(new int[] { 3, 1 });
+
+                // calculate Kalman Gain
+
+                var inverse = np.dot(H, np.dot(P, H.T)) + R;          // np.linalg.inv buggy = return null ; known problem
+                inverse = np.eye(inverse.shape[1]) / inverse;
+
+                var iter = inverse.AsIterator<double>();
+                var iter2 = inverse.AsIterator<double>();
+                while (iter.HasNext())
                 {
-                    iter2.MoveNextReference() = 0;
+                    var val = iter.MoveNext();
+                    if (val.Equals(np.nan))
+                    {
+                        iter2.MoveNextReference() = 0;
+                    }
+                    else
+                    {
+                        iter2.MoveNext();
+                    }
                 }
-                else
-                {
-                    iter2.MoveNext();
-                }
-            }
-            K = np.dot(P, np.dot(H.T, inverse));
+                K = np.dot(P, np.dot(H.T, inverse));
 
-            // estimate new Value
+                // estimate new Value
 
-            x = x + np.matmul(K, measureND - np.dot(H, x));
+                x = x + np.matmul(K, measureND - np.dot(H, x));
 
-            // I identity matrix
-            NDArray I = np.eye(H.shape[1]);
+                // I identity matrix
+                NDArray I = np.eye(H.shape[1]);
 
-            P = np.dot(I - np.dot(K, H), np.dot(P, (I - np.dot(K, H)).T + np.dot(K, np.dot(R, K.T))));
+                P = np.dot(I - np.dot(K, H), np.dot(P, (I - np.dot(K, H)).T + np.dot(K, np.dot(R, K.T))));
 
-            predict();
+                predict();
 
-
-            return new List<double>() { x[0][0], x[2][0], x[4][0], measure.Last() };
+                dataPoint.X = x[0][0];
+                dataPoint.Y = x[2][0];
+                dataPoint.Z = x[4][0];
+            });
         }
     }
 }

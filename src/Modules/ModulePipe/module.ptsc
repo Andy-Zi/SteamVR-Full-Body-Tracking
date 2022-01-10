@@ -1,9 +1,9 @@
 {
-    "Name": "Python Pipe Demo",
-    "Description": "Starts a Demo Pipe-Stream",
-    "SupportsImage" : true,
-    "Process" : "venv\\Scripts\\python.exe",
-    "Arguments" : "pipe_client.py",
-    "InstallationScript": ".\\setupVenv.ps1 ",
-    "InstallationDirectory": "venv"
+  "Name": "Python Pipe Demo",
+  "Description": "Starts a Demo Pipe-Stream",
+  "SupportsImage": true,
+  "Process": "venv\\Scripts\\python.exe",
+  "Arguments": "pipe_client.py foobar",
+  "InstallationScript": ".\\setupVenv.ps1 ",
+  "InstallationDirectory": "venv"
 }

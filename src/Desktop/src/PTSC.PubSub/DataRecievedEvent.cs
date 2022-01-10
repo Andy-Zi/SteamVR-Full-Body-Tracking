@@ -5,13 +5,13 @@ namespace PTSC.PubSub
 {
     public class DataRecievedPayload
     {
-        public DataRecievedPayload(IModuleDataModel moduleDataModel,Mat image)
+        public DataRecievedPayload(IModuleData moduleData,Mat image)
         {
-            ModuleDataModel = moduleDataModel;
+            ModuleData = moduleData;
             Image = image;
         }
 
-        public IModuleDataModel ModuleDataModel { get; }
+        public IModuleData ModuleData { get; }
         public Mat Image { get; }
     } 
     public class DataRecievedEvent : Prism.Events.PubSubEvent<DataRecievedPayload>

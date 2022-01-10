@@ -44,19 +44,7 @@ namespace PTSC.Ui.Controller
             this.View.Close();
         }
 
-        protected string GetControlBindingField(Control control)
-        {
-            switch (control)
-            {
-                case NumericUpDown _:
-                    return "Value";
-                case CheckBox _:
-                    return "Checked";
-
-                default:
-                    return "Value";
-            }
-        }
+     
 
   
 
@@ -64,29 +52,7 @@ namespace PTSC.Ui.Controller
         {
             Model = ((ApplicationSettingsModel)ApplicationEnvironment.Settings).Clone();
             Model.ResetState();
-            void BindControlls(Control control)
-            {
-                if(control is GroupBox groupBox)
-                {
-                    foreach(var obj in groupBox.Controls)
-                    {
-                        BindControlls(obj as Control);
-                    }
-                }
-
-
-                var propertyName = control.Tag as string;
-
-                if (propertyName == null)
-                    return;
-
-                control.DataBindings.Add(GetControlBindingField(control), Model, propertyName);
-            }
-
-            foreach(var obj in this.View.Controls)
-            {
-                BindControlls(obj as Control);
-            }
+            ViewBindings.BindView(this.View, Model);
         }
 
 

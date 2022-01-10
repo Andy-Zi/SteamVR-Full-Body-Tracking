@@ -109,19 +109,19 @@ namespace ChartWin
             renderBodies(e.ChartGraphics.Graphics);
         }
 
-        public void Plot(IModuleDataModel moduleDataModel)
+        public void Plot(IModuleData moduleData)
         {
             try
             {
 
-                Build3DPoints(moduleDataModel.GetData());
+                Build3DPoints(moduleData);
 
                 this.Refresh();
             }
             catch { }
         }
 
-        private void Build3DPoints(Dictionary<string, List<double>> data)
+        private void Build3DPoints(IModuleData data)
         {
             Points?.Clear();
             Chard3DSeries.Points?.Clear();
@@ -131,9 +131,9 @@ namespace ChartWin
                 if (value == null)
                     continue;
 
-                Points.Add(key, new(key, new((float)-value[0], (float)value[1], (float)-value[2])));
+                Points.Add(key, new(key, new((float)value.X, (float)value.Y, (float)value.Z)));
 
-                var p = Chard3DSeries.Points?.AddXY((float)-value[0], (float)-value[1], (float)-value[2]);
+                var p = Chard3DSeries.Points?.AddXY((float)value.X, (float)value.Y, (float)value.Z);
                 if(Chard3DSeries.Points != null)
                 {
                     Chard3DSeries.Points[p ?? 0].Color = Color.Transparent;

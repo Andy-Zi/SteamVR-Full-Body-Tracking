@@ -1,9 +1,9 @@
 {
-    "Name": "Simple Webcam",
-    "Description": "Starts a Webcam Stream in a Python-Process",
-    "SupportsImage" : true,
-    "Process" : "venv\\Scripts\\python.exe",
-    "Arguments" : " main.py",
-    "InstallationScript": ".\\setupVenv.ps1 ",
-    "InstallationDirectory": "venv"
+  "Name": "Simple Webcam",
+  "Description": "Starts a Webcam Stream in a Python-Process",
+  "SupportsImage": true,
+  "Process": "venv\\Scripts\\python.exe",
+  "Arguments": " main.py -w 0",
+  "InstallationScript": ".\\setupVenv.ps1 ",
+  "InstallationDirectory": "venv"
 }

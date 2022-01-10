@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PTSC.Communication\PTSC.Communication.csproj" />
-    <ProjectReference Include="..\PTSC.Modules\PTSC.Modules.csproj" />
     <ProjectReference Include="..\PTSC.Nameservice\PTSC.Nameservice.csproj" />
     <ProjectReference Include="..\PTSC.Interfaces\PTSC.Interfaces.csproj" />
     <ProjectReference Include="..\PTSC.Nameservice\PTSC.Nameservice.csproj" />

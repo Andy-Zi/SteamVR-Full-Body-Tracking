@@ -2,9 +2,9 @@
 using System.Text;
 using PTSC.Interfaces;
 using Unity;
-using PTSC.Communication.Model;
 using Prism.Events;
 using PTSC.PubSub;
+using PTSC.Nameservice;
 
 namespace PTSC.Communication.Controller
 {
@@ -36,7 +36,7 @@ namespace PTSC.Communication.Controller
                 dataProcessedEvent = EventAggregator.GetEvent<DataProcessedEvent>();
                 subscriptionToken = dataProcessedEvent.Subscribe(SendData, ThreadOption.BackgroundThread);
                 driverConnectionEvent = EventAggregator.GetEvent<DriverConnectionEvent>();
-                server = new NamedPipeServerStream(DriverPipeDataModel.PipeName, PipeDirection.Out, 1, PipeTransmissionMode.Byte);
+                server = new NamedPipeServerStream(DriverPipeConstants.PipeName, PipeDirection.Out, 1, PipeTransmissionMode.Byte);
                 WaitForConnection();
             }
             catch (Exception ex)
@@ -76,7 +76,7 @@ namespace PTSC.Communication.Controller
                     //Restart the Server on Error 
                     server?.Close();
                     driverConnectionEvent.Publish(new ConnectionPayload(true));
-                    server = new NamedPipeServerStream(DriverPipeDataModel.PipeName, PipeDirection.Out, 1, PipeTransmissionMode.Byte);
+                    server = new NamedPipeServerStream(DriverPipeConstants.PipeName, PipeDirection.Out, 1, PipeTransmissionMode.Byte);
                     WaitForConnection();
                 }
                 

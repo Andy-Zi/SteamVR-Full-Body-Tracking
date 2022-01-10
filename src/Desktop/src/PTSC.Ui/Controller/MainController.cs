@@ -6,8 +6,8 @@ using Unity;
 using PTSC.Pipeline;
 using Prism.Events;
 using PTSC.PubSub;
-using PTSC.Modules;
 using System.ComponentModel;
+using PTSC.Ui.Modules;
 
 namespace PTSC.Ui.Controller
 {
@@ -79,9 +79,35 @@ namespace PTSC.Ui.Controller
             this.View.labelDriverStateValue.Text = obj.IsConnected ? "Connected" : "Disconnected";
         }
 
+        internal void ShowModuleOptions()
+        {
+            var selectedModule = this.View.comboBoxModule.SelectedItem as ModuleModel;
+            if(selectedModule != null)
+            {
+                var result = UnityContainer.Resolve<ModuleController>()
+                .WithModule(selectedModule)
+                .Initialize()
+                .View
+                .ShowDialog();
+
+                if(result == DialogResult.OK)
+                {
+                    //Rebind the Combobox
+                    var availableModules = new BindingList<IDetectionModule>(ModuleRepository.Values.ToList());
+                    this.View.comboBoxModule.ValueMember = null;
+                    this.View.comboBoxModule.DisplayMember = "Name";
+                    this.View.comboBoxModule.DataSource = availableModules;
+                }
+            }
+
+        }
+
         internal void ShowOptions()
         {
-            UnityContainer.Resolve<SettingsController>().Initialize().View.ShowDialog();
+            UnityContainer.Resolve<SettingsController>()
+                .Initialize()
+                .View
+                .ShowDialog();
         }
 
         private void OnModuleConnected(ConnectionPayload obj)
@@ -130,7 +156,7 @@ namespace PTSC.Ui.Controller
         {
             if (shouldPlot3DGraph)
             {
-                this.View.Graph3D.Plot(obj.ModuleDataModel);
+                this.View.Graph3D.Plot(obj.ModuleData);
             }
         }
 
