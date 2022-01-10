@@ -94,7 +94,6 @@ namespace PTSC.Pipeline.Kalman
             measureND = measureND.reshape(new int[] { 3, 1 });
 
             // calculate Kalman Gain
-            var tttt = np.dot(P, H.T);
 
             var inverse = np.dot(H, np.dot(P, H.T)) + R;          // np.linalg.inv buggy = return null ; known problem
             inverse = np.eye(inverse.shape[1]) / inverse;
@@ -116,24 +115,11 @@ namespace PTSC.Pipeline.Kalman
             K = np.dot(P, np.dot(H.T, inverse));
 
             // estimate new Value
-            /*NDArray temp;
-            try
-            {
-                temp = np.matmul(this.H, this.x);
-            } catch (System.NotSupportedException)
-            {
-                temp = np.array(new double[] { 0, 0, 0 }).T;
-            }*/
 
             x = x + np.matmul(K, measureND - np.dot(H, x));
 
             // I identity matrix
             NDArray I = np.eye(H.shape[1]);
-
-            var xx = I - np.dot(K, H);
-            var xxx = np.transpose(xx);
-            var tt = np.dot(K, np.dot(R, K.T));
-            var ttt = np.dot(xx, np.dot(P, xxx));
 
             P = np.dot(I - np.dot(K, H), np.dot(P, (I - np.dot(K, H)).T + np.dot(K, np.dot(R, K.T))));
 
