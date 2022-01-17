@@ -21,23 +21,26 @@ namespace PTSC.Ui.Modules
 
         public void Start(IDetectionModule detectionModule)
         {
-            // Check for venv folder
-            string venvPath = Path.Combine(detectionModule.WorkingDirectory, detectionModule.InstallationDirectory);
-            if (!Directory.Exists(venvPath))
+            // Check for installation folder
+            if (!string.IsNullOrEmpty(detectionModule.InstallationDirectory))
             {
-                var setupStartInfo = new ProcessStartInfo()
+                string installationPath = Path.Combine(detectionModule.WorkingDirectory, detectionModule.InstallationDirectory);
+                if (!Directory.Exists(installationPath))
                 {
-                    WorkingDirectory = detectionModule.WorkingDirectory,
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    FileName = "powershell.exe",
-                    Arguments = detectionModule.InstallationScript,
-                };
-                // Start new Task Chain
-                InstallationTask = Task.Run(() => { StartProcess(detectionModule, setupStartInfo, true); });
+                    var setupStartInfo = new ProcessStartInfo()
+                    {
+                        WorkingDirectory = detectionModule.WorkingDirectory,
+                        CreateNoWindow = true,
+                        UseShellExecute = false,
+                        RedirectStandardError = true,
+                        RedirectStandardOutput = true,
+                        WindowStyle = ProcessWindowStyle.Hidden,
+                        FileName = "powershell.exe",
+                        Arguments = detectionModule.InstallationScript,
+                    };
+                    // Start new Task Chain
+                    InstallationTask = Task.Run(() => { StartProcess(detectionModule, setupStartInfo, true); });
+                }
             }
 
             var runStartInfo = new ProcessStartInfo()

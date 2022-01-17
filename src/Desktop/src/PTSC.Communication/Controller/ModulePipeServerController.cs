@@ -142,7 +142,6 @@ namespace PTSC.Communication.Controller
         }
         protected ModuleDataModel HandleJsonData(Span<byte> jsonData)
         {
-
             string receivedData = Encoding.UTF8.GetString(jsonData);
             return DataController.DeserializeModuleData(receivedData);
         }
