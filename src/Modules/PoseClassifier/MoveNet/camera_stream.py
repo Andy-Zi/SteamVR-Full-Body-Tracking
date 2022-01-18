@@ -31,8 +31,14 @@ class RealSenseStream:
     def get_format_of_stream(self):
         """find product line and format"""
         config = rs.config()
-        config.enable_stream(rs.stream.depth, 640, 480, rs.format.bgr8, 30)
-        config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+        print("type:",type(config))
+        # if config.can_resolve():
+        #     print("config found device to stream from")
+        #     return config
+        # else:
+        config.enable_all_streams()
+            # config.enable_stream(rs.stream.depth, 640, 480, rs.format.bgr8, 30)
+            # config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
  
         return config
   

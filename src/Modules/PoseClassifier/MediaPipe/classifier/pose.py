@@ -3,7 +3,7 @@ import cv2
 from ..utils_mp.positions import PositionHandler
 import numpy as np
 from typing import Union, Optional,Dict
-
+from MediaPipe.utils_mp.plot_landmarks import plot_landmarks
 
 
 class PoseMP:
@@ -12,7 +12,7 @@ class PoseMP:
         
         self.points = PositionHandler(ignore_hidden_points=default_value)
 
-        if options is not None:
+        if isinstance(options, Dict):
             estimator_options = options
         else:
             estimator_options = {"static_image_mode": True,
@@ -38,6 +38,13 @@ class PoseMP:
         if pose is not None and pose.pose_world_landmarks is not None:
             result = self.points.manage_points(pose)
             self._draw_landmarks(image,pose)
+            x,y,z,names = [],[],[],[]
+            for key, value in result.serialize().items():
+                x.append(value[0])
+                y.append(value[1])
+                z.append(value[2])
+                names.append(key)
+            plot_landmarks(x,y,z,names)
             return result, image
         else:
             return None, None
