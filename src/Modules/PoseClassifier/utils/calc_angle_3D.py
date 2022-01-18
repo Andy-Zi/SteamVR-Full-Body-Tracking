@@ -2,7 +2,7 @@ import numpy as np
 
 
 def calculate_angle_3D(a:np.ndarray,b:np.ndarray,c:np.ndarray):
-    assert len(p1) == len(p2) == 3
+    assert len(a) == len(b) == 3
     
     ba = a-b
     bc = c-b
