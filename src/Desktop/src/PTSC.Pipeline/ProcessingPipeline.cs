@@ -87,7 +87,7 @@ namespace PTSC.Pipeline
             return await Task.Run(async () =>
             {
                 var moduledata = payload.ModuleData;
-                moduledata = correctYAxis(moduledata);
+                //moduledata = correctYAxis(moduledata);
                 moduledata = await FilterData(moduledata);
 
                 await Task.Run(() => ModuleDataProcessedEvent.Publish(new(moduledata)));
