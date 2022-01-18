@@ -17,7 +17,7 @@ class PositionHandler:
     positions:Dict[str,List[float]] = {field.name:[] for field in fields(Positions())}
     previous_positions: Positions = Positions()
     current_positions: Positions = Positions()
-    
+
 
     def __init__(self, ignore_hidden_points: Optional[bool] = False, 
                  output_to_file: bool = False,
@@ -74,12 +74,15 @@ class PositionHandler:
         """Normalizes landmarks translation and scale."""
         #calculate distane between nose and center
         #pose_center = self._get_pose_center()
+        #TODO: inverse z-axis
         distance = self.positions["NOSE"]
         
         for key,values in self.positions.items():
-            self.positions[key] = [ values[i]-distance[i] if i <= 2 else values[i] for i in range(4) ]
+            self.positions[key] = [values[i]-distance[i] if i <= 3 else values[i] for i in range(4)]
         
-
+        
+            
+        
     def _calc_landmarks(self, landmarks):
         """Listify positions
 
@@ -88,13 +91,14 @@ class PositionHandler:
         """
         if not landmarks:
             return
-        
         for key, value in landmarks.items():
             if value:
                 if self.use_visibility_threshold and value.visibility < self.position_visible_threshold:
                     self.positions[key] = self.defaultPosition
                 else:
                     self.positions[key] = [value.x, value.y, value.z, value.visibility]
+                
+                    
             else:
                 continue
             
