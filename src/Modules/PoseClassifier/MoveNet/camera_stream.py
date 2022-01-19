@@ -102,12 +102,12 @@ class RealSenseStream:
                 color_image = np.asanyarray(color_frame.get_data())
                 
                 
-                assert color_image.shape[2] == 3
-                assert depth_image.shape[2] == 1
+                #assert color_image.shape[2] == 3
+                #assert depth_image.shape[2] == 1
                 ########################################################################
                 #set to zero for testing
-                depth_image = np.zeros(depth_image.shape)
-                color_image = np.zeros(color_image.shape)
+                #depth_image = np.zeros(depth_image.shape)
+                #color_image = np.zeros(color_image.shape)
                 
                 ########################################################################
                 
@@ -141,15 +141,15 @@ class RealSenseStream:
                 images = np.dstack((color_image,depth_image))
                 
                 
-                results = classifier.classify_image(images)
-                plt.show()
+                results,output_overlay = classifier.classify_image(images)
+                
                 if results is not None and images is not None:
                     if pipe:
-                        pipe.SendPositions(results, images)
+                        pipe.SendPositions(results, output_overlay)
                 
                 
                 cv2.namedWindow('Align Example', cv2.WINDOW_NORMAL)
-                cv2.imshow('Align Example', image)
+                cv2.imshow('Align Example', color_image)
                 if output:
                     key = cv2.waitKey(1)
                     # Press esc or 'q' to close the image window

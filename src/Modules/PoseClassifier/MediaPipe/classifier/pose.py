@@ -38,13 +38,13 @@ class PoseMP:
         if pose is not None and pose.pose_world_landmarks is not None:
             result = self.points.manage_points(pose)
             self._draw_landmarks(image,pose)
-            x,y,z,names = [],[],[],[]
-            for key, value in result.serialize().items():
-                x.append(value[0])
-                y.append(value[1])
-                z.append(value[2])
-                names.append(key)
-            plot_landmarks(x,y,z,names)
+            # x,y,z,names = [],[],[],[]
+            # for key, value in result.serialize().items():
+            #     x.append(value[0])
+            #     y.append(value[1])
+            #     z.append(value[2])
+            #     names.append(key)
+            # plot_landmarks(x,y,z,names)
             return result, image
         else:
             return None, None
