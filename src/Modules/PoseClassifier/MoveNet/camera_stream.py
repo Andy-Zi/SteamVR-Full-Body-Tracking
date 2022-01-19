@@ -25,17 +25,13 @@ class RealSenseStream:
         
   
     def get_profile(self,config):
-        self.pipeline.start(config)
-        #return profile
+        profile = self.pipeline.start(config)
+        return profile
         
     def get_format_of_stream(self):
         """find product line and format"""
         config = rs.config()
-        print("type:",type(config))
-        # if config.can_resolve():
-        #     print("config found device to stream from")
-        #     return config
-        # else:
+        
         config.enable_all_streams()
             # config.enable_stream(rs.stream.depth, 640, 480, rs.format.bgr8, 30)
             # config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
@@ -77,7 +73,7 @@ class RealSenseStream:
         depth_sensor = self.get_depth_sensor(profile)
         return depth_sensor
     
-    def loop(self, classifier, pipe, output, cut_off_distance:float= 10.0):
+    def loop(self, classifier, pipe, output, cut_off_distance:float= 10.0, remove_background:bool = False):
         # Streaming loop
         depth_sensor = self.configure_divice()
 
@@ -105,19 +101,32 @@ class RealSenseStream:
                 depth_image = np.asanyarray(aligned_depth_frame.get_data())
                 color_image = np.asanyarray(color_frame.get_data())
                 
-                #nwe
+                
+                assert color_image.shape[2] == 3
+                assert depth_image.shape[2] == 1
+                ########################################################################
+                #set to zero for testing
+                depth_image = np.zeros(depth_image.shape)
+                color_image = np.zeros(color_image.shape)
+                
+                ########################################################################
+                
+                
                 # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
-                depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
+                #depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
 
-                depth_colormap_dim = depth_colormap.shape
-                color_colormap_dim = color_image.shape
+                depth_map_dim = depth_image.shape
+                color_map_dim = color_image.shape
 
                 # If depth and color resolutions are different, resize color image to match depth image for display
-                if depth_colormap_dim != color_colormap_dim:
-                    resized_color_image = cv2.resize(color_image, dsize=(depth_colormap_dim[1], depth_colormap_dim[0]), interpolation=cv2.INTER_AREA)
-                    images = np.hstack((resized_color_image, depth_colormap))
+                if depth_map_dim != color_map_dim:
+                    resized_color_image = cv2.resize(color_image, dsize=(depth_map_dim[1], depth_map_dim[0]), interpolation=cv2.INTER_AREA)
+                    images = np.dstack((resized_color_image, depth_image))
                 else:
-                    images = np.hstack((color_image, depth_colormap))
+                    images = np.dstack((color_image, depth_image))
+                    
+                #stacked images with depthmap in images[:,:,3]    
+                assert images.shape[2] == 4
 
                 # Show images
                 cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
@@ -127,20 +136,16 @@ class RealSenseStream:
                 #new            
                 # Remove background - Set pixels further than clipping_distance to grey
                 grey_color = 153
-                depth_image_3d = np.dstack((depth_image,depth_image,depth_image)) #depth image is 1 channel, color is 3 channels
-                #bg_removed = np.where((depth_image_3d > self.clipping_distance) | (depth_image_3d <= 0), grey_color, color_image)
-                image = np.dstack((color_image,depth_image))
-                # Render images:
-                #   depth align to color on left
-                #   depth on right
-                #depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
-                #image = np.hstack((bg_removed, depth_colormap))
-                results = classifier.classify_image(image)
-                imgplot = plt.imshow(image)
+                if remove_background:
+                    depth_image = np.where((depth_image > self.clipping_distance) | (depth_image <= 0), grey_color, color_image)
+                images = np.dstack((color_image,depth_image))
+                
+                
+                results = classifier.classify_image(images)
                 plt.show()
-                if results is not None and image is not None:
+                if results is not None and images is not None:
                     if pipe:
-                        pipe.SendPositions(results, image)
+                        pipe.SendPositions(results, images)
                 
                 
                 cv2.namedWindow('Align Example', cv2.WINDOW_NORMAL)
