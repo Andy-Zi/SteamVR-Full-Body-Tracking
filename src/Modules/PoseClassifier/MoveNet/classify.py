@@ -1,13 +1,13 @@
 
 
 from re import I
-from typing import Optional
+from typing import Optional, List
 import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
 import cv2
 from MoveNet.crop import run_inference,determine_crop_region,init_crop_region
-from MoveNet.draw_on_image import draw_prediction_on_image,KEYPOINT_DICT
+from MoveNet.draw_on_image import draw_prediction_on_image
 from utils.positions_dataclass import Positions
 from MoveNet.config import MoveNetConfig as cfg
 from MoveNet.camera_stream import RealSenseStream
@@ -81,26 +81,25 @@ class MoveNetModel:
     #     if positions is not None and len(positions.keys()) == 17:
     #         return Positions(**positions)
         
-    def _look_up_depth_values_for_keys(self, keypoints_with_scores:np.ndarray):
+    def _look_up_depth_values_for_keys(self, key_point_locs:List):
         """extract values from depthmap where keypoints are"""
         
                 #self.depth_values = {key.upper() : 0 for key,_ in cfg.KEYPOINT_DICT.items()}
         self.depth_values = {}
         for key,val in cfg.KEYPOINT_DICT.items():
-            x, y, _ = keypoints_with_scores[0,0,val,:]
-            middle = 96
-            x = int(x*middle) if x*middle < 192 else 80
-            y = int(y*middle) if y*middle < 192 else 80
+            x, y, _ = key_point_locs[0,0,val,:]
+            assert isinstance(x, int)
+            assert isinstance(y, int)
             self.depth_values[key.upper()] = self.depth_map[x, y]
             
-    def insert_depth_value(self, key_point_locs:tf.Tensor)->tf.Tensor:
+    def insert_depth_value(self, key_point_locs:List)->List:
         """inserts depth value in predictions of keypoints from a depth-map of the picture"""
         #find out values from depth-map
         self._look_up_depth_values_for_keys(key_point_locs)
         
         for key,val in cfg.KEYPOINT_DICT.items():
             key_point_locs[0,0,val,:].tolist().insert(2, self.depth_values[key.upper()]) # insert depth value
-        return keypoints_with_scores
+        return key_point_locs
    
     def calculate_positions(self,points_3d):
         positions:dict[str,list[float]] = {}
@@ -108,7 +107,7 @@ class MoveNetModel:
         nose = points_3d[0,0,KEYPOINT_DICT["nose"],:]
         for ind,val in enumerate(points_3d[0,0,:,:]):
             positions[list_of_body_parts[ind].upper()] = val - nose #scale to nose
- 
+
         return Positions(**positions)
     
     
@@ -180,4 +179,3 @@ def input_stream():
 if __name__ == "__main__":
     
     move = MoveNetModel()
-    move.input_stream()
