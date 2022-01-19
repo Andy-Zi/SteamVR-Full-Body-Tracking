@@ -1,0 +1,9 @@
+{
+  "Name": "Kinect V2",
+  "Description": "Uses a Kinect Camera to perform BodyTracking",
+  "SupportsImage": false,
+  "Process": "KinectModule\\KinectModule\\bin\\Debug\\KinectModule.exe",
+  "Arguments": "",
+  "InstallationScript": "",
+  "InstallationDirectory": ""
+}
