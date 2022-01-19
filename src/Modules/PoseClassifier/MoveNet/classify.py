@@ -73,27 +73,32 @@ class MoveNetModel:
         keypoints_with_scores = outputs['output_0'].numpy()
         return keypoints_with_scores
 
-    def convert_to_formated_points(self, keypoints_with_scores)->Optional[Positions]:
-        """"""
-        positions:dict[str,list[float]] = {}
-        for key,val in cfg.KEYPOINT_DICT.items():
-            positions[key.upper()] = keypoints_with_scores[0,0,val,:]
-        if positions is not None and len(positions.keys()) == 17:
-            return Positions(**positions)
+    # def convert_to_formated_points(self, keypoints_with_scores)->Optional[Positions]:
+    #     """"""
+    #     positions:dict[str,list[float]] = {}
+    #     for key,val in cfg.KEYPOINT_DICT.items():
+    #         positions[key.upper()] = keypoints_with_scores[0,0,val,:]
+    #     if positions is not None and len(positions.keys()) == 17:
+    #         return Positions(**positions)
         
     def _look_up_depth_values_for_keys(self, keypoints_with_scores:np.ndarray):
-        for key,val in cfg.KEYPOINT_DICT.items():
-            x, y, _ = keypoints_with_scores[0,0,val,:]
-            self.depth_values[key.upper()] = self.depth_map[x, y, :]
+        """extract values from depthmap where keypoints are"""
+        if self.depth_values is None:
+                self.depth_values = {key.upper() : 0 for key,_ in cfg.KEYPOINT_DICT.items()}
+        else:
+            for key,val in cfg.KEYPOINT_DICT.items():
+                x, y, _ = keypoints_with_scores[0,0,val,:]
+                self.depth_values[key.upper()] = self.depth_map[x, y, :]
             
     def insert_depth_value(self, keypoints_with_scores:tf.Tensor)->tf.Tensor:
         """inserts depth value in predictions of keypoints from a depth-map of the picture"""
-        
+        #find out values from depth-map
         self._look_up_depth_values_for_keys(keypoints_with_scores)
         print("before",keypoints_with_scores.shape)
+        
+                
         for key,val in cfg.KEYPOINT_DICT.items():
             keypoints_with_scores[0,0,val,:].insert(2, self.depth_values[key.upper()]) # insert depth value
-        print("after",keypoints_with_scores.shape)
         return keypoints_with_scores
    
     def calculate_positions(self,points_3d):
@@ -101,7 +106,7 @@ class MoveNetModel:
         list_of_body_parts = list(KEYPOINT_DICT.keys())
         nose = points_3d[0,0,KEYPOINT_DICT["nose"],:]
         for ind,val in enumerate(points_3d[0,0,:,:]):
-            positions[list_of_body_parts[ind].upper()] = val
+            positions[list_of_body_parts[ind].upper()] = val - nose #scale to nose
  
         return Positions(**positions)
     
@@ -111,6 +116,8 @@ class MoveNetModel:
         """classify image and crop"""
         # Resize and pad the image to keep the aspect ratio and fit the expected size.
         print(rawimage.shape[2])
+        
+        #check if shape[3]==4 -> depth map was appended
         if rawimage.shape[2] == 4:
             image = rawimage[:,:,:3]
             self.depth_map = rawimage[:,:,3]
@@ -119,21 +126,19 @@ class MoveNetModel:
             image = rawimage
         
         input_image = tf.expand_dims(image, axis=0)
+        
         input_image = tf.image.resize_with_pad(input_image, self.accepted_input_size, self.accepted_input_size)
-
+        assert input_image.shape == (1,192,192,4)
         # Run model inference.
         keypoints_with_scores = self.movenet(input_image)
         output_overlay = None
+        
         # # Visualize the predictions with image.
-        # display_image = tf.expand_dims(image, axis=0)
-        # display_image = tf.cast(tf.image.resize_with_pad(
-        #     input_image, 1280, 1280), dtype=tf.int32)
-        # output_overlay = draw_prediction_on_image(
-        #     np.squeeze(display_image.numpy(), axis=0), keypoints_with_scores)
-
-        # plt.figure(figsize=(5, 5))
-        # plt.imshow(output_overlay)
-        # _ = plt.axis('off')
+        display_image = tf.expand_dims(image, axis=0) #expand image to image.shape[0]==1
+        display_image = tf.cast(tf.image.resize_with_pad(
+                                image, 1280, 1280), dtype=tf.int32)
+        output_overlay = draw_prediction_on_image(
+             np.squeeze(display_image.numpy(), axis=0), keypoints_with_scores) #get rid of first dim 
 
         if self.depth_map:
             keypoints_with_scores = self.insert_depth_value(keypoints_with_scores)
