@@ -24,7 +24,7 @@ class MoveNetModel:
         
         self.load_movenet_model(model_name)
         self.use_default_value = default_value
-        
+        self.depth_values = None
         if options is not None:
             raise NotImplementedError
         
@@ -83,12 +83,15 @@ class MoveNetModel:
         
     def _look_up_depth_values_for_keys(self, keypoints_with_scores:np.ndarray):
         """extract values from depthmap where keypoints are"""
-        if self.depth_values is None:
-                self.depth_values = {key.upper() : 0 for key,_ in cfg.KEYPOINT_DICT.items()}
-        else:
-            for key,val in cfg.KEYPOINT_DICT.items():
-                x, y, _ = keypoints_with_scores[0,0,val,:]
-                self.depth_values[key.upper()] = self.depth_map[x, y, :]
+        
+                #self.depth_values = {key.upper() : 0 for key,_ in cfg.KEYPOINT_DICT.items()}
+        self.depth_values = {}
+        for key,val in cfg.KEYPOINT_DICT.items():
+            x, y, _ = keypoints_with_scores[0,0,val,:]
+            middle = 96
+            x = int(x*middle) if x*middle < 192 else 80
+            y = int(y*middle) if y*middle < 192 else 80
+            self.depth_values[key.upper()] = self.depth_map[x, y]
             
     def insert_depth_value(self, keypoints_with_scores:tf.Tensor)->tf.Tensor:
         """inserts depth value in predictions of keypoints from a depth-map of the picture"""
@@ -98,7 +101,7 @@ class MoveNetModel:
         
                 
         for key,val in cfg.KEYPOINT_DICT.items():
-            keypoints_with_scores[0,0,val,:].insert(2, self.depth_values[key.upper()]) # insert depth value
+            keypoints_with_scores[0,0,val,:].tolist().insert(2, self.depth_values[key.upper()]) # insert depth value
         return keypoints_with_scores
    
     def calculate_positions(self,points_3d):
@@ -128,20 +131,23 @@ class MoveNetModel:
         input_image = tf.expand_dims(image, axis=0)
         
         input_image = tf.image.resize_with_pad(input_image, self.accepted_input_size, self.accepted_input_size)
-        assert input_image.shape == (1,192,192,4)
+        #assert input_image.shape == (1,192,192,4)
         # Run model inference.
         keypoints_with_scores = self.movenet(input_image)
         output_overlay = None
         
         # # Visualize the predictions with image.
-        display_image = tf.expand_dims(image, axis=0) #expand image to image.shape[0]==1
+        display_image = tf.expand_dims(image, axis=0) #expand image to image.shape[0]==1 (1,192,192,3)
         display_image = tf.cast(tf.image.resize_with_pad(
                                 image, 1280, 1280), dtype=tf.int32)
-        output_overlay = draw_prediction_on_image(
-             np.squeeze(display_image.numpy(), axis=0), keypoints_with_scores) #get rid of first dim 
-
-        if self.depth_map:
-            keypoints_with_scores = self.insert_depth_value(keypoints_with_scores)
+        if display_image.shape[0]==1:
+            output_overlay = draw_prediction_on_image(
+                np.squeeze(display_image.numpy(), axis=0), keypoints_with_scores) #get rid of first dim 
+        else:
+            output_overlay = draw_prediction_on_image(
+                display_image.numpy(), keypoints_with_scores)
+        #if self.depth_map[0] != None:
+        keypoints_with_scores = self.insert_depth_value(keypoints_with_scores)
     
         positions = self.calculate_positions(keypoints_with_scores)
         return positions,output_overlay

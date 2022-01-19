@@ -53,7 +53,6 @@ def parse_options():
     if "-mv" in opts:
         parsed_options["classifier"] = MoveNetModel
         parsed_options["video_stream"] = RealSenseStream
-    
         
     return parsed_options
 
