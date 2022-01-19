@@ -93,15 +93,13 @@ class MoveNetModel:
             y = int(y*middle) if y*middle < 192 else 80
             self.depth_values[key.upper()] = self.depth_map[x, y]
             
-    def insert_depth_value(self, keypoints_with_scores:tf.Tensor)->tf.Tensor:
+    def insert_depth_value(self, key_point_locs:tf.Tensor)->tf.Tensor:
         """inserts depth value in predictions of keypoints from a depth-map of the picture"""
         #find out values from depth-map
-        self._look_up_depth_values_for_keys(keypoints_with_scores)
-        print("before",keypoints_with_scores.shape)
+        self._look_up_depth_values_for_keys(key_point_locs)
         
-                
         for key,val in cfg.KEYPOINT_DICT.items():
-            keypoints_with_scores[0,0,val,:].tolist().insert(2, self.depth_values[key.upper()]) # insert depth value
+            key_point_locs[0,0,val,:].tolist().insert(2, self.depth_values[key.upper()]) # insert depth value
         return keypoints_with_scores
    
     def calculate_positions(self,points_3d):
@@ -141,13 +139,13 @@ class MoveNetModel:
         display_image = tf.cast(tf.image.resize_with_pad(
                                 image, 1280, 1280), dtype=tf.int32)
         if display_image.shape[0]==1:
-            output_overlay = draw_prediction_on_image(
+            output_overlay, key_point_locs = draw_prediction_on_image(
                 np.squeeze(display_image.numpy(), axis=0), keypoints_with_scores) #get rid of first dim 
         else:
-            output_overlay = draw_prediction_on_image(
+            output_overlay, key_point_locs = draw_prediction_on_image(
                 display_image.numpy(), keypoints_with_scores)
         #if self.depth_map[0] != None:
-        keypoints_with_scores = self.insert_depth_value(keypoints_with_scores)
+        keypoints_with_scores = self.insert_depth_value(key_point_locs)
     
         positions = self.calculate_positions(keypoints_with_scores)
         return positions,output_overlay

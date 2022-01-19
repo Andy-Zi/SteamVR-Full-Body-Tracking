@@ -118,16 +118,6 @@ def draw_prediction_on_image(
     if keypoint_locs.shape[0]:
         scat.set_offsets(keypoint_locs)
 
-    if crop_region is not None:
-        xmin = max(crop_region['x_min'] * width, 0.0)
-        ymin = max(crop_region['y_min'] * height, 0.0)
-        rec_width = min(crop_region['x_max'], 0.99) * width - xmin
-        rec_height = min(crop_region['y_max'], 0.99) * height - ymin
-        rect = patches.Rectangle(
-            (xmin,ymin),rec_width,rec_height,
-            linewidth=1,edgecolor='b',facecolor='none')
-        ax.add_patch(rect)
-
     fig.canvas.draw()
     image_from_plot = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
     image_from_plot = image_from_plot.reshape(
@@ -138,5 +128,5 @@ def draw_prediction_on_image(
         image_from_plot = cv2.resize(
             image_from_plot, dsize=(output_image_width, output_image_height),
             interpolation=cv2.INTER_CUBIC)
-    return image_from_plot
+    return image_from_plot, keypoint_locs
 
