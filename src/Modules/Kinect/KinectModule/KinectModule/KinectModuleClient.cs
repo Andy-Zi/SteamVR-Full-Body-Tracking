@@ -1,16 +1,17 @@
 ﻿
 
+using Interfaces;
 using Newtonsoft.Json;
 using System.IO.Pipes;
 using System.Text;
 
 namespace KinectModule
 {
-    internal class KinectModuleClient
+    public class KinectModuleClient
     {
         NamedPipeClientStream pipeclient;
-        Kinectv2 kinect;
-        public KinectModuleClient(Kinectv2 kinect)
+        IKinectAdapter kinect;
+        public KinectModuleClient(IKinectAdapter kinect)
         {
             pipeclient = new NamedPipeClientStream(".", "PTSCModulePipe", PipeDirection.Out);
             this.kinect = kinect;
@@ -22,9 +23,9 @@ namespace KinectModule
             pipeclient.Connect();
         }
 
-        private void Kinect_OnDataProcessed(ModuleDataModel data)
+        private void Kinect_OnDataProcessed(IModuleDataModel data)
         {
-
+            data.NormalizeToHead();
             var text = JsonConvert.SerializeObject(data);
             if (pipeclient.IsConnected)
             {

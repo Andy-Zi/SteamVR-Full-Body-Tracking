@@ -1,15 +1,15 @@
-﻿using System;
-using System.IO.Pipes;
+﻿using KinectModule;
+using System;
 using System.Threading.Tasks;
 
-namespace KinectModule
+namespace KinectV2
 {
     internal class Program
     {
         static void Main(string[] args)
         {
-            var kinectv2 = new Kinectv2();
-            var kinectModuleClient = new KinectModuleClient(kinectv2);
+            var kinectv1 = new KinectV2();
+            var kinectModuleClient = new KinectModuleClient(kinectv1);
             kinectModuleClient.Start();
 
             while (true)
@@ -18,5 +18,6 @@ namespace KinectModule
                 Console.WriteLine("Hello from Kinect!");
             }
         }
+
     }
 }

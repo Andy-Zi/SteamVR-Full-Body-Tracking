@@ -1,37 +1,11 @@
-﻿using Microsoft.Kinect;
+﻿
+using Interfaces;
 using System.Collections.Generic;
-
 
 namespace KinectModule
 {
-    public class ModuleDataModel
+    public class ModuleDataModel : IModuleDataModel
     {
-
-        private List<double> TranformJoint(Joint joint)
-        {
-            return new List<double>() { joint.Position.X, joint.Position.Y, joint.Position.Z };
-        }
-        public ModuleDataModel(IReadOnlyDictionary<JointType,Joint> positions)
-        {
-            NOSE = TranformJoint(positions[JointType.Neck]);
-            LEFT_EYE = null;
-            RIGHT_EYE = null;
-            LEFT_EAR = null;
-            RIGHT_EAR = null;
-            LEFT_SHOULDER = TranformJoint(positions[JointType.ShoulderLeft]);
-            RIGHT_SHOULDER = TranformJoint(positions[JointType.ShoulderRight]);
-            LEFT_ELBOW = TranformJoint(positions[JointType.ElbowLeft]);
-            RIGHT_ELBOW = TranformJoint(positions[JointType.ElbowRight]);
-            LEFT_WRIST = TranformJoint(positions[JointType.WristLeft]);
-            RIGHT_WRIST = TranformJoint(positions[JointType.WristRight]);
-            LEFT_HIP = TranformJoint(positions[JointType.HipLeft]);
-            RIGHT_HIP = TranformJoint(positions[JointType.HipRight]);
-            LEFT_KNEE = TranformJoint(positions[JointType.KneeLeft]);
-            RIGHT_KNEE = TranformJoint(positions[JointType.KneeRight]);
-            LEFT_ANKLE = TranformJoint(positions[JointType.AnkleLeft]);
-            RIGHT_ANKLE = TranformJoint(positions[JointType.AnkleRight]);
-        }
-
         private List<double> Normlize(List<double> values, List<double> offset)
         {
             return new List<double>() { values[0] - offset[0], values[1] - offset[1], values[2] - offset[2] };
@@ -40,7 +14,7 @@ namespace KinectModule
         {
             var offset = NOSE;
             NOSE = new List<double>() { 0, 0, 0, };
-            LEFT_SHOULDER = Normlize(LEFT_SHOULDER,offset);
+            LEFT_SHOULDER = Normlize(LEFT_SHOULDER, offset);
             RIGHT_SHOULDER = Normlize(RIGHT_SHOULDER, offset);
             LEFT_ELBOW = Normlize(LEFT_ELBOW, offset);
             RIGHT_ELBOW = Normlize(RIGHT_ELBOW, offset);
