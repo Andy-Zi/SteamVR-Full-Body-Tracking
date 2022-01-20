@@ -31,6 +31,12 @@ namespace KinectV1
 
         }
 
+        public void Stop()
+        {
+            kinectSensor.Stop();
+            kinectSensor.Dispose();
+        }
+
         private void SensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
             Skeleton[] skeletons = new Skeleton[0];

@@ -50,6 +50,7 @@ namespace PTSC.Ui.Modules
                 UseShellExecute = false,
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
+                RedirectStandardInput = true,
                 WindowStyle = ProcessWindowStyle.Hidden,
                 FileName = Path.Combine(detectionModule.WorkingDirectory, detectionModule.Process),
                 Arguments = detectionModule.Arguments,
@@ -96,8 +97,23 @@ namespace PTSC.Ui.Modules
 
         public void Stop()
         {
-            CurrentProcess?.Kill();
-            CurrentDetectionModule = null;
+            try
+            {
+                //Ask the process to gently stop
+                CurrentProcess.StandardInput.WriteLine("Please Stop");
+                Task.Delay(100).Wait();
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                //Kill it 
+                CurrentProcess?.Kill();
+                CurrentDetectionModule = null;
+            }
+
         }
 
         public void Dispose()

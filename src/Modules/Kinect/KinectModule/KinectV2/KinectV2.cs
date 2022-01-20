@@ -32,6 +32,14 @@ namespace KinectV2
 
         }
 
+
+        public void Stop()
+        {
+            bodyFrameReader.Dispose();
+            kinectSensor.Close();
+        }
+
+
         private void Reader_FrameArrived(object sender, Kinect.BodyFrameArrivedEventArgs e)
         {
             bool dataReceived = false;

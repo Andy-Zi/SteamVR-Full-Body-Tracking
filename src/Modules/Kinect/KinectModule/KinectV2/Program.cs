@@ -8,15 +8,14 @@ namespace KinectV2
     {
         static void Main(string[] args)
         {
-            var kinectv1 = new KinectV2();
-            var kinectModuleClient = new KinectModuleClient(kinectv1);
+            var kinect = new KinectV2();
+            var kinectModuleClient = new KinectModuleClient(kinect);
             kinectModuleClient.Start();
+            Console.WriteLine("Started Kinect V2!");
+            Console.ReadLine();
+            Console.WriteLine("Stopping Kinect V2!");
+            kinect.Stop();
 
-            while (true)
-            {
-                Task.Delay(100).Wait();
-                Console.WriteLine("Hello from Kinect!");
-            }
         }
 
     }

@@ -592,7 +592,15 @@ namespace System.Windows.Forms.DataVisualization.Charting
 
 			this.dirtyFlag = true;
             this.ResetAccessibilityObject();
-			base.Refresh();
+            try
+            {
+				base.Refresh();
+            }
+            catch
+            {
+
+            }
+			
 		}
 
 		/// <summary>
