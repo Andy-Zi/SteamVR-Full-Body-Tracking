@@ -9,18 +9,17 @@ namespace KinectV1
 {
     internal class Program
     {
+        static KinectV1 kinect;
         static void Main(string[] args)
         {
-            var kinectv1 = new KinectV1();
-            var kinectModuleClient = new KinectModuleClient(kinectv1);
+            kinect = new KinectV1();
+            var kinectModuleClient = new KinectModuleClient(kinect);
             kinectModuleClient.Start();
+            Console.WriteLine("Started Kinect V1!");
+            Console.ReadLine();
+            Console.WriteLine("Stopping Kinect V1!");
+            kinect?.Stop();
 
-            while (true)
-            {
-                Task.Delay(100).Wait();
-                Console.WriteLine("Hello from Kinect!");
-            }
         }
-
     }
 }
