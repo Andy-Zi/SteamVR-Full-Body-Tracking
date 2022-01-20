@@ -6,7 +6,6 @@ import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
 import cv2
-from MoveNet.crop import run_inference,determine_crop_region,init_crop_region
 from MoveNet.draw_on_image import draw_prediction_on_image
 from utils.positions_dataclass import Positions
 from MoveNet.config import MoveNetConfig as cfg
@@ -84,12 +83,11 @@ class MoveNetModel:
     def _look_up_depth_values_for_keys(self, key_point_locs:List):
         """extract values from depthmap where keypoints are"""
         
-                #self.depth_values = {key.upper() : 0 for key,_ in cfg.KEYPOINT_DICT.items()}
         self.depth_values = {}
         for key,val in cfg.KEYPOINT_DICT.items():
             x, y, _ = key_point_locs[0,0,val,:]
-            assert isinstance(x, int)
-            assert isinstance(y, int)
+            assert isinstance(x, int),"needs integer to index depthmap"
+            assert isinstance(y, int),"needs integer to index depthmap"
             self.depth_values[key.upper()] = self.depth_map[x, y]
             
     def insert_depth_value(self, key_point_locs:List)->List:
@@ -103,8 +101,8 @@ class MoveNetModel:
    
     def calculate_positions(self,points_3d):
         positions:dict[str,list[float]] = {}
-        list_of_body_parts = list(KEYPOINT_DICT.keys())
-        nose = points_3d[0,0,KEYPOINT_DICT["nose"],:]
+        list_of_body_parts = list(cfg.KEYPOINT_DICT.keys())
+        nose = points_3d[0,0,cfg.KEYPOINT_DICT["nose"],:]
         for ind,val in enumerate(points_3d[0,0,:,:]):
             positions[list_of_body_parts[ind].upper()] = val - nose #scale to nose
 
@@ -122,7 +120,7 @@ class MoveNetModel:
             image = rawimage[:,:,:3]
             self.depth_map = rawimage[:,:,3]
         else: 
-            self.depth_map = None
+            self.depth_map = np.zeros(rawimage.shape[0],rawimage.shape[1],1)
             image = rawimage
         
         input_image = tf.expand_dims(image, axis=0)
@@ -144,9 +142,9 @@ class MoveNetModel:
             output_overlay, key_point_locs = draw_prediction_on_image(
                 display_image.numpy(), keypoints_with_scores)
         #if self.depth_map[0] != None:
-        keypoints_with_scores = self.insert_depth_value(key_point_locs)
+        keypoints_3d = self.insert_depth_value(key_point_locs)
     
-        positions = self.calculate_positions(keypoints_with_scores)
+        positions = self.calculate_positions(keypoints_3d)
         return positions,output_overlay
         
 #@profile
