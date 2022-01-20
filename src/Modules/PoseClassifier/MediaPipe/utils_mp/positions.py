@@ -22,6 +22,7 @@ class PositionHandler:
     def __init__(self, ignore_hidden_points: Optional[bool] = False, 
                  output_to_file: bool = False,
                  outputfile: str = "landmarks.txt", 
+                 increase_depth:float = 3
                  ):
         # settings
         self.use_visibility_threshold = ignore_hidden_points
@@ -35,6 +36,7 @@ class PositionHandler:
         self.not_visible_names: List[str] = []
 
         self.mp_pose = mp.solutions.pose
+        self.increase_depth = increase_depth
 
     def manage_points(self, results) -> Optional[Positions]:
         """loads keypoint names from dataclass Positions and fills them with values"""
@@ -74,11 +76,13 @@ class PositionHandler:
         """Normalizes landmarks translation and scale."""
         #calculate distane between nose and center
         #pose_center = self._get_pose_center()
-        #TODO: inverse z-axis
         distance = self.positions["NOSE"]
         
         for key,values in self.positions.items():
-            self.positions[key] = [values[i]-distance[i] if i <= 3 else values[i] for i in range(4)]
+            self.positions[key][0] = values[0] - distance[0]
+            self.positions[key][1] = (values[1] - distance[1]) * (-1) # inverse y-axis
+            self.positions[key][2] *= (values[2] - distance[2]) #* self.increase_depth
+            self.positions[key][3] = values[3]
         
         
             
