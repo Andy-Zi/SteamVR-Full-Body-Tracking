@@ -132,6 +132,9 @@ def plot_landmarks(x,y,z,names):
     for name,xi,yi,zi in zip(names,x,y,z):
         ax.text(xi,yi,zi,name,color="red")
         ax.scatter(xi,yi,zi,color="blue")
+        ax.set_xlabel('X Values')
+        ax.set_ylabel('Y Values')
+        ax.set_zlabel('Z Values')
     plt.show()
     #plt.savefig("")
     
