@@ -1,6 +1,27 @@
 class MoveNetConfig:
     
     MIN_CROP_KEYPOINT_SCORE: float = 0.2
+    
+    CONNECTIONS = [
+    [0, 1, (255, 255, 255)],  # nose → left eye
+    [0, 2, (255, 255, 255)],  # nose → right eye
+    [1, 3, (255, 255, 255)],  # left eye → left ear
+    [2, 4, (255, 255, 255)],  # right eye → right ear
+    [0, 5, (255, 255, 255)],  # nose → left shoulder
+    [0, 6, (255, 255, 255)],  # nose → right shoulder
+    [5, 6, (255, 255, 255)],  # left shoulder → right shoulder
+    [5, 7, (255, 255, 255)],  # left shoulder → left elbow
+    [7, 9, (255, 255, 255)],  # left elbow → left wrist
+    [6, 8, (255, 255, 255)],  # right shoulder → right elbow
+    [8, 10, (255, 255, 255)],  # right elbow → right wrist
+    [11, 12, (255, 255, 255)],  # left hip → right hip
+    [5, 11, (255, 255, 255)],  # left shoulder → left hip
+    [11, 13, (255, 255, 255)],  # left hip → left knee
+    [13, 15, (255, 255, 255)],  # left knee → left ankle
+    [6, 12, (255, 255, 255)],  # right shoulder → right hip
+    [12, 14, (255, 255, 255)],  # right hip → right knee
+    [14, 16, (255, 255, 255)],  # right knee → right ankle
+]
 
     KEYPOINT_DICT:dict[str,int] = {
         'nose': 0,

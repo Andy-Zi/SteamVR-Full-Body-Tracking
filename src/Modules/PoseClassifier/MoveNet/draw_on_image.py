@@ -91,8 +91,8 @@ def draw_prediction_on_image(
     """
     height, width, _ = image.shape
     aspect_ratio = float(width) / height
-    keypoints_shape = keypoints_with_scores.shape
     fig, ax = plt.subplots(figsize=(12 * aspect_ratio, 12))
+
     # To remove the huge white borders
     fig.tight_layout(pad=0)
     ax.margins(0)
@@ -101,6 +101,7 @@ def draw_prediction_on_image(
     plt.axis('off')
     
     im = ax.imshow(image)
+    print(im)
     line_segments = LineCollection([], linewidths=(4), linestyle='solid')
     ax.add_collection(line_segments)
     # Turn off tick labels
@@ -109,6 +110,7 @@ def draw_prediction_on_image(
     (keypoint_locs, keypoint_edges,
     edge_colors) = _keypoints_and_edges_for_display(
         keypoints_with_scores, height, width)
+    print(keypoint_locs, keypoint_edges, edge_colors)
 
     line_segments.set_segments(keypoint_edges)
     line_segments.set_color(edge_colors)
@@ -120,6 +122,10 @@ def draw_prediction_on_image(
 
     fig.canvas.draw()
     image_from_plot = np.frombuffer(fig.canvas.tostring_rgb(), dtype=np.uint8)
+    l = len(image_from_plot)
+    l_3 = l/3
+    l1 = l_3/2
+    print(f"Shape={l} should be {l1},{l1},{3} from {height},{width}")
     image_from_plot = image_from_plot.reshape(
         fig.canvas.get_width_height()[::-1] + (3,))
     plt.close(fig)

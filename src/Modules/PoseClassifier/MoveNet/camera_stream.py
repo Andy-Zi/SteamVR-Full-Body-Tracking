@@ -28,11 +28,13 @@ class RealSenseStream:
         profile = self.pipeline.start(config)
         return profile
         
-    def get_format_of_stream(self):
+    def get_format_of_stream(self,test:bool = False):
         """find product line and format"""
         config = rs.config()
-        
-        config.enable_all_streams()
+        if test:
+            config.enable_device_from_file("MoveNet/outdoors.bag")
+        else:
+            config.enable_all_streams()
             # config.enable_stream(rs.stream.depth, 640, 480, rs.format.bgr8, 30)
             # config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
  
@@ -66,22 +68,21 @@ class RealSenseStream:
         align = rs.align(align_to)  
         return align
     
-    def configure_divice(self):
+    def configure_divice(self,test):
         self.start_streaming()
-        config = self.get_format_of_stream()
+        config = self.get_format_of_stream(test)
         profile = self.get_profile(config)
         depth_sensor = self.get_depth_sensor(profile)
         return depth_sensor
     
-    def loop(self, classifier, pipe, output, cut_off_distance:float= 10.0, remove_background:bool = False):
+    def loop(self, classifier, pipe, output, cut_off_distance:float= 10.0, remove_background:bool = False,test:bool=True):
         # Streaming loop
-        depth_sensor = self.configure_divice()
+        depth_sensor = self.configure_divice(test)
 
         self.depth_scale = self.get_depth_scale(depth_sensor)
         self.clipping_distance = self.set_clipping_distance(cut_off_distance)
         try:
             while True:
-                print("looping")
                 # Get frameset of color and depth
                 frames = self.pipeline.wait_for_frames()
                 
@@ -102,15 +103,7 @@ class RealSenseStream:
                 color_image = np.asanyarray(color_frame.get_data())
                 
                 
-                #assert color_image.shape[2] == 3
-                #assert depth_image.shape[2] == 1
-                ########################################################################
-                #set to zero for testing
-                #depth_image = np.zeros(depth_image.shape)
-                #color_image = np.zeros(color_image.shape)
-                
-                ########################################################################
-                
+                print("shapes:",color_image.shape, depth_image.shape)
                 
                 # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
                 #depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
@@ -130,7 +123,7 @@ class RealSenseStream:
 
                 # Show images
                 cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
-                cv2.imshow('RealSense', images)
+                cv2.imshow('RealSense', color_image)
                 cv2.waitKey(1)    
                 
                 #new            

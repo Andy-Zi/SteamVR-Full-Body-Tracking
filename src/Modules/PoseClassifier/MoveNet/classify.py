@@ -1,7 +1,7 @@
 
 
 from re import I
-from typing import Optional, List
+from typing import List
 import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
@@ -10,7 +10,9 @@ from MoveNet.draw_on_image import draw_prediction_on_image
 from utils.positions_dataclass import Positions
 from MoveNet.config import MoveNetConfig as cfg
 from MoveNet.camera_stream import RealSenseStream
-import matplotlib.pyplot as plt
+import copy
+
+
 
 class MoveNetModel:
     image_size:int #only square pictures
@@ -19,13 +21,16 @@ class MoveNetModel:
     depth_values:dict[str, float] # a depth value for every position
     accepted_input_size:int
     
-    def __init__(self, model_name:str = "movenet_lightning",default_value = False,options = None):
+    def __init__(self, model_name:str = "movenet_lightning",default_value = False,
+                 options = None,output_image_height=480,output_image_width=640):
         
         self.load_movenet_model(model_name)
         self.use_default_value = default_value
-        self.depth_values = None
+        self.depth_values = {}
         if options is not None:
             raise NotImplementedError
+        self.output_image_width = output_image_width
+        self.output_image_height = output_image_height
         
     def load_movenet_model(self,model_name) -> None:
         """select from two models and load them"""
@@ -44,6 +49,19 @@ class MoveNetModel:
             self.accepted_input_size = 256
         else:
             raise ValueError("Unsupported model name: %s" % model_name)
+        
+    def postprocess_image(self,keypoints_with_scores):
+        keypoints = []
+        scores = []
+        for index in range(17):
+            keypoint_x = int(self.output_image_width * keypoints_with_scores[index][1])
+            keypoint_y = int(self.output_image_height * keypoints_with_scores[index][0])
+            score = keypoints_with_scores[index][2]
+
+            keypoints.append([keypoint_x, keypoint_y])
+            scores.append(score)
+
+        return keypoints, scores
 
     def movenet(self,input_image:tf.Tensor):
         """Runs detection on an input image.
@@ -54,7 +72,7 @@ class MoveNetModel:
             expected input resolution of the model before passing into this function.
 
         Returns:
-        A [1, 1, 17, 3] float numpy array representing the predicted keypoint
+        A [17, 3] float numpy array representing the predicted keypoint
         coordinates and scores.
         
         """
@@ -69,47 +87,52 @@ class MoveNetModel:
         outputs = self.model(input_image)
         #print("output: ", outputs)
         # Output is a [1, 1, 17, 3] tensor.
-        keypoints_with_scores = outputs['output_0'].numpy()
-        return keypoints_with_scores
+        keypoints_with_scores = outputs['output_0']
+        return np.squeeze(keypoints_with_scores)
 
-    # def convert_to_formated_points(self, keypoints_with_scores)->Optional[Positions]:
-    #     """"""
-    #     positions:dict[str,list[float]] = {}
-    #     for key,val in cfg.KEYPOINT_DICT.items():
-    #         positions[key.upper()] = keypoints_with_scores[0,0,val,:]
-    #     if positions is not None and len(positions.keys()) == 17:
-    #         return Positions(**positions)
-        
     def _look_up_depth_values_for_keys(self, key_point_locs:List):
         """extract values from depthmap where keypoints are"""
-        
-        self.depth_values = {}
+    
         for key,val in cfg.KEYPOINT_DICT.items():
-            x, y, _ = key_point_locs[0,0,val,:]
+            x, y = key_point_locs[val]
             assert isinstance(x, int),"needs integer to index depthmap"
             assert isinstance(y, int),"needs integer to index depthmap"
             self.depth_values[key.upper()] = self.depth_map[x, y]
             
-    def insert_depth_value(self, key_point_locs:List)->List:
+    def insert_depth_value(self, keypoints:List)->List:
         """inserts depth value in predictions of keypoints from a depth-map of the picture"""
         #find out values from depth-map
-        self._look_up_depth_values_for_keys(key_point_locs)
+        self._look_up_depth_values_for_keys(keypoints)
         
         for key,val in cfg.KEYPOINT_DICT.items():
-            key_point_locs[0,0,val,:].tolist().insert(2, self.depth_values[key.upper()]) # insert depth value
-        return key_point_locs
+            keypoints[val].append(self.depth_values[key.upper()]) # insert depth value
+        return keypoints
    
-    def calculate_positions(self,points_3d):
+    def calculate_positions(self,keypoints,scores):
         positions:dict[str,list[float]] = {}
         list_of_body_parts = list(cfg.KEYPOINT_DICT.keys())
-        nose = points_3d[0,0,cfg.KEYPOINT_DICT["nose"],:]
-        for ind,val in enumerate(points_3d[0,0,:,:]):
-            positions[list_of_body_parts[ind].upper()] = val - nose #scale to nose
-
+        nose = keypoints[cfg.KEYPOINT_DICT["nose"]]
+        for ind,val in enumerate(keypoints):
+            positions[list_of_body_parts[ind].upper()] = [val[i]-nose[i] if i < 3 else scores[ind] for i in range(4)] #scale to nose
         return Positions(**positions)
     
-    
-    #@profile
+    def draw_image_overlay(self,image,keypoints,scores,keypoint_score_th=0.3):
+            # Connect Line
+        image = image.copy()
+        for (index01, index02, color) in cfg.CONNECTIONS:
+            if scores[index01] > keypoint_score_th and scores[
+                    index02] > keypoint_score_th:
+                point01 = keypoints[index01]
+                point02 = keypoints[index02]
+                cv2.line(image, point01, point02, color, 2)
+
+        # Keypoint circle
+        for keypoint, score in zip(keypoints, scores):
+            if score > keypoint_score_th:
+                cv2.circle(image, keypoint, 3, (0, 255, 0), 1)
+
+        return image
+
     def classify_image(self,rawimage:np.ndarray):
         """classify image and crop"""
         # Resize and pad the image to keep the aspect ratio and fit the expected size.
@@ -131,20 +154,24 @@ class MoveNetModel:
         keypoints_with_scores = self.movenet(input_image)
         output_overlay = None
         
+        keypoints_xy,scores = self.postprocess_image(keypoints_with_scores)
+        
+        output_overlay = self.draw_image_overlay(image=image,keypoints = keypoints_xy,scores=scores)
         # # Visualize the predictions with image.
-        display_image = tf.expand_dims(image, axis=0) #expand image to image.shape[0]==1 (1,192,192,3)
-        display_image = tf.cast(tf.image.resize_with_pad(
-                                image, 1280, 1280), dtype=tf.int32)
-        if display_image.shape[0]==1:
-            output_overlay, key_point_locs = draw_prediction_on_image(
-                np.squeeze(display_image.numpy(), axis=0), keypoints_with_scores) #get rid of first dim 
-        else:
-            output_overlay, key_point_locs = draw_prediction_on_image(
-                display_image.numpy(), keypoints_with_scores)
-        #if self.depth_map[0] != None:
-        keypoints_3d = self.insert_depth_value(key_point_locs)
+        # display_image = tf.expand_dims(image, axis=0) #expand image to image.shape[0]==1 (1,192,192,3)
+        
+        # display_image = tf.cast(tf.image.resize_with_pad(
+        #                         image, 1280, 1280), dtype=tf.int32).numpy()
+        # if display_image.shape[0]==1:
+        #     display_image = np.sqeeze(display_image)
+        # print("image has shape before drawing: ",display_image[0].shape,display_image[1].shape)
+            
+        # output_overlay, key_point_locs = draw_prediction_on_image(
+        #         display_image, keypoints_with_scores)
+        # #if self.depth_map[0] != None:
+        keypoints_3d = self.insert_depth_value(keypoints_xy)
     
-        positions = self.calculate_positions(keypoints_3d)
+        positions = self.calculate_positions(keypoints_3d,scores)
         return positions,output_overlay
         
 #@profile
