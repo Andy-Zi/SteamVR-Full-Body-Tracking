@@ -78,7 +78,7 @@ namespace KinectV2
         {
             List<double> TranformJoint(Joint joint)
             {
-                return new List<double>() { joint.Position.X, joint.Position.Y, joint.Position.Z };
+                return new List<double>() { -(joint.Position.X), joint.Position.Y, -(joint.Position.Z) };
             }
 
             var data = new ModuleDataModel();
