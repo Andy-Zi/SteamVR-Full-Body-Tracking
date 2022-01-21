@@ -10,7 +10,6 @@ from MoveNet.draw_on_image import draw_prediction_on_image
 from utils.positions_dataclass import Positions
 from MoveNet.config import MoveNetConfig as cfg
 from MoveNet.camera_stream import RealSenseStream
-import copy
 
 
 
@@ -37,20 +36,23 @@ class MoveNetModel:
         
         if model_name == "movenet_lightning":
             try:
-                self.module = hub.load("/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/MoveNet/models/movenet_singlepose_lightning_4")
+                module = hub.load("/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/MoveNet/models/movenet_singlepose_lightning_4")
                 self.accepted_input_size:int = 192
             except Exception as e:
                 print("Error loading movenet_singlepose_lightning: ", e)
                 
-                self.module = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
+                module = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
                 self.accepted_input_size:int = 192
         elif "movenet_thunder" in model_name:
-            self.module = hub.load("https://tfhub.dev/google/movenet/singlepose/thunder/4")
+            module = hub.load("https://tfhub.dev/google/movenet/singlepose/thunder/4")
             self.accepted_input_size = 256
         else:
             raise ValueError("Unsupported model name: %s" % model_name)
+        self.model = module.signatures['serving_default']
+        
         
     def postprocess_image(self,keypoints_with_scores):
+        """scales results to image size"""
         keypoints = []
         scores = []
         for index in range(17):
@@ -60,7 +62,6 @@ class MoveNetModel:
 
             keypoints.append([keypoint_x, keypoint_y])
             scores.append(score)
-
         return keypoints, scores
 
     def movenet(self,input_image:tf.Tensor):
@@ -77,16 +78,11 @@ class MoveNetModel:
         
         """
         
-       
-        self.model = self.module.signatures['serving_default']
         # SavedModel format expects tensor type of int32.
-        #print("type cast")
         input_image = tf.cast(input_image, dtype=tf.int32)
         # Run model inference.
         assert input_image.shape == (1,192,192,3)
         outputs = self.model(input_image)
-        #print("output: ", outputs)
-        # Output is a [1, 1, 17, 3] tensor.
         keypoints_with_scores = outputs['output_0']
         return np.squeeze(keypoints_with_scores)
 
@@ -117,7 +113,7 @@ class MoveNetModel:
         return Positions(**positions)
     
     def draw_image_overlay(self,image,keypoints,scores,keypoint_score_th=0.3):
-            # Connect Line
+        # Connect Line
         image = image.copy()
         for (index01, index02, color) in cfg.CONNECTIONS:
             if scores[index01] > keypoint_score_th and scores[
@@ -149,28 +145,14 @@ class MoveNetModel:
         input_image = tf.expand_dims(image, axis=0)
         
         input_image = tf.image.resize_with_pad(input_image, self.accepted_input_size, self.accepted_input_size)
-        #assert input_image.shape == (1,192,192,4)
         # Run model inference.
         keypoints_with_scores = self.movenet(input_image)
         output_overlay = None
         
+        #postprocess
         keypoints_xy,scores = self.postprocess_image(keypoints_with_scores)
-        
         output_overlay = self.draw_image_overlay(image=image,keypoints = keypoints_xy,scores=scores)
-        # # Visualize the predictions with image.
-        # display_image = tf.expand_dims(image, axis=0) #expand image to image.shape[0]==1 (1,192,192,3)
-        
-        # display_image = tf.cast(tf.image.resize_with_pad(
-        #                         image, 1280, 1280), dtype=tf.int32).numpy()
-        # if display_image.shape[0]==1:
-        #     display_image = np.sqeeze(display_image)
-        # print("image has shape before drawing: ",display_image[0].shape,display_image[1].shape)
-            
-        # output_overlay, key_point_locs = draw_prediction_on_image(
-        #         display_image, keypoints_with_scores)
-        # #if self.depth_map[0] != None:
         keypoints_3d = self.insert_depth_value(keypoints_xy)
-    
         positions = self.calculate_positions(keypoints_3d,scores)
         return positions,output_overlay
         

@@ -22,7 +22,7 @@ class PositionHandler:
     def __init__(self, ignore_hidden_points: Optional[bool] = False, 
                  output_to_file: bool = False,
                  outputfile: str = "landmarks.txt", 
-                 increase_depth:float = 3
+                 increase_depth:float = 1
                  ):
         # settings
         self.use_visibility_threshold = ignore_hidden_points
@@ -84,8 +84,6 @@ class PositionHandler:
             self.positions[key][2] *= (values[2] - distance[2]) #* self.increase_depth
             self.positions[key][3] = values[3]
         
-        
-            
         
     def _calc_landmarks(self, landmarks):
         """Listify positions
