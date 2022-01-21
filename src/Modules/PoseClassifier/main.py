@@ -6,12 +6,14 @@ from MoveNet.classify import MoveNetModel
 from MoveNet.camera_stream import RealSenseStream
 import sys
 from typing import Union,Callable
-from utils.positions_dataclass import Positions
 try:
     from ModulePipe.pipe_client import NamedPipe
 except:
     pass
 
+import sys
+
+print(sys.executable)
 
 def run_media_pipeline():
     """ runs pose detection with mediapipe (scalable) and return image and results"""
@@ -48,14 +50,22 @@ def parse_options():
         
     if "-mp" in opts:
         parsed_options["classifier"] = PoseMP
-        parsed_options["video_stream"] = CameraStream
         
     if "-mv" in opts:
         parsed_options["classifier"] = MoveNetModel
+    
+    if "-rs" in opts: # Realsense
         parsed_options["video_stream"] = RealSenseStream
         
+    if "-kin" in opts: #Kinect
+        parsed_options["video_stream"] = not_implemented
+        
+    if "-wc" in opts: #webcam
+        parsed_options["video_stream"] = CameraStream
     return parsed_options
 
+def not_implemented():
+    raise NotImplementedError
 
 if __name__ == "__main__":
 
