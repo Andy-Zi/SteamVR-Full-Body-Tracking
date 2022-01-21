@@ -19,6 +19,8 @@ class Positions:
     RIGHT_KNEE      : List[float] = None
     LEFT_ANKLE      : List[float] = None
     RIGHT_ANKLE     : List[float] = None
+    LEFT_FOOT_INDEX : List[float] = None
+    RIGHT_FOOT_INDEX: List[float] = None
 
     def serialize(self):
         return asdict(self)
