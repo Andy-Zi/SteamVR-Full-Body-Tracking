@@ -60,12 +60,12 @@ namespace PTSC.Communication.Controller
 
         private void SendData(DataProcessedPayload obj)
         {
+            Logger.Log($"Serialized DriverData: {DataController.SerializeDriverData(obj.DriverDataModel)}");
             // send data if a client is connected to the pipe
             if (isClientConnected)
             {
-                Logger.Log("Sending data to driver");
                 string serializedDataString = DataController.SerializeDriverData(obj.DriverDataModel);
-                Logger.Log($"Serializing driver data: {serializedDataString}");
+                Logger.Log($"Serialized DriverData: {serializedDataString}");
                 byte[] buffer = Encoding.UTF8.GetBytes(serializedDataString);
                 try
                 {

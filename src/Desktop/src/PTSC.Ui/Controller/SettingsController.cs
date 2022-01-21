@@ -44,10 +44,6 @@ namespace PTSC.Ui.Controller
             this.View.Close();
         }
 
-     
-
-  
-
         protected override void BindData()
         {
             Model = ((ApplicationSettingsModel)ApplicationEnvironment.Settings).Clone();
@@ -55,15 +51,14 @@ namespace PTSC.Ui.Controller
             ViewBindings.BindView(this.View, Model);
         }
 
-
         private void UpdateSettings()
         {
             UpdateModuleServer();
             UpdateKalman();
             UpdatePipeline();
-            UpdateDataController();
 
         }
+
         private void UpdateModuleServer()
         {
             ModulePipeServer.FPSLimit = Model.FPSLimit;
@@ -78,13 +73,8 @@ namespace PTSC.Ui.Controller
         private void UpdatePipeline()
         {
             ProcessingPipeline.UseKalmanFilter = Model.UseKalmanFilter;
-        }
-
-        private void UpdateDataController()
-        {
-            DataController.ScalingOffset = Model.Scaling;
-            DataController.RotationOffset = Model.Rotation;
-
+            ProcessingPipeline.ScalingOffset = Model.Scaling;
+            ProcessingPipeline.RotationOffset = Model.Rotation;
         }
     }
 }
