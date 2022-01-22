@@ -18,12 +18,13 @@ namespace PTSC.Communication.Controller
 
             // add x, y, z coordinates after keyword
             serialOutput += SerializeProperty(driverData.head, "head");
+            serialOutput += SerializeProperty(driverData.head_rotation);
             serialOutput += SerializeProperty(driverData.waist, "waist");
-            serialOutput += SerializeProperty(driverData.waist_direction);
+            serialOutput += SerializeProperty(driverData.waist_rotation);
             serialOutput += SerializeProperty(driverData.left_foot, "left_foot");
-            serialOutput += SerializeProperty(driverData.left_foot_direction);
+            serialOutput += SerializeProperty(driverData.left_foot_rotation);
             serialOutput += SerializeProperty(driverData.right_foot, "right_foot");
-            serialOutput += SerializeProperty(driverData.right_foot_direction);
+            serialOutput += SerializeProperty(driverData.right_foot_rotation);
             return serialOutput.Replace(",", ".");
         }
 

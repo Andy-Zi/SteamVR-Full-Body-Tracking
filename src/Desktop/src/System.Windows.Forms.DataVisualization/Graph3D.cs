@@ -46,12 +46,17 @@ namespace ChartWin
 
             { "LEFT_KNEE", Color.Violet },
             { "LEFT_ANKLE", Color.Violet },
+            { "LEFT_TOES", Color.Violet },
 
             { "RIGHT_ELBOW", Color.Blue },
             { "RIGHT_WRIST", Color.Blue },
 
             { "RIGHT_KNEE", Color.Yellow },
             { "RIGHT_ANKLE", Color.Yellow },
+            { "RIGHT_TOES", Color.Yellow },
+
+            
+            
         };
 
         public readonly static List<(List<string>, Color)> PossibleBodies = new()
@@ -59,8 +64,8 @@ namespace ChartWin
             new(new() { "LEFT_SHOULDER", "LEFT_HIP", "RIGHT_HIP", "RIGHT_SHOULDER", "LEFT_SHOULDER" }, Color.Black),
             new(new() { "LEFT_SHOULDER", "LEFT_ELBOW", "LEFT_WRIST"}, Color.Red),
             new(new() { "RIGHT_SHOULDER", "RIGHT_ELBOW", "RIGHT_WRIST"}, Color.Blue),
-            new(new() { "RIGHT_HIP", "RIGHT_KNEE", "RIGHT_ANKLE" }, Color.Yellow),
-            new(new() { "LEFT_HIP", "LEFT_KNEE", "LEFT_ANKLE" }, Color.Violet),
+            new(new() { "RIGHT_HIP", "RIGHT_KNEE", "RIGHT_ANKLE", "RIGHT_TOES" }, Color.Yellow),
+            new(new() { "LEFT_HIP", "LEFT_KNEE", "LEFT_ANKLE", "LEFT_TOES" }, Color.Violet),
             new(new() { "LEFT_EAR", "LEFT_EYE", "NOSE" , "RIGHT_EYE", "RIGHT_EAR"}, Color.Green),
         };
         public ChartArea ChartArea3D { get; protected set; }

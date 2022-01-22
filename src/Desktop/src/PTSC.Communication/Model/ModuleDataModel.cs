@@ -23,5 +23,7 @@ namespace PTSC.Communication.Model
         public List<double> RIGHT_KNEE { get; set; }
         public List<double> LEFT_ANKLE { get; set; }
         public List<double> RIGHT_ANKLE { get; set; }
+        public List<double> LEFT_TOES { get; set; }
+        public List<double> RIGHT_TOES { get; set; }
     }
 }

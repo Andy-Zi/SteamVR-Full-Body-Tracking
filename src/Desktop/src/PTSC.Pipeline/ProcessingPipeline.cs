@@ -97,7 +97,7 @@ namespace PTSC.Pipeline
 
                 var driverdata = MapData(moduledata);
                 // calculate destination for waist and feet
-                driverdata = CalculateDirections(driverdata);
+                driverdata = CalculateRotation(driverdata);
                 // scale coordinate before serializing
                 driverdata = ScaleData(driverdata);
                 // rotate coordinate before serializing
@@ -122,6 +122,9 @@ namespace PTSC.Pipeline
             // set ancles as foots for driver
             driverData.left_foot = moduledata["LEFT_ANKLE"].GetValues() ?? zeroList;
             driverData.right_foot = moduledata["RIGHT_ANKLE"].GetValues() ?? zeroList;
+            // set toes for dirver data
+            driverData.left_foot_toes = moduledata["LEFT_TOES"].GetValues() ?? zeroList;
+            driverData.right_foot_toes = moduledata["RIGHT_TOES"].GetValues() ?? zeroList;
             return driverData;
         }
 
@@ -191,31 +194,34 @@ namespace PTSC.Pipeline
             return (Math.PI / 180) * angle;
         }
 
-        private IDriverDataModel CalculateDirections(IDriverDataModel driverData)
+        private IDriverDataModel CalculateRotation(IDriverDataModel driverData)
         {
+            driverData.head_rotation = new List<double>() { 0.0, 0.0, 0.0, 0.0 };
             // calculate waist's direction as a normal vector in the x-z-plane
-            driverData.waist_direction = CalculateWaistDirection(driverData.left_hip, driverData.right_hip);
+            driverData.waist_rotation = CalculateWaistRotation(driverData.left_hip, driverData.right_hip);
             // set feet directions as the knee's direction from the hip
-            driverData.left_foot_direction = CalculateFootDirection(driverData.left_hip, driverData.left_knee);
-            driverData.right_foot_direction = CalculateFootDirection(driverData.right_hip, driverData.right_knee);
+            driverData.left_foot_rotation = CalculateFootRotation(driverData.left_foot, driverData.left_foot_toes);
+            driverData.right_foot_rotation = CalculateFootRotation(driverData.right_foot, driverData.right_foot_toes);
             return driverData;
         }
 
-        private List<double> CalculateFootDirection(List<double> point1, List<double> point2)
+        private List<double> CalculateFootRotation(List<double> point1, List<double> point2)
         {
 
             double deltaX = point2[0] - point1[0];
             double deltaY = 0; // set y coordinate to 0 for a horizontal vector
             double deltaZ = point2[2] - point1[2];
-            return new List<double> { deltaX, deltaY, deltaZ };
+            double deltaW = 0;
+            return new List<double> {deltaW, deltaX, deltaY, deltaZ };
         }
 
-        private List<double> CalculateWaistDirection(List<double> left_hip, List<double> right_hip)
+        private List<double> CalculateWaistRotation(List<double> left_hip, List<double> right_hip)
         {
             double hip_vector_x = left_hip[0] - right_hip[0];
             double hip_vector_y = 0; // set y coordinate to 0 to get a horizontal vector
             double hip_vector_z = left_hip[2] - right_hip[2];
-            return new List<double> { hip_vector_z, hip_vector_y, -hip_vector_x};
+            double hip_vector_w = 0;
+            return new List<double> { hip_vector_w, -hip_vector_x, hip_vector_y, hip_vector_z};
         }
     }
 }

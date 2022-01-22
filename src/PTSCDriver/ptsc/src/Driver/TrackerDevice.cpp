@@ -83,6 +83,11 @@ void ptscDriver::TrackerDevice::Update()
     pose.vecPosition[0] = pose.vecPosition[0] + vector.v[0];
     pose.vecPosition[1] = pose.vecPosition[1] + vector.v[1];
     pose.vecPosition[2] = pose.vecPosition[2] + vector.v[2];
+
+    /*pose.qRotation.w = hmd_rotation.w;
+    pose.qRotation.x = hmd_rotation.x;
+    pose.qRotation.y = hmd_rotation.y;
+    pose.qRotation.z = hmd_rotation.z;*/
     //this->wanted_pose_.vecPosition[0] += vector[0];//position_smoothing * x + (1 - position_smoothing) * this->wanted_pose_.vecPosition[0];  //can do some motion smoothing here?
     //this->wanted_pose_.vecPosition[1] += vector[1];//position_smoothing * y + (1 - position_smoothing) * this->wanted_pose_.vecPosition[1];
     //this->wanted_pose_.vecPosition[2] += vector[2];//position_smoothing * z + (1 - position_smoothing) * this->wanted_pose_.vecPosition[2];

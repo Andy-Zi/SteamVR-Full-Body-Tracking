@@ -150,11 +150,11 @@ void ptscDriver::VRDriver::RunFrame()
         }*/
 
         this->trackers_[0]->UpdatePos(waist_pos[0], waist_pos[1], waist_pos[2]);
-        //this->trackers_[0]->UpdateRot(waist_pos[3], waist_pos[4], waist_pos[5], waist_pos[6]);
+        this->trackers_[0]->UpdateRot(waist_pos[3], waist_pos[4], waist_pos[5], waist_pos[6]);
         this->trackers_[1]->UpdatePos(left_foot_pos[0], left_foot_pos[1], left_foot_pos[2]);
-        //this->trackers_[1]->UpdateRot(left_foot_pos[3], left_foot_pos[4], left_foot_pos[5], left_foot_pos[6]);
+        this->trackers_[1]->UpdateRot(left_foot_pos[3], left_foot_pos[4], left_foot_pos[5], left_foot_pos[6]);
         this->trackers_[2]->UpdatePos(right_foot_pos[0], right_foot_pos[1], right_foot_pos[2]);
-        //this->trackers_[2]->UpdateRot(right_foot_pos[3], right_foot_pos[4], right_foot_pos[5], right_foot_pos[6]);
+        this->trackers_[2]->UpdateRot(right_foot_pos[3], right_foot_pos[4], right_foot_pos[5], right_foot_pos[6]);
 
         for (auto& device : this->devices_)
             device->Update();
