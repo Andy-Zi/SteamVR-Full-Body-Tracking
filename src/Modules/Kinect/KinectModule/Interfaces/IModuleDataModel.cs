@@ -22,5 +22,7 @@ namespace Interfaces
         List<double> RIGHT_KNEE { get; set; }
         List<double> LEFT_ANKLE { get; set; }
         List<double> RIGHT_ANKLE { get; set; }
+        List<double> LEFT_TOES { get; set; }
+        List<double> RIGHT_TOES { get; set; }
     }
 }

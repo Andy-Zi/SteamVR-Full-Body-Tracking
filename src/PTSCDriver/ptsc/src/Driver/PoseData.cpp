@@ -17,7 +17,7 @@ void ptscDriver::PoseData::add_data(const std::string& s)
 
 	bool time_parsed = false;
 	std::string cur_position = "";
-	int cur_dimension = 3;
+	int cur_dimension = 7;
 	auto start = 0U;
 	auto end = s.find(delim);
 	while (end != std::string::npos)
@@ -29,7 +29,7 @@ void ptscDriver::PoseData::add_data(const std::string& s)
 		//	cur_time = std::stod(cur);
 		//}
 		//else
-		if (cur_dimension == 3)
+		if (cur_dimension == 7)
 		{
 			cur_position = cur;
 			cur_positions[cur_position] = std::vector<double>();
@@ -96,7 +96,7 @@ std::vector<double> ptscDriver::PoseData::get_desired_tracker_position(const std
 	std::vector<double> v;
 	if (cur_positions.empty())
 	{
-		v = { 0, 0, 0 };
+		v = { 0, 0, 0, 0, 0, 0, 0 };
 		return v;
 	}
 
@@ -145,7 +145,7 @@ std::vector<double> ptscDriver::PoseData::get_desired_tracker_position(const std
 		//hip_z += z_rotation_offset;
 
 		auto waist = get_calibrated_position_vector("waist");
-		v = { waist[0], waist[1], waist[2], 0, 0, 0, 0};
+		v = { waist[0], waist[1], waist[2], waist[3], waist[4], waist[5], waist[6]};
 
 	}
 	else if (tracker_name == "left_foot")
@@ -187,7 +187,7 @@ std::vector<double> ptscDriver::PoseData::get_desired_tracker_position(const std
 		//left_foot_z += z_rotation_offset;
 
 		auto left_foot = get_calibrated_position_vector("left_foot");
-		v = { left_foot[0], left_foot[1], left_foot[2], 0, 0, 0, 0};
+		v = { left_foot[0], left_foot[1], left_foot[2], left_foot[3], left_foot[4], left_foot[5], left_foot[6]};
 	}
 	else if (tracker_name == "right_foot")
 	{
@@ -221,7 +221,7 @@ std::vector<double> ptscDriver::PoseData::get_desired_tracker_position(const std
 		//right_foot_z += z_rotation_offset;
 
 		auto right_foot = get_calibrated_position_vector("right_foot");
-		v = { right_foot[0], right_foot[1], right_foot[2], 0, 0, 0, 0 };
+		v = { right_foot[0], right_foot[1], right_foot[2], right_foot[3], right_foot[4], right_foot[5], right_foot[6] };
 	}
 	return v;
 }

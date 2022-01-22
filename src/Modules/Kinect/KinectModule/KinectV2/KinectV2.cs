@@ -78,7 +78,7 @@ namespace KinectV2
         {
             List<double> TranformJoint(Joint joint)
             {
-                return new List<double>() { joint.Position.X, joint.Position.Y, joint.Position.Z };
+                return new List<double>() { -(joint.Position.X), joint.Position.Y, -(joint.Position.Z) };
             }
 
             var data = new ModuleDataModel();
@@ -99,6 +99,8 @@ namespace KinectV2
             data.RIGHT_KNEE = TranformJoint(positions[JointType.KneeRight]);
             data.LEFT_ANKLE = TranformJoint(positions[JointType.AnkleLeft]);
             data.RIGHT_ANKLE = TranformJoint(positions[JointType.AnkleRight]);
+            data.LEFT_TOES = TranformJoint(positions[JointType.FootLeft]);
+            data.RIGHT_TOES = TranformJoint(positions[JointType.FootRight]);
 
             return data;
         }

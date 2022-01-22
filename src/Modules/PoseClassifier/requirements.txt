@@ -5,4 +5,6 @@ matplotlib
 PyWin32
 #--find-links https://github.com/cansik/pyrealsense2-macosx/releases
 pyrealsense2
-opencv-python
+tensorflow
+tensorflow-hub
+
