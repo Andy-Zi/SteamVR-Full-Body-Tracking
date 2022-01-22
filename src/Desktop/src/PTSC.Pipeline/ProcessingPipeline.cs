@@ -197,31 +197,40 @@ namespace PTSC.Pipeline
         private IDriverDataModel CalculateRotation(IDriverDataModel driverData)
         {
             driverData.head_rotation = new List<double>() { 0.0, 0.0, 0.0, 0.0 };
-            // calculate waist's direction as a normal vector in the x-z-plane
-            driverData.waist_rotation = CalculateWaistRotation(driverData.left_hip, driverData.right_hip);
+            // calculate waist's direction as a normal vector of the vector from right to left hip
+            driverData.waist_rotation = CalculateWaistRotation(driverData.right_hip, driverData.left_hip);
             // set feet directions as the knee's direction from the hip
             driverData.left_foot_rotation = CalculateFootRotation(driverData.left_foot, driverData.left_foot_toes);
             driverData.right_foot_rotation = CalculateFootRotation(driverData.right_foot, driverData.right_foot_toes);
             return driverData;
         }
 
-        private List<double> CalculateFootRotation(List<double> point1, List<double> point2)
+        private List<double> CalculateFootRotation(List<double> ankle, List<double> toes)
         {
 
-            double deltaX = point2[0] - point1[0];
-            double deltaY = 0; // set y coordinate to 0 for a horizontal vector
-            double deltaZ = point2[2] - point1[2];
-            double deltaW = 0;
-            return new List<double> {deltaW, deltaX, deltaY, deltaZ };
+            double foot_vector_x = toes[0] - ankle[0];
+            double foot_vector_y = toes[1] - ankle[1];
+            double foot_vector_z = toes[2] - ankle[2];
+            double foot_vector_w = 0;
+            List<double> normalized_foot_vector = NormalizeVector(foot_vector_x, foot_vector_y, foot_vector_z);
+            return new List<double> { foot_vector_w, normalized_foot_vector[0], normalized_foot_vector[1], normalized_foot_vector[2] };
         }
 
-        private List<double> CalculateWaistRotation(List<double> left_hip, List<double> right_hip)
+        private List<double> CalculateWaistRotation(List<double> right_hip, List<double> left_hip)
         {
-            double hip_vector_x = left_hip[0] - right_hip[0];
-            double hip_vector_y = 0; // set y coordinate to 0 to get a horizontal vector
-            double hip_vector_z = left_hip[2] - right_hip[2];
-            double hip_vector_w = 0;
-            return new List<double> { hip_vector_w, -hip_vector_x, hip_vector_y, hip_vector_z};
+            // calculate vector (x, y, z) -> normal vector (z, y, -x)
+            double hip_normal_vector_x = left_hip[2] - right_hip[2]; // x value of the normal vector is the z value of the hip vector
+            double hip_normal_vector_y = 0; // set y value to 0 to get a horizontal vector
+            double hip_normal_vector_z = -(left_hip[0] - right_hip[0]); // z value of the normal vector is the negative x value of the hip vector
+            double hip_normal_vector_w = 0;
+            List<double> normalized_hip_vector = NormalizeVector(hip_normal_vector_x, hip_normal_vector_y, hip_normal_vector_z);
+            return new List<double> { hip_normal_vector_w, normalized_hip_vector[0], normalized_hip_vector[1], normalized_hip_vector[2] };
+        }
+
+        private List<double> NormalizeVector(double x, double y, double z)
+        {
+            double length = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2) + Math.Pow(z, 2));
+            return new List<double> { x / length, y / length, z / length };
         }
     }
 }
