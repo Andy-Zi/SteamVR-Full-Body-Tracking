@@ -23,10 +23,13 @@ namespace PTSC.Pipeline
         public List<double> zeroList = new List<double>() { 0.0, 0.0, 0.0 };
         [Dependency] public IEventAggregator EventAggregator { get; set; }
         [Dependency] public IKalmanFilterModel KalmanFilterModel { get; set; }
-        public ProcessingPipeline()
+        public ProcessingPipeline(IApplicationEnvironment applicationEnvironment)
         {
-
+            var settings = applicationEnvironment.Settings;
+            RotationOffset = settings.Rotation;
+            ScalingOffset = settings.Scaling;
         }
+
         protected SubscriptionToken SubscriptionToken;
         protected ImageProcessedEvent ImageProcessedEvent;
         protected DataProcessedEvent DataProcessedEvent;
@@ -143,15 +146,6 @@ namespace PTSC.Pipeline
             var y_new = (point1[1] + point2[1]) / 2;
             var z_new = (point1[2] + point2[2]) / 2;
             return new List<double> { x_new, y_new, z_new };
-        }
-
-        private static IModuleData correctYAxis(IModuleData moduledata)
-        {
-            foreach (var key in ModulePipeConstants.SkeletonParts)
-            {
-                moduledata[key].Y = -moduledata[key].Y;
-            }
-            return moduledata;
         }
 
         private IDriverDataModel ScaleData(IDriverDataModel driverData)

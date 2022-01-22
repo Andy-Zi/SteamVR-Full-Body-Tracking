@@ -3,7 +3,11 @@
 using Interfaces;
 using KinectModule;
 using Microsoft.Kinect;
+using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace KinectV1
 {
@@ -11,10 +15,12 @@ namespace KinectV1
     {
 
         public event OnDataProcessedHandler OnDataProcessed;
+        public event OnImageProcessedHandler OnImageProcessed;
 
         private KinectSensor kinectSensor = null;
+        private byte[] colorPixels;
 
-        public KinectV1()
+        public KinectV1(bool useCamera)
         {
             foreach (var potentialSensor in KinectSensor.KinectSensors)
             {
@@ -24,10 +30,49 @@ namespace KinectV1
                     break;
                 }
             }
-            kinectSensor.SkeletonStream.Enable();
+            if (kinectSensor == null)
+            {
+                throw new Exception("No Kinect-V1-Sensor found!");
+            }
 
+            kinectSensor.SkeletonStream.Enable();
             kinectSensor.SkeletonFrameReady += SensorSkeletonFrameReady;
+
+            if (useCamera)
+            {
+                colorPixels = new byte[kinectSensor.ColorStream.FramePixelDataLength];
+                kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+                kinectSensor.ColorFrameReady += KinectSensor_ColorFrameReady;
+            }
+
+            
             kinectSensor.Start();
+
+        }
+
+        private void KinectSensor_ColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
+        {
+
+
+            using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
+            {
+                if (colorFrame != null)
+                {
+                    // Copy the pixel data from the image to a temporary array
+                    colorFrame.CopyPixelDataTo(colorPixels);
+
+                    // Write the pixel data into our bitmap
+                    var bitmap = new Bitmap(
+                        kinectSensor.ColorStream.FrameWidth,
+                        kinectSensor.ColorStream.FrameHeight,
+                        kinectSensor.ColorStream.FrameWidth * 4,
+                        PixelFormat.Format32bppRgb,
+                        Marshal.UnsafeAddrOfPinnedArrayElement(colorPixels, 0));
+
+                    OnImageProcessed?.Invoke(bitmap);
+                }
+
+            }
 
         }
 
@@ -48,9 +93,9 @@ namespace KinectV1
                     skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
                     skeletonFrame.CopySkeletonDataTo(skeletons);
 
-                    foreach(var skeleton in skeletons)
+                    foreach (var skeleton in skeletons)
                     {
-                        if(skeleton.TrackingState == SkeletonTrackingState.Tracked)
+                        if (skeleton.TrackingState == SkeletonTrackingState.Tracked)
                         {
                             OnDataProcessed?.Invoke(TransformData(skeleton.Joints));
                         }

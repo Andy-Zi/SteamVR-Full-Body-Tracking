@@ -10,19 +10,25 @@ namespace KinectV2
     public class KinectV2 : IKinectAdapter
     {
         public event OnDataProcessedHandler OnDataProcessed;
+        public event OnImageProcessedHandler OnImageProcessed;
 
         private Kinect.KinectSensor kinectSensor = null;
         private Kinect.CoordinateMapper coordinateMapper = null;
         private Kinect.BodyFrameReader bodyFrameReader = null;
-
+        private ColorFrameReader colorFrameReader = null;
         private Kinect.Body[] bodies = null;
 
-        public KinectV2()
+        public KinectV2(bool useCamera)
         {
             kinectSensor = Kinect.KinectSensor.GetDefault();
             coordinateMapper = kinectSensor.CoordinateMapper;
             bodyFrameReader = kinectSensor.BodyFrameSource.OpenReader();
-
+            if (useCamera)
+            {
+                colorFrameReader = kinectSensor.ColorFrameSource.OpenReader();
+                colorFrameReader.FrameArrived += ColorFrameReader_FrameArrived;
+            }
+       
             kinectSensor.Open();
 
             if (bodyFrameReader != null)
@@ -32,10 +38,15 @@ namespace KinectV2
 
         }
 
+        private void ColorFrameReader_FrameArrived(object sender, ColorFrameArrivedEventArgs e)
+        {
+           //TODO
+        }
 
         public void Stop()
         {
-            bodyFrameReader.Dispose();
+            colorFrameReader?.Dispose();
+            bodyFrameReader?.Dispose();
             kinectSensor.Close();
         }
 
