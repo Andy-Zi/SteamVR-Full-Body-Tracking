@@ -26,6 +26,7 @@ class MoveNetModel:
         self.load_movenet_model(model_name)
         self.use_default_value = default_value
         self.depth_values = {}
+        self.depth_map = None
         if options is not None:
             raise NotImplementedError
         self.output_image_width = output_image_width
@@ -51,13 +52,13 @@ class MoveNetModel:
         self.model = module.signatures['serving_default']
         
         
-    def postprocess_image(self,keypoints_with_scores):
+    def postprocess_image(self,keypoints_with_scores,height,width):
         """scales results to image size"""
         keypoints = []
         scores = []
         for index in range(17):
-            keypoint_x = int(self.output_image_width * keypoints_with_scores[index][1])
-            keypoint_y = int(self.output_image_height * keypoints_with_scores[index][0])
+            keypoint_x = int(width * keypoints_with_scores[index][1])
+            keypoint_y = int(height * keypoints_with_scores[index][0])
             score = keypoints_with_scores[index][2]
 
             keypoints.append([keypoint_x, keypoint_y])
@@ -86,22 +87,27 @@ class MoveNetModel:
         keypoints_with_scores = outputs['output_0']
         return np.squeeze(keypoints_with_scores)
 
-    def _look_up_depth_values_for_keys(self, key_point_locs:List):
+    def _look_up_depth_values_for_keys(self, keypoints_with_scores:List):
         """extract values from depthmap where keypoints are"""
-    
+        max_y,max_x,_ = self.depth_map.shape
         for key,val in cfg.KEYPOINT_DICT.items():
-            x, y = key_point_locs[val]
-            assert isinstance(x, int),"needs integer to index depthmap"
-            assert isinstance(y, int),"needs integer to index depthmap"
-            self.depth_values[key.upper()] = self.depth_map[x, y]
+            x, y, _ = keypoints_with_scores[val]
+            y_int = int(self.accepted_input_size * y)
+            x_int = int(self.accepted_input_size * x)
             
-    def insert_depth_value(self, keypoints:List)->List:
+            if x_int > max_x and y_int < max_y:
+                val = self.depth_map[x_int, y_int]
+            else: val = 0
+            self.depth_values[key.upper()] = val
+            
+    def insert_depth_value(self, keypoints_with_scores:np.ndarray)->List:
         """inserts depth value in predictions of keypoints from a depth-map of the picture"""
         #find out values from depth-map
+        keypoints = keypoints_with_scores.tolist()
         self._look_up_depth_values_for_keys(keypoints)
         
         for key,val in cfg.KEYPOINT_DICT.items():
-            keypoints[val].append(self.depth_values[key.upper()]) # insert depth value
+            keypoints[val].insert(self.depth_values[key.upper()],2) # insert depth value
         return keypoints
    
     def calculate_positions(self,keypoints,scores):
@@ -132,28 +138,32 @@ class MoveNetModel:
     def classify_image(self,rawimage:np.ndarray):
         """classify image and crop"""
         # Resize and pad the image to keep the aspect ratio and fit the expected size.
-        print(rawimage.shape[2])
-        
+        height, width = rawimage.shape[0], rawimage.shape[1]
         #check if shape[3]==4 -> depth map was appended
         if rawimage.shape[2] == 4:
             image = rawimage[:,:,:3]
             self.depth_map = rawimage[:,:,3]
         else: 
-            self.depth_map = np.zeros(rawimage.shape[0],rawimage.shape[1],1)
+            print("No depthmap was found, make sure dimension 4 of picture contains depth values. Otherwise this model won't work for VR")
+            self.depth_map = np.ones((rawimage.shape[0],rawimage.shape[1],1))
             image = rawimage
         
         input_image = tf.expand_dims(image, axis=0)
         
-        input_image = tf.image.resize_with_pad(input_image, self.accepted_input_size, self.accepted_input_size)
+        input_image = tf.image.resize(input_image, (self.accepted_input_size, self.accepted_input_size))
         # Run model inference.
         keypoints_with_scores = self.movenet(input_image)
-        output_overlay = None
         
+        #image = np.squeeze(tf.image.resize(input_image, [self.output_image_height, self.output_image_width]))
+        #cv2.imshow("image with overlay",np.squeeze(input_image))
         #postprocess
-        keypoints_xy,scores = self.postprocess_image(keypoints_with_scores)
-        output_overlay = self.draw_image_overlay(image=image,keypoints = keypoints_xy,scores=scores)
-        keypoints_3d = self.insert_depth_value(keypoints_xy)
+        keypoints_xy,scores = self.postprocess_image(keypoints_with_scores, height=height, width=width)
+        output_overlay = self.draw_image_overlay(image=image, keypoints = keypoints_xy, scores=scores)
+        keypoints_3d = self.insert_depth_value(keypoints_with_scores)
         positions = self.calculate_positions(keypoints_3d,scores)
+        #output_overlay = cv2.resize(output_overlay,(self.output_image_width,self.output_image_height))
+        print("Tiefe",positions.LEFT_SHOULDER[0],positions.LEFT_SHOULDER[1],positions.LEFT_SHOULDER[2],positions.LEFT_SHOULDER[3])
+        print("Tiefe",positions.LEFT_KNEE[0],positions.LEFT_KNEE[1],positions.LEFT_KNEE[2],positions.LEFT_KNEE[3])
         return positions,output_overlay
         
 #@profile
