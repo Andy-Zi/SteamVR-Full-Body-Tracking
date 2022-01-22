@@ -107,13 +107,16 @@ class MoveNetModel:
         self._look_up_depth_values_for_keys(keypoints)
         
         for key,val in cfg.KEYPOINT_DICT.items():
-            keypoints[val].insert(self.depth_values[key.upper()],2) # insert depth value
+            print("k:",keypoints[val])
+            keypoints[val].insert(2, self.depth_values[key.upper()]) # insert depth value
+            print("kn:",keypoints[val])
         return keypoints
    
     def calculate_positions(self,keypoints,scores):
         positions:dict[str,list[float]] = {}
         list_of_body_parts = list(cfg.KEYPOINT_DICT.keys())
         nose = keypoints[cfg.KEYPOINT_DICT["nose"]]
+        print("Nose val:", nose)
         for ind,val in enumerate(keypoints):
             positions[list_of_body_parts[ind].upper()] = [val[i]-nose[i] if i < 3 else scores[ind] for i in range(4)] #scale to nose
         return Positions(**positions)
@@ -145,7 +148,7 @@ class MoveNetModel:
             self.depth_map = rawimage[:,:,3]
         else: 
             print("No depthmap was found, make sure dimension 4 of picture contains depth values. Otherwise this model won't work for VR")
-            self.depth_map = np.ones((rawimage.shape[0],rawimage.shape[1],1))
+            self.depth_map = np.zeros((rawimage.shape[0],rawimage.shape[1],1))
             image = rawimage
         
         input_image = tf.expand_dims(image, axis=0)
@@ -154,16 +157,11 @@ class MoveNetModel:
         # Run model inference.
         keypoints_with_scores = self.movenet(input_image)
         
-        #image = np.squeeze(tf.image.resize(input_image, [self.output_image_height, self.output_image_width]))
-        #cv2.imshow("image with overlay",np.squeeze(input_image))
         #postprocess
         keypoints_xy,scores = self.postprocess_image(keypoints_with_scores, height=height, width=width)
         output_overlay = self.draw_image_overlay(image=image, keypoints = keypoints_xy, scores=scores)
         keypoints_3d = self.insert_depth_value(keypoints_with_scores)
         positions = self.calculate_positions(keypoints_3d,scores)
-        #output_overlay = cv2.resize(output_overlay,(self.output_image_width,self.output_image_height))
-        print("Tiefe",positions.LEFT_SHOULDER[0],positions.LEFT_SHOULDER[1],positions.LEFT_SHOULDER[2],positions.LEFT_SHOULDER[3])
-        print("Tiefe",positions.LEFT_KNEE[0],positions.LEFT_KNEE[1],positions.LEFT_KNEE[2],positions.LEFT_KNEE[3])
         return positions,output_overlay
         
 #@profile
