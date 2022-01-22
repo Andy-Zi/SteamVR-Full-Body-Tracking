@@ -36,7 +36,7 @@ namespace PTSC.Communication.Controller
             {
                 if (keyWord == "") // serialization for point direction
                 {
-                    serializedProperty += $"{coordinates[0]}{seperator}{coordinates[2]}{seperator}{coordinates[1]}{seperator}{0}{seperator}";
+                    serializedProperty += $"{coordinates[0]}{seperator}{coordinates[1]}{seperator}{coordinates[2]}{seperator}{coordinates[3]}{seperator}";
                 }
                 else // serialization for point coordinates
                 {
