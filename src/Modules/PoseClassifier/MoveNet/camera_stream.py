@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import pyrealsense2.pyrealsense2 as rs
 import numpy as np
-from .draw_on_image import draw_prediction_on_image
 import cv2
 import os
 
@@ -80,6 +79,7 @@ class RealSenseStream:
         depth_sensor = self.configure_divice(test)
 
         self.depth_scale = self.get_depth_scale(depth_sensor)
+        
         self.clipping_distance = self.set_clipping_distance(cut_off_distance)
         try:
             while True:
@@ -102,9 +102,6 @@ class RealSenseStream:
                 depth_image = np.asanyarray(aligned_depth_frame.get_data())
                 color_image = np.asanyarray(color_frame.get_data())
                 
-                
-                print("shapes:",color_image.shape, depth_image.shape)
-                
                 # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
                 #depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
 
@@ -121,18 +118,11 @@ class RealSenseStream:
                 #stacked images with depthmap in images[:,:,3]    
                 assert images.shape[2] == 4
 
-                # Show images
-                cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
-                cv2.imshow('RealSense', color_image)
-                cv2.waitKey(1)    
-                
-                #new            
                 # Remove background - Set pixels further than clipping_distance to grey
                 grey_color = 153
                 if remove_background:
                     depth_image = np.where((depth_image > self.clipping_distance) | (depth_image <= 0), grey_color, color_image)
                 images = np.dstack((color_image,depth_image))
-                
                 
                 results,output_overlay = classifier.classify_image(images)
                 
@@ -140,9 +130,6 @@ class RealSenseStream:
                     if pipe:
                         pipe.SendPositions(results, output_overlay)
                 
-                
-                cv2.namedWindow('Align Example', cv2.WINDOW_NORMAL)
-                cv2.imshow('Align Example', color_image)
                 if output:
                     key = cv2.waitKey(1)
                     # Press esc or 'q' to close the image window
@@ -152,42 +139,23 @@ class RealSenseStream:
         finally:
             self.pipeline.stop()
 
-    def predict_distance(self,aligned_depth_frame):
+    def predict_avg_distance(self,profile,aligned_depth_frame):
         """calculates mean distance in area of x_depth and y_depth +- sample_size"""
         depth = np.asanyarray(aligned_depth_frame.get_data())
         # Crop depth data:
        
-        #cv2.imshow(depth)
         depth = depth[(self.x_depth-self.sample_size):(self.x_depth+self.sample_size),(self.y_depth-self.sample_size):(self.y_depth+self.sample_size)].astype(float)
 
         # Get data scale from the device and convert to meters
-        depth_scale = self.profile.get_device().first_depth_sensor().get_depth_scale()
+        depth_scale = profile.get_device().first_depth_sensor().get_depth_scale()
         depth = depth * depth_scale
         dist,_,_,_ = cv2.mean(depth)
         return dist
 
-
-
-
-def visualize(image, keypoint_with_scores):
-
-    # Visualize the predictions with image.
-    display_image = tf.expand_dims(image, axis=0)
-    display_image = tf.cast(tf.image.resize_with_pad(
-        display_image, 480,480), dtype=tf.int32)
-    output_overlay = draw_prediction_on_image(
-        np.squeeze(display_image.numpy(), axis=0), keypoint_with_scores)
-
-    plt.figure(figsize=(5, 5))
-    plt.imshow(output_overlay)
-    _ = plt.axis('off')
     
     
 def main():
-    a = RealSencePipeline()
-    a.run()
-    # with RealSencePipeline() as pipe:
-    #     pipe.run()
+    pass
     
 if __name__ == "__main__":
     

@@ -6,11 +6,8 @@ import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
 import cv2
-from MoveNet.draw_on_image import draw_prediction_on_image
 from utils.positions_dataclass import Positions
 from MoveNet.config import MoveNetConfig as cfg
-from MoveNet.camera_stream import RealSenseStream
-
 
 
 class MoveNetModel:
@@ -82,7 +79,6 @@ class MoveNetModel:
         # SavedModel format expects tensor type of int32.
         input_image = tf.cast(input_image, dtype=tf.int32)
         # Run model inference.
-        assert input_image.shape == (1,192,192,3)
         outputs = self.model(input_image)
         keypoints_with_scores = outputs['output_0']
         return np.squeeze(keypoints_with_scores)
@@ -107,16 +103,13 @@ class MoveNetModel:
         self._look_up_depth_values_for_keys(keypoints)
         
         for key,val in cfg.KEYPOINT_DICT.items():
-            print("k:",keypoints[val])
             keypoints[val].insert(2, self.depth_values[key.upper()]) # insert depth value
-            print("kn:",keypoints[val])
         return keypoints
    
     def calculate_positions(self,keypoints,scores):
         positions:dict[str,list[float]] = {}
         list_of_body_parts = list(cfg.KEYPOINT_DICT.keys())
         nose = keypoints[cfg.KEYPOINT_DICT["nose"]]
-        print("Nose val:", nose)
         for ind,val in enumerate(keypoints):
             positions[list_of_body_parts[ind].upper()] = [val[i]-nose[i] if i < 3 else scores[ind] for i in range(4)] #scale to nose
         return Positions(**positions)
@@ -164,7 +157,7 @@ class MoveNetModel:
         positions = self.calculate_positions(keypoints_3d,scores)
         return positions,output_overlay
         
-#@profile
+
 def input_stream():
     mn = MoveNetModel()
     cap = cv2.VideoCapture(0)
