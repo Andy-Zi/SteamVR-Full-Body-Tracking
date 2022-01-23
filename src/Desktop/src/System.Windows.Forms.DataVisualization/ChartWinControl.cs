@@ -428,12 +428,6 @@ namespace System.Windows.Forms.DataVisualization.Charting
 					{
 						// Draw exception method
 						DrawException(paintBufferBitmapGraphics);
-
-						// Rethrow exception if not in design-time mode
-						if(!this.DesignMode)
-						{
-							throw;
-						}
 					}
 				}
 
