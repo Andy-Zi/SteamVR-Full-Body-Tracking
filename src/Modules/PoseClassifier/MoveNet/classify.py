@@ -28,6 +28,7 @@ class MoveNetModel:
             raise NotImplementedError
         self.output_image_width = output_image_width
         self.output_image_height = output_image_height
+        self.depth_scale = 0.001
         
     def load_movenet_model(self,model_name) -> None:
         """select from two models and load them"""
@@ -85,16 +86,17 @@ class MoveNetModel:
 
     def _look_up_depth_values_for_keys(self, keypoints_with_scores:List):
         """extract values from depthmap where keypoints are"""
-        max_y,max_x,_ = self.depth_map.shape
+        
+        max_y,max_x = self.depth_map.shape
         for key,val in cfg.KEYPOINT_DICT.items():
             x, y, _ = keypoints_with_scores[val]
             y_int = int(self.accepted_input_size * y)
             x_int = int(self.accepted_input_size * x)
             
-            if x_int > max_x and y_int < max_y:
-                val = self.depth_map[x_int, y_int]
-            else: val = 0
-            self.depth_values[key.upper()] = val
+            if x_int < max_x and y_int < max_y:
+                depth_m = self.depth_map[y_int, x_int]*self.depth_scale
+            else: val = 0.0
+            self.depth_values[key.upper()] = depth_m
             
     def insert_depth_value(self, keypoints_with_scores:np.ndarray)->List:
         """inserts depth value in predictions of keypoints from a depth-map of the picture"""
@@ -116,20 +118,20 @@ class MoveNetModel:
     
     def draw_image_overlay(self,image,keypoints,scores,keypoint_score_th=0.3):
         # Connect Line
-        image = image.copy()
+        image2 = image.copy()
         for (index01, index02, color) in cfg.CONNECTIONS:
             if scores[index01] > keypoint_score_th and scores[
                     index02] > keypoint_score_th:
                 point01 = keypoints[index01]
                 point02 = keypoints[index02]
-                cv2.line(image, point01, point02, color, 2)
+                cv2.line(image2, point01, point02, color, 2)
 
         # Keypoint circle
         for keypoint, score in zip(keypoints, scores):
             if score > keypoint_score_th:
-                cv2.circle(image, keypoint, 3, (0, 255, 0), 1)
+                cv2.circle(image2, keypoint, 3, (0, 255, 0), 1)
 
-        return image
+        return image2
 
     def classify_image(self,rawimage:np.ndarray):
         """classify image and crop"""
@@ -141,8 +143,13 @@ class MoveNetModel:
             self.depth_map = rawimage[:,:,3]
         else: 
             print("No depthmap was found, make sure dimension 4 of picture contains depth values. Otherwise this model won't work for VR")
-            self.depth_map = np.zeros((rawimage.shape[0],rawimage.shape[1],1))
+            self.depth_map = np.zeros((rawimage.shape[0],rawimage.shape[1]))
             image = rawimage
+        
+        if len(self.depth_map.shape) != 2:
+            raise ValueError("Depth map is not of the right shape -> maybe camera is not selected")
+            self.depth_map = np.zeros((rawimage.shape[0],rawimage.shape[1]))
+
         
         input_image = tf.expand_dims(image, axis=0)
         
