@@ -31,12 +31,14 @@ class RealSenseStream:
         """find product line and format"""
         config = rs.config()
         if test:
-            config.enable_device_from_file("MoveNet/outdoors.bag")
+             config.enable_device_from_file("MoveNet/outdoors.bag")
         else:
-            config.enable_all_streams()
-            # config.enable_stream(rs.stream.depth, 640, 480, rs.format.bgr8, 30)
-            # config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
- 
+        #     config.enable_all_streams()
+
+
+            config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
+            config.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+
         return config
   
     def get_depth_sensor(self,profile):  
@@ -74,7 +76,7 @@ class RealSenseStream:
         depth_sensor = self.get_depth_sensor(profile)
         return depth_sensor
     
-    def loop(self, classifier, pipe, output, cut_off_distance:float= 10.0, remove_background:bool = False,test:bool=True):
+    def loop(self, classifier,pipe, output, cut_off_distance:float= 10.0, remove_background:bool = False,test:bool=False):
         # Streaming loop
         depth_sensor = self.configure_divice(test)
 
@@ -85,7 +87,6 @@ class RealSenseStream:
             while True:
                 # Get frameset of color and depth
                 frames = self.pipeline.wait_for_frames()
-                
                 # frames.get_depth_frame() is a 640x360 depth image
 
                 # Align the depth frame to color frame
@@ -95,6 +96,7 @@ class RealSenseStream:
                 aligned_depth_frame = aligned_frames.get_depth_frame() # aligned_depth_frame is a 640x480 depth image
                 color_frame = aligned_frames.get_color_frame()
 
+                #print(color_frame)
                 # Validate that both frames are valid
                 if not aligned_depth_frame or not color_frame:
                     continue
@@ -105,8 +107,8 @@ class RealSenseStream:
                 # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
                 #depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
 
-                depth_map_dim = depth_image.shape
-                color_map_dim = color_image.shape
+                depth_map_dim = depth_image.shape[:2]
+                color_map_dim = color_image.shape[:2]
 
                 # If depth and color resolutions are different, resize color image to match depth image for display
                 if depth_map_dim != color_map_dim:
@@ -122,15 +124,14 @@ class RealSenseStream:
                 grey_color = 153
                 if remove_background:
                     depth_image = np.where((depth_image > self.clipping_distance) | (depth_image <= 0), grey_color, color_image)
-                images = np.dstack((color_image,depth_image))
-                
+                    images = np.dstack((color_image,depth_image))
                 results,output_overlay = classifier.classify_image(images)
-                
                 if results is not None and images is not None:
                     if pipe:
                         pipe.SendPositions(results, output_overlay)
                 
                 if output:
+                    cv2.imshow('Pose', np.uint8(output_overlay))
                     key = cv2.waitKey(1)
                     # Press esc or 'q' to close the image window
                     if key & 0xFF == ord('q') or key == 27:
