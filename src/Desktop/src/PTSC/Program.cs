@@ -62,6 +62,8 @@ namespace PTSC
             applicationEnvironment.LoggingPath = logger.LoggingPath;
 
             container.RegisterInstance<ILogger>(logger);
+            container.RegisterInstance<ILogger>("ModuleDataLogger", new Logger(executablePath, "moduleData.txt"));
+            container.RegisterInstance<ILogger>("DriverDataLogger", new Logger(executablePath, "driverData.txt"));
 
             container.RegisterInstance<IApplicationEnvironment>(applicationEnvironment);
 

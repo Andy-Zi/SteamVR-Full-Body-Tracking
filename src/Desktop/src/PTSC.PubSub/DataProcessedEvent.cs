@@ -4,12 +4,12 @@ namespace PTSC.PubSub
 {
     public class DataProcessedPayload
     {
-        public DataProcessedPayload(IDriverDataModel driverDataModel)
+        public DataProcessedPayload(IDriverData driverData)
         {
-            DriverDataModel = driverDataModel;
+            DriverData = driverData;
         }
 
-        public IDriverDataModel DriverDataModel { get; }
+        public IDriverData DriverData { get; }
     }
 
     public class DataProcessedEvent : Prism.Events.PubSubEvent<DataProcessedPayload>

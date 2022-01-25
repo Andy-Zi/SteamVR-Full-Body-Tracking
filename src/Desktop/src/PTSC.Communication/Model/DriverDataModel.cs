@@ -4,7 +4,7 @@ namespace PTSC.Communication.Model
 {
 
     [Serializable]
-    public class DriverDataModel : IDriverDataModel
+    public class DriverDataModel
     {
         public List<double> head { get; set; }
         public List<double> waist { get; set; }

@@ -1,13 +1,10 @@
-﻿using OpenCvSharp;
+﻿using System.Diagnostics;
+using System.Drawing;
 using Prism.Events;
 using PTSC.Communication.Model;
 using PTSC.Interfaces;
-using PTSC.Nameservice;
 using PTSC.OpenCV;
-using PTSC.Pipeline.Kalman;
 using PTSC.PubSub;
-using System.Diagnostics;
-using System.Drawing;
 using Unity;
 
 namespace PTSC.Pipeline
@@ -88,7 +85,7 @@ namespace PTSC.Pipeline
             );
         }
 
-        async Task<IDriverDataModel> ProcessData(DataRecievedPayload payload)
+        async Task<IDriverData> ProcessData(DataRecievedPayload payload)
         {
             return await Task.Run(async () =>
             {
@@ -100,35 +97,35 @@ namespace PTSC.Pipeline
 
                 var driverdata = MapData(moduledata);
                 // calculate destination for waist and feet
-                driverdata = CalculateRotation(driverdata);
+                CalculateRotation(driverdata);
                 // scale coordinate before serializing
-                driverdata = ScaleData(driverdata);
+                ScaleData(driverdata);
                 // rotate coordinate before serializing
-                driverdata = RotateData(driverdata);
+                RotateData(driverdata);
                 return driverdata;
             });
         }
 
-        private IDriverDataModel MapData(IModuleData moduledata)
+        private IDriverData MapData(IModuleData moduledata)
         {
-            DriverDataModel driverData = new DriverDataModel();
+            DriverDataModel driverDataModel = new DriverDataModel();
             // set nose as head for driver
-            driverData.head = moduledata["NOSE"].GetValues() ?? zeroList;
+            driverDataModel.head = moduledata["NOSE"].GetValues() ?? zeroList;
             // set hips for dirver data
-            driverData.left_hip = moduledata["LEFT_HIP"].GetValues() ?? zeroList;
-            driverData.right_hip = moduledata["RIGHT_HIP"].GetValues() ?? zeroList;
+            driverDataModel.left_hip = moduledata["LEFT_HIP"].GetValues() ?? zeroList;
+            driverDataModel.right_hip = moduledata["RIGHT_HIP"].GetValues() ?? zeroList;
             // set center point of hips as the waist point for driver
-            driverData.waist = CalculateCenter3D(moduledata["LEFT_HIP"].GetValues() ?? zeroList, moduledata["RIGHT_HIP"].GetValues() ?? zeroList);
+            driverDataModel.waist = CalculateHipCenter3D(driverDataModel.right_hip, driverDataModel.left_hip);
             // set knees for dirver data
-            driverData.left_knee = moduledata["LEFT_KNEE"].GetValues() ?? zeroList;
-            driverData.right_knee = moduledata["RIGHT_KNEE"].GetValues() ?? zeroList;
+            driverDataModel.left_knee = moduledata["LEFT_KNEE"].GetValues() ?? zeroList;
+            driverDataModel.right_knee = moduledata["RIGHT_KNEE"].GetValues() ?? zeroList;
             // set ancles as foots for driver
-            driverData.left_foot = moduledata["LEFT_ANKLE"].GetValues() ?? zeroList;
-            driverData.right_foot = moduledata["RIGHT_ANKLE"].GetValues() ?? zeroList;
+            driverDataModel.left_foot = moduledata["LEFT_ANKLE"].GetValues() ?? zeroList;
+            driverDataModel.right_foot = moduledata["RIGHT_ANKLE"].GetValues() ?? zeroList;
             // set toes for dirver data
-            driverData.left_foot_toes = moduledata["LEFT_TOES"].GetValues() ?? zeroList;
-            driverData.right_foot_toes = moduledata["RIGHT_TOES"].GetValues() ?? zeroList;
-            return driverData;
+            driverDataModel.left_foot_toes = moduledata["LEFT_FOOT_INDEX"].GetValues() ?? zeroList;
+            driverDataModel.right_foot_toes = moduledata["RIGHT_FOOT_INDEX"].GetValues() ?? zeroList;
+            return new DriverData(driverDataModel);
         }
 
         private async Task<IModuleData> FilterData(IModuleData moduledata)
@@ -138,49 +135,41 @@ namespace PTSC.Pipeline
             return moduledata;
         }
 
-        private static List<double> CalculateCenter3D(List<double> point1, List<double> point2)
+        private static List<double> CalculateHipCenter3D(List<double> rightHip, List<double> leftHip)
         {
-            if(point1.Count < 3|| point2.Count < 3)
-                return new List<double>() { 0.0,0.0,0.0};
-            var x_new = (point1[0] + point2[0]) / 2;
-            var y_new = (point1[1] + point2[1]) / 2;
-            var z_new = (point1[2] + point2[2]) / 2;
-            return new List<double> { x_new, y_new, z_new };
+            double waistX = (leftHip[0] + rightHip[0]) / 2;
+            double waistY = (leftHip[1] + rightHip[1]) / 2;
+            double waistZ = (leftHip[2] + rightHip[2]) / 2;
+            return new List<double> { waistX, waistY, waistZ };
         }
 
-        private IDriverDataModel ScaleData(IDriverDataModel driverData)
+        private void ScaleData(IDriverData driverData)
         {
-            driverData.waist = ScaleProperty(driverData.waist);
-            driverData.left_foot = ScaleProperty(driverData.left_foot);
-            driverData.right_foot = ScaleProperty(driverData.right_foot);
-            return driverData;
+            ScaleProperty(driverData["waist"]);
+            ScaleProperty(driverData["left_foot"]);
+            ScaleProperty(driverData["right_foot"]);
         }
 
-        private List<double> ScaleProperty(List<double> coordinate)
+        private void ScaleProperty(IDriverDataPoint dataPoint)
         {
-            double newX = coordinate[0] * ScalingOffset;
-            double newY = coordinate[1] * ScalingOffset;
-            double newZ = coordinate[2] * ScalingOffset;
-            return new List<double> { newX, newY, newZ };
+            dataPoint.X = dataPoint.X * ScalingOffset;
+            dataPoint.Y = dataPoint.Y * ScalingOffset;
+            dataPoint.Z = dataPoint.Z * ScalingOffset;
         }
 
-        private IDriverDataModel RotateData(IDriverDataModel driverData)
+        private void RotateData(IDriverData driverData)
         {
             double rotation = ToRadians(RotationOffset);
-            driverData.waist = RotateProperty(driverData.waist, rotation);
-            driverData.left_foot = RotateProperty(driverData.left_foot, rotation);
-            driverData.right_foot = RotateProperty(driverData.right_foot, rotation);
-            return driverData;
+            RotateProperty(driverData["waist"], rotation);
+            RotateProperty(driverData["left_foot"], rotation);
+            RotateProperty(driverData["right_foot"], rotation);
         }
 
-        private List<double> RotateProperty(List<double> coodinate, double rotation)
+        private void RotateProperty(IDriverDataPoint dataPoint, double rotation)
         {
-            double x = coodinate[0];
-            double y = coodinate[2];
-            double newX = Math.Cos(rotation) * x - Math.Sin(rotation) * y;
-            double newY = Math.Sin(rotation) * x + Math.Cos(rotation) * y;
-            double newZ = coodinate[1];
-            return new List<double> { newX, newY, newZ };
+            dataPoint.X = Math.Cos(rotation) * dataPoint.X - Math.Sin(rotation) * dataPoint.Z;
+            dataPoint.Y = Math.Sin(rotation) * dataPoint.X + Math.Cos(rotation) * dataPoint.Z;
+            dataPoint.Z = dataPoint.Y;
         }
 
         private static double ToRadians(double angle)
@@ -188,43 +177,52 @@ namespace PTSC.Pipeline
             return (Math.PI / 180) * angle;
         }
 
-        private IDriverDataModel CalculateRotation(IDriverDataModel driverData)
+        private void CalculateRotation(IDriverData driverData)
         {
-            driverData.head_rotation = new List<double>() { 0.0, 0.0, 0.0, 0.0 };
+            SetHeadRotation(driverData["head_rotation"]);
             // calculate waist's direction as a normal vector of the vector from right to left hip
-            driverData.waist_rotation = CalculateWaistRotation(driverData.right_hip, driverData.left_hip);
+            CalculateWaistRotation(driverData["waist_rotation"], driverData["right_hip"], driverData["left_hip"]);
             // set feet directions as the knee's direction from the hip
-            driverData.left_foot_rotation = CalculateFootRotation(driverData.left_foot, driverData.left_foot_toes);
-            driverData.right_foot_rotation = CalculateFootRotation(driverData.right_foot, driverData.right_foot_toes);
-            return driverData;
+            CalculateFootRotation(driverData["left_foot_rotation"], driverData["left_foot"], driverData["left_foot_toes"]);
+            CalculateFootRotation(driverData["right_foot_rotation"], driverData["right_foot"], driverData["right_foot_toes"]);
         }
 
-        private List<double> CalculateFootRotation(List<double> ankle, List<double> toes)
+        private void SetHeadRotation(IDriverDataPoint headRotation)
         {
-
-            double foot_vector_x = toes[0] - ankle[0];
-            double foot_vector_y = toes[1] - ankle[1];
-            double foot_vector_z = toes[2] - ankle[2];
-            double foot_vector_w = 0;
-            List<double> normalized_foot_vector = NormalizeVector(foot_vector_x, foot_vector_y, foot_vector_z);
-            return new List<double> { foot_vector_w, normalized_foot_vector[0], normalized_foot_vector[1], normalized_foot_vector[2] };
+            headRotation.rotationW = 0;
+            headRotation.rotationX = 0;
+            headRotation.rotationY = 0;
+            headRotation.rotationZ = 0;
         }
 
-        private List<double> CalculateWaistRotation(List<double> right_hip, List<double> left_hip)
+        private void CalculateFootRotation(IDriverDataPoint footRotation, IDriverDataPoint ankle, IDriverDataPoint toes)
         {
+            footRotation.rotationW = 0;
+            // calculate the foot direction as the vector from ankle to toes
+            footRotation.rotationX = toes.X - ankle.X;
+            footRotation.rotationY = toes.Y - ankle.Y;
+            footRotation.rotationZ = toes.Z - ankle.Z;
+            // normalize the vector to a length of 1
+            NormalizeVector(footRotation);
+        }
+
+        private void CalculateWaistRotation(IDriverDataPoint waistRotation, IDriverDataPoint rightHip, IDriverDataPoint leftHip)
+        {
+            waistRotation.rotationW = 0;
             // calculate vector (x, y, z) -> normal vector (z, y, -x)
-            double hip_normal_vector_x = left_hip[2] - right_hip[2]; // x value of the normal vector is the z value of the hip vector
-            double hip_normal_vector_y = 0; // set y value to 0 to get a horizontal vector
-            double hip_normal_vector_z = -(left_hip[0] - right_hip[0]); // z value of the normal vector is the negative x value of the hip vector
-            double hip_normal_vector_w = 0;
-            List<double> normalized_hip_vector = NormalizeVector(hip_normal_vector_x, hip_normal_vector_y, hip_normal_vector_z);
-            return new List<double> { hip_normal_vector_w, normalized_hip_vector[0], normalized_hip_vector[1], normalized_hip_vector[2] };
+            waistRotation.rotationX = leftHip.Z - rightHip.Z; // x value of the normal vector is the z value of the hip vector
+            waistRotation.rotationY = 0; // set y value to 0 to get a horizontal vector
+            waistRotation.rotationZ = -(leftHip.X - rightHip.X); // z value of the normal vector is the negative x value of the hip vector
+            // normalize the vector to a length of 1
+            NormalizeVector(waistRotation);
         }
 
-        private List<double> NormalizeVector(double x, double y, double z)
+        private void NormalizeVector(IDriverDataPoint driverDataPoint)
         {
-            double length = Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2) + Math.Pow(z, 2));
-            return new List<double> { x / length, y / length, z / length };
+            double length = Math.Sqrt(Math.Pow(driverDataPoint.X, 2) + Math.Pow(driverDataPoint.Y, 2) + Math.Pow(driverDataPoint.Z, 2));
+            driverDataPoint.X /= length;
+            driverDataPoint.Y /= length;
+            driverDataPoint.Z /= length;
         }
     }
 }

@@ -8,39 +8,41 @@ namespace PTSC.Communication.Controller
     public class DataController
     {
         [Dependency] public ILogger Logger { get; set; }
+        [Dependency("ModuleDataLogger")] public ILogger ModuleDataLogger { get; set; }
         [Dependency] public IApplicationEnvironment ApplicationEnvironment { get; set; }
 
         public const string seperator = ";";
 
-        public string SerializeDriverData(IDriverDataModel driverData)
+        public string SerializeDriverData(IDriverData driverData)
         {
             string serialOutput = string.Empty;
 
             // add x, y, z coordinates after keyword
-            serialOutput += SerializeProperty(driverData.head, "head");
-            serialOutput += SerializeProperty(driverData.head_rotation);
-            serialOutput += SerializeProperty(driverData.waist, "waist");
-            serialOutput += SerializeProperty(driverData.waist_rotation);
-            serialOutput += SerializeProperty(driverData.left_foot, "left_foot");
-            serialOutput += SerializeProperty(driverData.left_foot_rotation);
-            serialOutput += SerializeProperty(driverData.right_foot, "right_foot");
-            serialOutput += SerializeProperty(driverData.right_foot_rotation);
+            serialOutput += SerializeProperty(driverData["head"], "head");
+            serialOutput += SerializeProperty(driverData["head_rotation"]);
+            serialOutput += SerializeProperty(driverData["waist"], "waist");
+            serialOutput += SerializeProperty(driverData["waist_rotation"]);
+            serialOutput += SerializeProperty(driverData["left_foot"], "left_foot");
+            serialOutput += SerializeProperty(driverData["left_foot_rotation"]);
+            serialOutput += SerializeProperty(driverData["right_foot"], "right_foot");
+            serialOutput += SerializeProperty(driverData["right_foot_rotation"]);
             return serialOutput.Replace(",", ".");
         }
 
-        public string SerializeProperty(List<double> coordinates, string keyWord = "")
+        public string SerializeProperty(IDriverDataPoint driverDataPoint, string keyWord = "")
         {
             string serializedProperty = string.Empty;
             // add coordinate values to serialized string if they are not null
-            if (coordinates != null)
+            if (driverDataPoint != null)
             {
-                if (keyWord == "") // serialization for point direction
+                if (keyWord == "") // serialization of a point's rotation values
                 {
-                    serializedProperty += $"{coordinates[0]}{seperator}{coordinates[1]}{seperator}{coordinates[2]}{seperator}{coordinates[3]}{seperator}";
+                    serializedProperty += $"{driverDataPoint.rotationW}{seperator}{driverDataPoint.rotationX}{seperator}{driverDataPoint.rotationY}{seperator}{driverDataPoint.rotationZ}{seperator}";
                 }
-                else // serialization for point coordinates
+                else // serialization of a point's space coordinates values
                 {
-                    serializedProperty += $"{keyWord}{seperator}{coordinates[0]}{seperator}{coordinates[2]}{seperator}{coordinates[1]}{seperator}";
+                    // serializing the values by x, z, y, because the coordinate system in switched between the y and z-axis
+                    serializedProperty += $"{keyWord}{seperator}{driverDataPoint.X}{seperator}{driverDataPoint.Z}{seperator}{driverDataPoint.Y}{seperator}";
                 }
             }
             return serializedProperty;
@@ -51,7 +53,7 @@ namespace PTSC.Communication.Controller
             if (jsonString != string.Empty)
             {
                 string receivedData = jsonString.Replace("\0", string.Empty);
-                Logger.Log($"Received ModuleData: {receivedData}");
+                ModuleDataLogger.Log($"Received ModuleData: {receivedData}");
                 return JsonSerializer.Deserialize<ModuleDataModel>(receivedData);
             }
             return null;
