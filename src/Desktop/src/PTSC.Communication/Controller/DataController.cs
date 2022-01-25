@@ -18,32 +18,29 @@ namespace PTSC.Communication.Controller
             string serialOutput = string.Empty;
 
             // add x, y, z coordinates after keyword
-            serialOutput += SerializeProperty(driverData["head"], "head");
-            serialOutput += SerializeProperty(driverData["head_rotation"]);
-            serialOutput += SerializeProperty(driverData["waist"], "waist");
-            serialOutput += SerializeProperty(driverData["waist_rotation"]);
-            serialOutput += SerializeProperty(driverData["left_foot"], "left_foot");
-            serialOutput += SerializeProperty(driverData["left_foot_rotation"]);
-            serialOutput += SerializeProperty(driverData["right_foot"], "right_foot");
-            serialOutput += SerializeProperty(driverData["right_foot_rotation"]);
+            serialOutput += SerializeProperty("head", driverData["head"], driverData["head_rotation"]);
+            serialOutput += SerializeProperty("waist", driverData["waist"], driverData["waist_rotation"]);
+            serialOutput += SerializeProperty("left_foot", driverData["left_foot"], driverData["left_foot_rotation"]);
+            serialOutput += SerializeProperty("right_foot", driverData["right_foot"], driverData["right_foot_rotation"]);
             return serialOutput.Replace(",", ".");
         }
 
-        public string SerializeProperty(IDriverDataPoint driverDataPoint, string keyWord = "")
+        public string SerializeProperty(string keyWord, IDriverDataPoint driverDataPoint, IDriverDataPoint driverDataPointRotation)
         {
             string serializedProperty = string.Empty;
             // add coordinate values to serialized string if they are not null
-            if (driverDataPoint != null)
+            if (driverDataPoint != null && driverDataPointRotation != null)
             {
-                if (keyWord == "") // serialization of a point's rotation values
-                {
-                    serializedProperty += $"{driverDataPoint.rotationW}{seperator}{driverDataPoint.rotationX}{seperator}{driverDataPoint.rotationY}{seperator}{driverDataPoint.rotationZ}{seperator}";
-                }
-                else // serialization of a point's space coordinates values
-                {
-                    // serializing the values by x, z, y, because the coordinate system in switched between the y and z-axis
-                    serializedProperty += $"{keyWord}{seperator}{driverDataPoint.X}{seperator}{driverDataPoint.Z}{seperator}{driverDataPoint.Y}{seperator}";
-                }
+                serializedProperty += $"{keyWord}{seperator}";
+                // serializing the values by x, z, y, because the coordinate system in switched between the y and z-axis
+                serializedProperty += $"{driverDataPoint.X}{seperator}";
+                serializedProperty += $"{driverDataPoint.Z}{seperator}";
+                serializedProperty += $"{driverDataPoint.Y}{seperator}";
+                // serialize point rotation
+                serializedProperty += $"{driverDataPointRotation.rotationW}{seperator}";
+                serializedProperty += $"{driverDataPointRotation.rotationX}{seperator}";
+                serializedProperty += $"{driverDataPointRotation.rotationY}{seperator}";
+                serializedProperty += $"{driverDataPointRotation.rotationZ}{seperator}";
             }
             return serializedProperty;
         }
