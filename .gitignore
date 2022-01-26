@@ -4,5 +4,7 @@
 src/PTSCDriver/x64/
 src/PTSCDriver/ptsc/x64/
 src/PTSCDriver/.vs
+artifacts/
+release/
 __pycache__
 venv
