@@ -2,7 +2,5 @@
 	"alwaysActivate": true,
 	"name" : "ptsc",
 	"directory" : "",
-	"resourceOnly" : false,
-	"prefersUpperDeviceIndices" :  true,
-	"hmd_presence" : ["*.*"]
+	"resourceOnly" : false
 }

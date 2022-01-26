@@ -1,8 +1,5 @@
 #include "VRDriver.hpp"
-#include <Driver/HMDDevice.hpp>
 #include <Driver/TrackerDevice.hpp>
-#include <Driver/ControllerDevice.hpp>
-#include <Driver/TrackingReferenceDevice.hpp>
 
 std::mutex mymutex;
 
@@ -13,7 +10,7 @@ vr::EVRInitError ptscDriver::VRDriver::Init(vr::IVRDriverContext* pDriverContext
         return init_error;
     }
 
-    Log("Activating ptscDriver...");
+    Log("Activating ptsc Driver...");
 
     Log("Connecting to pipe...");
     LPTSTR lpszPipename = (LPTSTR)(L"\\\\.\\pipe\\PTSCDriverPipe");
@@ -44,33 +41,17 @@ vr::EVRInitError ptscDriver::VRDriver::Init(vr::IVRDriverContext* pDriverContext
     std::thread pipeThread(&ptscDriver::VRDriver::PipeThread, this);
     pipeThread.detach();
 
-    // Add a HMD
-    //this->AddDevice(std::make_shared<HMDDevice>("ptsc_HMDDevice"));
-
-    // Add a couple controllers
-    //this->AddDevice(std::make_shared<ControllerDevice>("ptsc_ControllerDevice_Left", ControllerDevice::Handedness::LEFT));
-    //this->AddDevice(std::make_shared<ControllerDevice>("ptsc_ControllerDevice_Right", ControllerDevice::Handedness::RIGHT));
-
-    // Add a tracker
-    /*this->AddDevice(std::make_shared<TrackerDevice>("waist_TrackerDevice"));
-    this->AddDevice(std::make_shared<TrackerDevice>("leftfoot_TrackerDevice"));
-    this->AddDevice(std::make_shared<TrackerDevice>("rightfoot_TrackerDevice"));*/
-
-    auto waist_tracker = std::make_shared<TrackerDevice>("0Waist_TrackerDevice");
+    auto waist_tracker = std::make_shared<TrackerDevice>("0Waist_TrackerDevice",0, static_cast<TrackerRole>(WAIST));
     this->AddDevice(waist_tracker);
     this->trackers_.push_back(waist_tracker);
 
-    auto left_foot_tracker = std::make_shared<TrackerDevice>("1LeftFoot_TrackerDevice");
+    auto left_foot_tracker = std::make_shared<TrackerDevice>("1LeftFoot_TrackerDevice",1, static_cast<TrackerRole>(LEFT_FOOT));
     this->AddDevice(left_foot_tracker);
     this->trackers_.push_back(left_foot_tracker);
 
-    auto right_foot_tracker = std::make_shared<TrackerDevice>("2RightFoot_TrackerDevice");
+    auto right_foot_tracker = std::make_shared<TrackerDevice>("2RightFoot_TrackerDevice",2, static_cast<TrackerRole>(RIGHT_FOOT));
     this->AddDevice(right_foot_tracker);
     this->trackers_.push_back(right_foot_tracker);
-
-    // Add a couple tracking references
-    //this->AddDevice(std::make_shared<TrackingReferenceDevice>("ptsc_TrackingReference_A"));
-    //this->AddDevice(std::make_shared<TrackingReferenceDevice>("ptsc_TrackingReference_B"));
 
     Log("ptscDriver Loaded Successfully");
 

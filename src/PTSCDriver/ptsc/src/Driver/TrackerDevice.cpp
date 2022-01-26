@@ -1,9 +1,10 @@
 #include "TrackerDevice.hpp"
 #include <Windows.h>
 
-ptscDriver::TrackerDevice::TrackerDevice(std::string serial):
-    serial_(serial)
+ptscDriver::TrackerDevice::TrackerDevice(std::string serial, int deviceId, TrackerRole trackerRole_) :
+    serial_(serial), trackerRole(trackerRole_), deviceId_(deviceId)
 {
+    this->last_pose_ = MakeDefaultPose();
 }
 
 std::string ptscDriver::TrackerDevice::GetSerial()
@@ -121,26 +122,19 @@ vr::EVRInitError ptscDriver::TrackerDevice::Activate(uint32_t unObjectId)
     // Get the properties handle
     auto props = GetDriver()->GetProperties()->TrackedDeviceToPropertyContainer(this->device_index_);
 
-    // Setup inputs and outputs
-    GetDriver()->GetInput()->CreateHapticComponent(props, "/output/haptic", &this->haptic_component_);
-
-    GetDriver()->GetInput()->CreateBooleanComponent(props, "/input/system/click", &this->system_click_component_);
-    GetDriver()->GetInput()->CreateBooleanComponent(props, "/input/system/touch", &this->system_touch_component_);
-
     // Set some universe ID (Must be 2 or higher)
-    GetDriver()->GetProperties()->SetUint64Property(props, vr::Prop_CurrentUniverseId_Uint64, 2);
-    
+    GetDriver()->GetProperties()->SetUint64Property(props, vr::Prop_CurrentUniverseId_Uint64, 4);
+
     // Set up a model "number" (not needed but good to have)
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_ModelNumber_String, "ptsc_tracker");
+    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_ModelNumber_String, "ptsc Virtual Tracker");
 
     // Opt out of hand selection
     GetDriver()->GetProperties()->SetInt32Property(props, vr::Prop_ControllerRoleHint_Int32, vr::ETrackedControllerRole::TrackedControllerRole_OptOut);
+    vr::VRProperties()->SetInt32Property(props, vr::Prop_DeviceClass_Int32, vr::TrackedDeviceClass_GenericTracker);
+    vr::VRProperties()->SetInt32Property(props, vr::Prop_ControllerHandSelectionPriority_Int32, -1);
 
     // Set up a render model path
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_RenderModelName_String, "vr_controller_05_wireless_b");
-
-    // Set controller profile
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_InputProfilePath_String, "{ptsc}/input/ptsc_tracker_bindings.json");
+    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_RenderModelName_String, "{htc}/rendermodels/vr_tracker_vive_1_0");
 
     // Set the icon
     GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceReady_String, "{ptsc}/icons/tracker_ready.png");
@@ -153,28 +147,15 @@ vr::EVRInitError ptscDriver::TrackerDevice::Activate(uint32_t unObjectId)
     GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceStandby_String, "{ptsc}/icons/tracker_not_ready.png");
     GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_NamedIconPathDeviceAlertLow_String, "{ptsc}/icons/tracker_not_ready.png");
 
-    // create switch statement based on serial id to create hip and feet trackers
-    std::string role;
-    switch (this->serial_[0])
-    {
-    case '0':
-        role = "vive_tracker_waist";
-        // set starting pose
-        this->wanted_pose_.vecPosition[1] = 1;
-        break;
-    case '1':
-        role = "vive_tracker_left_foot";
-        // set starting pose
-        this->wanted_pose_.vecPosition[0] = -0.3;
-        break;
-    case '2':
-        role = "vive_tracker_right_foot";
-        // set starting pose
-        this->wanted_pose_.vecPosition[0] = 0.3;
-        break;
-    }
+    // Automatically select vive tracker roles and set hints for games that need it (Beat Saber avatar mod, for example)
+    auto roleHint = getViveRoleHint(trackerRole);
+    if (roleHint != "")
+        GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_ControllerType_String, roleHint.c_str());
 
-    GetDriver()->GetProperties()->SetStringProperty(props, vr::Prop_ControllerType_String, role.c_str());
+    auto role = getViveRole(trackerRole);
+    if (role != "")
+        vr::VRSettings()->SetString(vr::k_pch_Trackers_Section, ("/devices/ptsc/" + this->serial_).c_str(), role.c_str());
+
     return vr::EVRInitError::VRInitError_None;
 }
 
