@@ -1,11 +1,10 @@
-
-import cv2
 from MediaPipe.classifier.pose import PoseMP
 from MediaPipe.camera_stream import CameraStream
 from MoveNet.classify import MoveNetModel
 from MoveNet.camera_stream import RealSenseStream
 import sys
-from typing import Union,Callable
+from typing import Union, Callable
+
 try:
     from ModulePipe.pipe_client import NamedPipe
 except:
@@ -13,10 +12,9 @@ except:
 
 import sys
 
-print(sys.executable)
 
 def run_media_pipeline():
-    """ runs pose detection with mediapipe (scalable) and return image and results"""
+    """runs pose detection with mediapipe (scalable) and return image and results"""
 
     parsed_options = parse_options()
 
@@ -27,45 +25,49 @@ def run_media_pipeline():
         pipe = NamedPipe()
     except Exception as e:
         pass
-        
 
-    classifier = parsed_options["classifier"](
-        default_value=default_value, options=None)
+    classifier = parsed_options["classifier"](default_value=default_value, options=None)
 
     streamer = parsed_options["video_stream"]()
-    streamer.loop(classifier=classifier,pipe=pipe,output=output)
+    streamer.loop(classifier=classifier, pipe=pipe, output=output)
 
 
 def parse_options():
     opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
-    parsed_options: dict[str, Union[bool,Callable]] = {
-        "default-position-value": False, "commandline-output": False, "classifier": PoseMP,
-        "video_stream": CameraStream}
+    parsed_options: dict[str, Union[bool, Callable]] = {
+        "default-position-value": False,
+        "commandline-output": False,
+        "classifier": PoseMP,
+        "video_stream": CameraStream,
+    }
 
     if "-dv" in opts:
         parsed_options["default-position-value"] = True
-        
+
     if "-o" in opts:
         parsed_options["commandline-output"] = True
-        
+
     if "-mp" in opts:
         parsed_options["classifier"] = PoseMP
-        
+
     if "-mv" in opts:
         parsed_options["classifier"] = MoveNetModel
-    
-    if "-rs" in opts: # Realsense
+
+    if "-rs" in opts:  # Realsense
         parsed_options["video_stream"] = RealSenseStream
-        
-    if "-kin" in opts: #Kinect
+
+    if "-kin" in opts:  # Kinect
         parsed_options["video_stream"] = not_implemented
-        
-    if "-wc" in opts: #webcam
+
+    if "-wc" in opts:  # webcam
         parsed_options["video_stream"] = CameraStream
+
     return parsed_options
 
+
 def not_implemented():
-    raise NotImplementedError
+    raise NotImplementedError("Kinect Module is not implemented yet")
+
 
 if __name__ == "__main__":
 
