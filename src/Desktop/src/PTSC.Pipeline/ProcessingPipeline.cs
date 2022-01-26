@@ -170,9 +170,12 @@ namespace PTSC.Pipeline
 
         private void RotateProperty(IDriverDataPoint dataPoint, double rotation)
         {
-            dataPoint.X = Math.Cos(rotation) * dataPoint.X - Math.Sin(rotation) * dataPoint.Z;
-            dataPoint.Y = Math.Sin(rotation) * dataPoint.X + Math.Cos(rotation) * dataPoint.Z;
-            dataPoint.Z = dataPoint.Y;
+            double x = dataPoint.X;
+            double y = dataPoint.Y;
+            double z = dataPoint.Z;
+            dataPoint.X = Math.Cos(rotation) * x - Math.Sin(rotation) * z;
+            dataPoint.Y = dataPoint.Y;
+            dataPoint.Z = Math.Cos(rotation) * z + Math.Sin(rotation) * x;
         }
 
         private static double ToRadians(double angle)
@@ -202,9 +205,9 @@ namespace PTSC.Pipeline
         {
             footRotation.rotationW = 0;
             // calculate the foot direction as the vector from ankle to toes
-            footRotation.rotationX = toes.X - ankle.X;
-            footRotation.rotationY = toes.Y - ankle.Y;
-            footRotation.rotationZ = toes.Z - ankle.Z;
+            footRotation.rotationX = ankle.X - toes.X;
+            footRotation.rotationY = ankle.Y - toes.Y;
+            footRotation.rotationZ = ankle.Z - toes.Z;
             // normalize the vector to a length of 1
             NormalizeVector(footRotation);
         }
@@ -213,19 +216,19 @@ namespace PTSC.Pipeline
         {
             waistRotation.rotationW = 0;
             // calculate vector (x, y, z) -> normal vector (z, y, -x)
-            waistRotation.rotationX = leftHip.Z - rightHip.Z; // x value of the normal vector is the z value of the hip vector
+            waistRotation.rotationX = leftHip.X - rightHip.X; // x value of the normal vector is the z value of the hip vector
             waistRotation.rotationY = 0; // set y value to 0 to get a horizontal vector
-            waistRotation.rotationZ = -(leftHip.X - rightHip.X); // z value of the normal vector is the negative x value of the hip vector
+            waistRotation.rotationZ = leftHip.Z - rightHip.Z; // z value of the normal vector is the negative x value of the hip vector
             // normalize the vector to a length of 1
             NormalizeVector(waistRotation);
         }
 
         private void NormalizeVector(IDriverDataPoint driverDataPoint)
         {
-            double length = Math.Sqrt(Math.Pow(driverDataPoint.X, 2) + Math.Pow(driverDataPoint.Y, 2) + Math.Pow(driverDataPoint.Z, 2));
-            driverDataPoint.X /= length;
-            driverDataPoint.Y /= length;
-            driverDataPoint.Z /= length;
+            double length = Math.Sqrt(Math.Pow(driverDataPoint.rotationX, 2) + Math.Pow(driverDataPoint.rotationY, 2) + Math.Pow(driverDataPoint.rotationZ, 2));
+            driverDataPoint.rotationX /= length;
+            driverDataPoint.rotationY /= length;
+            driverDataPoint.rotationZ /= length;
         }
     }
 }
