@@ -6,3 +6,7 @@ src/PTSCDriver/ptsc/x64/
 src/PTSCDriver/.vs
 __pycache__
 venv
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+*.suo
+*.so
