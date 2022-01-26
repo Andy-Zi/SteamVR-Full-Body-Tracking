@@ -137,6 +137,9 @@ namespace PTSC.Pipeline
 
         private static List<double> CalculateHipCenter3D(List<double> rightHip, List<double> leftHip)
         {
+            if(leftHip.Count < 3 || rightHip.Count < 3)
+                return new List<double> { 0, 0, 0 };
+
             double waistX = (leftHip[0] + rightHip[0]) / 2;
             double waistY = (leftHip[1] + rightHip[1]) / 2;
             double waistZ = (leftHip[2] + rightHip[2]) / 2;

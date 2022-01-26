@@ -23,7 +23,7 @@ namespace KinectV1
             var p = new FluentCommandLineParser<ApplicationArguments>();
             p.Setup(arg => arg.UseCamera)
                 .As('c', "camera")
-                .SetDefault(true);
+                .SetDefault(false);
 
             var result = p.Parse(args);
             if (result.HasErrors)

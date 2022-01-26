@@ -34,16 +34,16 @@ namespace PTSC
 #if DEBUG
                 logger.Log("Running in Debug Mode");
                 //Get 'src'-Directory of Repo
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < 5; i++)
                     moduleDirectory = Directory.GetParent(moduleDirectory).FullName;
-
-                moduleDirectory = Path.Combine(moduleDirectory, "Modules");
-
 #else
                 logger.Log("Running in Release Mode");
-                // In release Mode we expect a "Modules" Directory next to the *.exe
-                moduleDirectory = Path.Combine(moduleDirectory, "Modules");
+                for (int i = 0; i < 2; i++)
+                    moduleDirectory = Directory.GetParent(moduleDirectory).FullName;
 #endif
+
+                moduleDirectory = Path.Combine(moduleDirectory, "Modules");
+
             }
             catch (Exception e)
             {
@@ -105,6 +105,7 @@ namespace PTSC
                 container.RegisterType<ModuleWrapper, ModuleWrapper>(new ContainerControlledLifetimeManager());
                 container.RegisterInstance<IKalmanFilterModel>(new KalmanFilterModel());
 
+                Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
                 ApplicationConfiguration.Initialize();
                 var controller = container.Resolve<MainController>();
                 Application.Run(controller.RegisterEventAggregator(container).Initialize().View);

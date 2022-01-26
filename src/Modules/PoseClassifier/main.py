@@ -1,9 +1,7 @@
 
 import cv2
-from MediaPipe.classifier.pose import PoseMP
-from MediaPipe.camera_stream import CameraStream
-from MoveNet.classify import MoveNetModel
-from MoveNet.camera_stream import RealSenseStream
+
+
 import sys
 from typing import Union,Callable
 try:
@@ -37,6 +35,8 @@ def run_media_pipeline():
 
 
 def parse_options():
+    from MediaPipe.classifier.pose import PoseMP
+    from MediaPipe.camera_stream import CameraStream
     opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
     parsed_options: dict[str, Union[bool,Callable]] = {
         "default-position-value": False, "commandline-output": False, "classifier": PoseMP,
@@ -49,12 +49,15 @@ def parse_options():
         parsed_options["commandline-output"] = True
         
     if "-mp" in opts:
+        
         parsed_options["classifier"] = PoseMP
         
     if "-mv" in opts:
+        from MoveNet.classify import MoveNetModel
         parsed_options["classifier"] = MoveNetModel
     
     if "-rs" in opts: # Realsense
+        from MoveNet.camera_stream import RealSenseStream
         parsed_options["video_stream"] = RealSenseStream
         
     if "-kin" in opts: #Kinect
@@ -62,13 +65,7 @@ def parse_options():
         
     if "-wc" in opts: #webcam
         parsed_options["video_stream"] = CameraStream
-    
-    
-    parsed_options["classifier"] = MoveNetModel
-    parsed_options["video_stream"] = RealSenseStream
-    
-    
-    
+        
     return parsed_options
 
 def not_implemented():
