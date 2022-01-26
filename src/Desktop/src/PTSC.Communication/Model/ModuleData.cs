@@ -28,8 +28,8 @@ namespace PTSC.Communication.Model
             this.Add("RIGHT_KNEE", new ModuleDataPoint(moduleDataModel.RIGHT_KNEE));
             this.Add("LEFT_ANKLE", new ModuleDataPoint(moduleDataModel.LEFT_ANKLE));
             this.Add("RIGHT_ANKLE", new ModuleDataPoint(moduleDataModel.RIGHT_ANKLE));
-            this.Add("LEFT_TOES", new ModuleDataPoint(moduleDataModel.LEFT_TOES));
-            this.Add("RIGHT_TOES", new ModuleDataPoint(moduleDataModel.RIGHT_TOES));
+            this.Add("LEFT_FOOT_INDEX", new ModuleDataPoint(moduleDataModel.LEFT_FOOT_INDEX));
+            this.Add("RIGHT_FOOT_INDEX", new ModuleDataPoint(moduleDataModel.RIGHT_FOOT_INDEX));
         }
     }
 }

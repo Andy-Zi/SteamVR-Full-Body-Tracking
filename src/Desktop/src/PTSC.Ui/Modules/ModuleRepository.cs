@@ -17,6 +17,9 @@ namespace PTSC.Ui.Modules
         }
         public void Load()
         {
+            if(!Directory.Exists(moduleDirectory))
+                Directory.CreateDirectory(moduleDirectory);
+
             foreach (var file in Directory.GetFiles(moduleDirectory, "*.ptsc", SearchOption.AllDirectories))
             {
                 var module = JsonSerializer.Deserialize<ModuleModel>(File.ReadAllText(file));

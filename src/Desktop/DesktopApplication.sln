@@ -23,12 +23,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PTSC.Pipeline", "src\PTSC.P
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChartWin", "src\System.Windows.Forms.DataVisualization\ChartWin.csproj", "{A6026062-3E99-4CB3-88D3-0DE96E409661}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", ".build\_build.csproj", "{99C4ED0F-3C97-49F0-8715-376F5D895C3D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{99C4ED0F-3C97-49F0-8715-376F5D895C3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99C4ED0F-3C97-49F0-8715-376F5D895C3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0EDC8810-7128-4B5E-B980-49E1E250D6F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0EDC8810-7128-4B5E-B980-49E1E250D6F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0EDC8810-7128-4B5E-B980-49E1E250D6F4}.Release|Any CPU.ActiveCfg = Release|Any CPU

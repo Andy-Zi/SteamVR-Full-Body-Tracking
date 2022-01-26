@@ -1,0 +1,9 @@
+{
+    "Name": "MoveNet Pose",
+    "Description": "Estimates body position and rotation from Intel Realsense",
+    "SupportsImage" : true,
+    "Process" : "venv\\Scripts\\python.exe",
+    "Arguments" : "main.py -mv -rs",
+    "InstallationScript": ".\\setupVenv.ps1 ",
+    "InstallationDirectory": "venv"
+}
