@@ -41,6 +41,8 @@ class Build : NukeBuild
 
     AbsolutePath OutputDirectory => RootDirectory / "release";
 
+    AbsolutePath ModuleDirectory => RootDirectory / "src" / "Modules" / "Release";
+
     Target Clean => _ => _
         .Before(Restore)
         .Executes(() =>
@@ -75,6 +77,7 @@ class Build : NukeBuild
 
         File.Copy(Path.Combine(ArtifactsDirectory,"ptsc.exe"), Path.Combine(OutputDirectory, "ptsc.exe"));
 
+        //Copy Driver
         if (Directory.Exists(DriverDriectory))
         {
             var drivertarget = Path.Combine(OutputDirectory, "Driver");
@@ -91,8 +94,8 @@ class Build : NukeBuild
             }
         }
 
+        //Copy Modules
 
-            
     });
 
 }

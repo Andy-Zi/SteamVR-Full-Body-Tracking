@@ -37,7 +37,7 @@ namespace PTSC
                 for (int i = 0; i < 6; i++)
                     moduleDirectory = Directory.GetParent(moduleDirectory).FullName;
 
-                moduleDirectory = Path.Combine(moduleDirectory, "Modules","Debug");
+                moduleDirectory = Path.Combine(moduleDirectory, "Modules");
 
 #else
                 logger.Log("Running in Release Mode");
