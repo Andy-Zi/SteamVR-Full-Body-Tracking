@@ -26,8 +26,8 @@ namespace KinectModule
             RIGHT_KNEE = Normlize(RIGHT_KNEE, offset);
             LEFT_ANKLE = Normlize(LEFT_ANKLE, offset);
             RIGHT_ANKLE = Normlize(RIGHT_ANKLE, offset);
-            LEFT_TOES = Normlize(LEFT_TOES, offset);
-            RIGHT_TOES = Normlize(RIGHT_TOES, offset);
+            LEFT_FOOT_INDEX = Normlize(LEFT_FOOT_INDEX, offset);
+            RIGHT_FOOT_INDEX = Normlize(RIGHT_FOOT_INDEX, offset);
         }
 
 
@@ -48,7 +48,7 @@ namespace KinectModule
         public List<double> RIGHT_KNEE { get; set; }
         public List<double> LEFT_ANKLE { get; set; }
         public List<double> RIGHT_ANKLE { get; set; }
-        public List<double> LEFT_TOES { get; set; }
-        public List<double> RIGHT_TOES { get; set; }
+        public List<double> LEFT_FOOT_INDEX { get; set; }
+        public List<double> RIGHT_FOOT_INDEX { get; set; }
     }
 }

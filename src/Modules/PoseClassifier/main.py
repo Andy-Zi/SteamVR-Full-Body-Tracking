@@ -62,6 +62,13 @@ def parse_options():
         
     if "-wc" in opts: #webcam
         parsed_options["video_stream"] = CameraStream
+    
+    
+    parsed_options["classifier"] = MoveNetModel
+    parsed_options["video_stream"] = RealSenseStream
+    
+    
+    
     return parsed_options
 
 def not_implemented():

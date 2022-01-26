@@ -34,8 +34,8 @@ namespace PTSC.Communication.Controller
                 serializedProperty += $"{keyWord}{seperator}";
                 // serializing the values by x, z, y, because the coordinate system in switched between the y and z-axis
                 serializedProperty += $"{driverDataPoint.X}{seperator}";
-                serializedProperty += $"{driverDataPoint.Z}{seperator}";
                 serializedProperty += $"{driverDataPoint.Y}{seperator}";
+                serializedProperty += $"{driverDataPoint.Z}{seperator}";
                 // serialize point rotation
                 serializedProperty += $"{driverDataPointRotation.rotationW}{seperator}";
                 serializedProperty += $"{driverDataPointRotation.rotationX}{seperator}";

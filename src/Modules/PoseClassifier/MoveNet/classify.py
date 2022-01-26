@@ -35,7 +35,7 @@ class MoveNetModel:
         
         if model_name == "movenet_lightning":
             try:
-                module = hub.load("/Users/macbook/Documents/KI_Master/AR-VR/arvr-projekt-modularbeit/src/Modules/PoseClassifier/MoveNet/models/movenet_singlepose_lightning_4")
+                module = hub.load("/PoseClassifier/MoveNet/models/movenet_singlepose_lightning_4")
                 self.accepted_input_size:int = 192
             except Exception as e:
                 print("Error loading movenet_singlepose_lightning: ", e)

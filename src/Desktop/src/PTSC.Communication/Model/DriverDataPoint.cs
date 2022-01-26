@@ -13,9 +13,18 @@ namespace PTSC.Communication.Model
 
         public DriverDataPoint(List<double> position)
         {
-            this.X = position[0];
-            this.Y = position[1];
-            this.Z = position[2];
+            if(position.Count != 0)
+            {
+                this.X = position[0];
+                this.Y = position[1];
+                this.Z = position[2];
+            }
+            else
+            {
+                this.X = 0;
+                this.Y = 0;
+                this.Z = 0;
+            }
         }
 
         public double X 
