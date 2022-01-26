@@ -7,8 +7,9 @@
 
 #include <Driver/IVRDevice.hpp>
 #include <Native/DriverFactory.hpp>
+#include "TrackerRole.hpp"
 
-#include <windows.h>    // used in VRDriver but can only be included here???
+#include <windows.h>
 #include <thread>
 #include <string>
 #include <mutex>
@@ -18,7 +19,7 @@ namespace ptscDriver {
     class TrackerDevice : public IVRDevice {
         public:
 
-            TrackerDevice(std::string serial);
+            TrackerDevice(std::string serial, int deviceId, TrackerRole trackerRole);
             ~TrackerDevice() = default;
 
             // Inherited via IVRDevice
@@ -43,6 +44,8 @@ namespace ptscDriver {
     private:
         vr::TrackedDeviceIndex_t device_index_ = vr::k_unTrackedDeviceIndexInvalid;
         std::string serial_;
+        int deviceId_;
+        TrackerRole trackerRole;
 
         vr::DriverPose_t last_pose_ = IVRDevice::MakeDefaultPose();
 

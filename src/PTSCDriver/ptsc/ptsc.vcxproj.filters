@@ -18,16 +18,7 @@
     <ClCompile Include="src\Native\DriverFactory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Driver\ControllerDevice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Driver\HMDDevice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Driver\TrackerDevice.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Driver\TrackingReferenceDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Driver\VRDriver.cpp">
@@ -36,18 +27,15 @@
     <ClCompile Include="src\Driver\PoseData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Driver\TrackerRole.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Native\DriverFactory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Driver\ControllerDevice.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Driver\DeviceType.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Driver\HMDDevice.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Driver\IVRDevice.hpp">
@@ -59,13 +47,13 @@
     <ClInclude Include="src\Driver\TrackerDevice.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Driver\TrackingReferenceDevice.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Driver\VRDriver.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Driver\PoseData.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Driver\TrackerRole.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

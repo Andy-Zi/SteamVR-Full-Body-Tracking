@@ -154,22 +154,18 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Driver\PoseData.cpp" />
-    <ClCompile Include="src\Driver\ControllerDevice.cpp" />
-    <ClCompile Include="src\Driver\HMDDevice.cpp" />
     <ClCompile Include="src\Driver\TrackerDevice.cpp" />
-    <ClCompile Include="src\Driver\TrackingReferenceDevice.cpp" />
+    <ClCompile Include="src\Driver\TrackerRole.cpp" />
     <ClCompile Include="src\Driver\VRDriver.cpp" />
     <ClCompile Include="src\Native\DriverFactory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Driver\PoseData.hpp" />
-    <ClInclude Include="src\Driver\ControllerDevice.hpp" />
     <ClInclude Include="src\Driver\DeviceType.hpp" />
-    <ClInclude Include="src\Driver\HMDDevice.hpp" />
     <ClInclude Include="src\Driver\IVRDevice.hpp" />
     <ClInclude Include="src\Driver\IVRDriver.hpp" />
     <ClInclude Include="src\Driver\TrackerDevice.hpp" />
-    <ClInclude Include="src\Driver\TrackingReferenceDevice.hpp" />
+    <ClInclude Include="src\Driver\TrackerRole.hpp" />
     <ClInclude Include="src\Driver\VRDriver.hpp" />
     <ClInclude Include="src\Native\DriverFactory.hpp" />
   </ItemGroup>
