@@ -59,12 +59,5 @@ namespace ptscDriver {
 
         virtual vr::HmdQuaternion_t get_HMD_rotation(vr::TrackedDevicePose_t hmd_pose);
         virtual vr::HmdVector3_t get_HMD_absolute_position(vr::TrackedDevicePose_t hmd_pose);
-
-        // PoseVR variables
-        /*std::chrono::milliseconds prev_time;*/
-        //const double velocity_smoothing = 0.2;  // lower number, more smoothing (0,1)
-        //const double position_smoothing = 0.2;
-        //const double rotation_smoothing = 0.2;
-
     };
 };
