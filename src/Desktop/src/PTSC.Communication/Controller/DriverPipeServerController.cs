@@ -67,7 +67,7 @@ namespace PTSC.Communication.Controller
             {
                 string serializedDataString = DataController.SerializeDriverData(obj.DriverData);
                 DriverDataLogger.Log($"Serialized DriverData: {serializedDataString}");
-                byte[] buffer = Encoding.UTF8.GetBytes(serializedDataString);
+                 byte[] buffer = Encoding.UTF8.GetBytes(serializedDataString);
                 try
                 {
                     server?.Write(buffer, 0, buffer.Length);
