@@ -31,6 +31,9 @@ class PoseMP:
 
     def classify_image(self, image: np.ndarray):
         
+        if image.shape[2] == 4:
+            print("wrong shape")
+            image = np.uint8(image[:,:,:3])
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         pose = self._get_pose(image_rgb)
         #image = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)

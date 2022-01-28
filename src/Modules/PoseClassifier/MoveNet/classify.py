@@ -94,7 +94,7 @@ class MoveNetModel:
             x_int = int(self.accepted_input_size * x)
             
             if x_int < max_x and y_int < max_y:
-                depth_m = self.depth_map[y_int, x_int]*self.depth_scale
+                depth_m = float(self.depth_map[y_int, x_int]*self.depth_scale)
             else: val = 0.0
             self.depth_values[key.upper()] = depth_m
             
@@ -113,7 +113,8 @@ class MoveNetModel:
         list_of_body_parts = list(cfg.KEYPOINT_DICT.keys())
         nose = keypoints[cfg.KEYPOINT_DICT["nose"]]
         for ind,val in enumerate(keypoints):
-            positions[list_of_body_parts[ind].upper()] = [val[i]-nose[i] if i < 3 else scores[ind] for i in range(4)] #scale to nose
+            #positions[list_of_body_parts[ind].upper()] = [val[i]-nose[i] if i < 3 else float(scores[ind]) for i in range(4)] #scale to nose
+            positions[list_of_body_parts[ind].upper()] = [val[1]-nose[1], (-1) * (val[0]-nose[0]), val[2]-nose[2], float(scores[ind])]
         return Positions(**positions)
     
     def draw_image_overlay(self,image,keypoints,scores,keypoint_score_th=0.3):
@@ -162,6 +163,7 @@ class MoveNetModel:
         output_overlay = self.draw_image_overlay(image=image, keypoints = keypoints_xy, scores=scores)
         keypoints_3d = self.insert_depth_value(keypoints_with_scores)
         positions = self.calculate_positions(keypoints_3d,scores)
+    
         return positions,output_overlay
         
 
