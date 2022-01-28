@@ -30,9 +30,7 @@ class PoseMP:
         self.mp_drawing_styles = mp.solutions.drawing_styles
 
     def classify_image(self, image: np.ndarray):
-        
         if image.shape[2] == 4:
-            print("wrong shape")
             image = np.uint8(image[:,:,:3])
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         pose = self._get_pose(image_rgb)
@@ -41,13 +39,7 @@ class PoseMP:
         if pose is not None and pose.pose_world_landmarks is not None:
             result = self.points.manage_points(pose)
             self._draw_landmarks(image,pose)
-            # x,y,z,names = [],[],[],[]
-            # for key, value in result.serialize().items():
-            #     x.append(value[0])
-            #     y.append(value[1])
-            #     z.append(value[2])
-            #     names.append(key)
-            # plot_landmarks(x,y,z,names)
+            
             return result, image
         else:
             return None, None
