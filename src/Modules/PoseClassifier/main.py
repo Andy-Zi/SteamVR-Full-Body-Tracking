@@ -65,12 +65,7 @@ def parse_options():
         
     if "-wc" in opts: #webcam
         parsed_options["video_stream"] = CameraStream
-<<<<<<< HEAD
-    
-    
-=======
         
->>>>>>> 22c4d19e20eb9da935d82498c1b512577f738b20
     return parsed_options
 
 def not_implemented():
