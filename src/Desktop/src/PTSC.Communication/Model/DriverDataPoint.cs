@@ -35,9 +35,12 @@ namespace PTSC.Communication.Model
 
         void IDriverDataPoint.setPosition(List<double> data)
         {
-            this.position.X = (float)data[0];
-            this.position.Y = (float)data[1];
-            this.position.Z = (float)data[2];
+            if (data.Count != 0)
+            {
+                this.position.X = (float)data[0];
+                this.position.Y = (float)data[1];
+                this.position.Z = (float)data[2];
+            }
         }
 
         string IDriverDataPoint.Serialize(string seperator)

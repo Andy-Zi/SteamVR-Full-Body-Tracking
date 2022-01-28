@@ -28,7 +28,7 @@ class MoveNetModel:
             raise NotImplementedError
         self.output_image_width = output_image_width
         self.output_image_height = output_image_height
-        self.depth_scale = 0.001
+        self.depth_scale = 0.0011
         
     def load_movenet_model(self,model_name) -> None:
         """select from two models and load them"""
@@ -84,25 +84,25 @@ class MoveNetModel:
         keypoints_with_scores = outputs['output_0']
         return np.squeeze(keypoints_with_scores)
 
-    def _look_up_depth_values_for_keys(self, keypoints_with_scores:List):
+    def _look_up_depth_values_for_keys(self, keypoints_xy:List):
         """extract values from depthmap where keypoints are"""
-        
+            
         max_y,max_x = self.depth_map.shape
         for key,val in cfg.KEYPOINT_DICT.items():
-            x, y, _ = keypoints_with_scores[val]
-            y_int = int(self.accepted_input_size * y)
-            x_int = int(self.accepted_input_size * x)
+            x,y = keypoints_xy[val]
             
-            if x_int < max_x and y_int < max_y:
-                depth_m = self.depth_map[y_int, x_int]*self.depth_scale
-            else: val = 0.0
+            if x < max_x and y < max_y:
+                depth_m = self.depth_map[y][x].astype(float)*self.depth_scale
+                
+            else:
+                depth_m = 0.0
+
             self.depth_values[key.upper()] = depth_m
-            
+        
     def insert_depth_value(self, keypoints_with_scores:np.ndarray)->List:
         """inserts depth value in predictions of keypoints from a depth-map of the picture"""
         #find out values from depth-map
         keypoints = keypoints_with_scores.tolist()
-        self._look_up_depth_values_for_keys(keypoints)
         
         for key,val in cfg.KEYPOINT_DICT.items():
             keypoints[val].insert(2, self.depth_values[key.upper()]) # insert depth value
@@ -113,7 +113,8 @@ class MoveNetModel:
         list_of_body_parts = list(cfg.KEYPOINT_DICT.keys())
         nose = keypoints[cfg.KEYPOINT_DICT["nose"]]
         for ind,val in enumerate(keypoints):
-            positions[list_of_body_parts[ind].upper()] = [val[i]-nose[i] if i < 3 else scores[ind] for i in range(4)] #scale to nose
+            #positions[list_of_body_parts[ind].upper()] = [val[i]-nose[i] if i < 3 else float(scores[ind]) for i in range(4)] #scale to nose
+            positions[list_of_body_parts[ind].upper()] = [val[1]-nose[1], (-1) * (val[0]-nose[0]), val[2]-nose[2], float(scores[ind])]
         return Positions(**positions)
     
     def draw_image_overlay(self,image,keypoints,scores,keypoint_score_th=0.3):
@@ -149,7 +150,6 @@ class MoveNetModel:
         if len(self.depth_map.shape) != 2:
             raise ValueError("Depth map is not of the right shape -> maybe camera is not selected")
             self.depth_map = np.zeros((rawimage.shape[0],rawimage.shape[1]))
-
         
         input_image = tf.expand_dims(image, axis=0)
         
@@ -159,9 +159,11 @@ class MoveNetModel:
         
         #postprocess
         keypoints_xy,scores = self.postprocess_image(keypoints_with_scores, height=height, width=width)
+        self._look_up_depth_values_for_keys(keypoints_xy)
         output_overlay = self.draw_image_overlay(image=image, keypoints = keypoints_xy, scores=scores)
         keypoints_3d = self.insert_depth_value(keypoints_with_scores)
         positions = self.calculate_positions(keypoints_3d,scores)
+    
         return positions,output_overlay
         
 

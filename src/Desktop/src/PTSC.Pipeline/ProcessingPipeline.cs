@@ -95,6 +95,10 @@ namespace PTSC.Pipeline
                 var moduledata = payload.ModuleData;
                 //moduledata = correctYAxis(moduledata);
                 moduledata = await FilterData(moduledata);
+                // scale data
+                ScaleData(moduledata);
+                // rotate rotate
+                RotateData(moduledata);
 
                 await Task.Run(() => ModuleDataProcessedEvent.Publish(new(moduledata)));
 
@@ -107,10 +111,6 @@ namespace PTSC.Pipeline
 
         private DriverData MapData(IModuleData moduledata)
         {
-            // scale coordinate before serializing
-            ScaleData(moduledata);
-            // rotate coordinate before serializing
-            RotateData(moduledata);
             DriverData driverData = new DriverData();
             // set center point of hips as the waist point for driver
             driverData.waist = CalculateHipCenter3D(moduledata["RIGHT_HIP"].GetValues(), moduledata["LEFT_HIP"].GetValues());

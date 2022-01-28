@@ -81,7 +81,6 @@ class RealSenseStream:
         depth_sensor = self.configure_divice(test)
 
         self.depth_scale = self.get_depth_scale(depth_sensor)
-        
         self.clipping_distance = self.set_clipping_distance(cut_off_distance)
         try:
             while True:
@@ -125,15 +124,18 @@ class RealSenseStream:
                 if remove_background:
                     depth_image = np.where((depth_image > self.clipping_distance) | (depth_image <= 0), grey_color, color_image)
                     images = np.dstack((color_image,depth_image))
-                results,output_overlay = classifier.classify_image(images)
+                image = np.uint8(images)
+                results,output_overlay = classifier.classify_image(image)
                 
-                output_overlay = np.uint8(output_overlay)
+                
                 if results is not None and images is not None:
                     if pipe:
                         pipe.SendPositions(results, output_overlay)
+
                 if output:
                     cv2.imshow('Pose', output_overlay)
                     key = cv2.waitKey(1)
+
                     # Press esc or 'q' to close the image window
                     if key & 0xFF == ord('q') or key == 27:
                         cv2.destroyAllWindows()

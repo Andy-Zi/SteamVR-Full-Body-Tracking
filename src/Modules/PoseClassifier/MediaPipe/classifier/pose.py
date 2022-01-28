@@ -35,15 +35,14 @@ class PoseMP:
         self.mp_drawing_styles = mp.solutions.drawing_styles
 
     def classify_image(self, image: np.ndarray):
-
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         pose = self._get_pose(image_rgb)
         # image = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
 
         if pose is not None and pose.pose_world_landmarks is not None:
             result = self.points.manage_points(pose)
-            self._draw_landmarks(image, pose)
-
+            self._draw_landmarks(image,pose)
+            
             return result, image
         else:
             return None, None
