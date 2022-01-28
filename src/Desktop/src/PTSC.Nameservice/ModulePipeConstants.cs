@@ -24,8 +24,8 @@
         "RIGHT_KNEE",
         "LEFT_ANKLE",
         "RIGHT_ANKLE",
-        "LEFT_TOES",
-        "RIGHT_TOES",
+        "LEFT_FOOT_INDEX",
+        "RIGHT_FOOT_INDEX",
         }; 
     }
 }

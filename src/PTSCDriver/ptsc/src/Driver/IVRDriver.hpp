@@ -35,7 +35,7 @@ namespace ptscDriver {
         /// </summary>
         /// <param name="device">Device instance</param>
         /// <returns>True on success, false on failure</returns>
-        virtual bool AddDevice(std::shared_ptr<IVRDevice> device) = 0;
+        virtual bool AddTracker(std::shared_ptr<IVRDevice> device) = 0;
 
         /// <summary>
         /// Returns the value of a settings key

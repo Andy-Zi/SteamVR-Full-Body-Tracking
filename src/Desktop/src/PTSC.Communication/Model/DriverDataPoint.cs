@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using PTSC.Interfaces;
@@ -9,105 +10,70 @@ namespace PTSC.Communication.Model
 {
     public class DriverDataPoint : IDriverDataPoint
     {
-        private readonly List<double> values = new() { 0,0,0,0,0,0,0 };
-
-        public DriverDataPoint(List<double> position)
+        public DriverDataPoint(String name)
         {
-            if(position.Count != 0)
-            {
-                this.X = position[0];
-                this.Y = position[1];
-                this.Z = position[2];
-            }
-            else
-            {
-                this.X = 0;
-                this.Y = 0;
-                this.Z = 0;
-            }
+            this.name = name;
+            position.X = 0;
+            position.Y = 0;
+            position.Z = 0;
+            rotation.X = 0;
+            rotation.Y = 0;
+            rotation.Z = 0;
+            rotation.W = 0;
+        }
+        public DriverDataPoint(String name,float x, float y, float z, float qx, float qy, float qz, float qw)
+        {
+            this.name = name;
+            position.X = x;
+            position.Y = y;
+            position.Z = z;
+            rotation.X = qx;
+            rotation.Y = qy;
+            rotation.Z = qz;
+            rotation.W = qw;
         }
 
-        public double X 
-        { 
-            get
-            {
-                return values[0];
-            }
-            set
-            {
-                values[0] = value;
-            }
+        void IDriverDataPoint.setPosition(List<double> data)
+        {
+            this.position.X = (float)data[0];
+            this.position.Y = (float)data[1];
+            this.position.Z = (float)data[2];
         }
 
-        public double Y
+        string IDriverDataPoint.Serialize(string seperator)
         {
-            get
-            {
-                return values[1];
-            }
-            set
-            {
-                values[1] = value;
-            }
+            string serializedProperty = string.Empty;
+
+            serializedProperty += $"{Name}{seperator}";
+            // serializing the values by x, z, y, because the coordinate system in switched between the y and z-axis
+            serializedProperty += $"{position.X}{seperator}";
+            serializedProperty += $"{position.Y}{seperator}";
+            serializedProperty += $"{position.Z}{seperator}";
+            // serialize point rotation
+            serializedProperty += $"{rotation.W}{seperator}";
+            serializedProperty += $"{rotation.X}{seperator}";
+            serializedProperty += $"{rotation.Y}{seperator}";
+            serializedProperty += $"{rotation.Z}{seperator}";
+
+            return serializedProperty;
         }
 
-        public double Z
+        public void setRotation(Quaternion q)
         {
-            get
-            {
-                return values[2];
-            }
-            set
-            {
-                values[2] = value;
-            }
-        }
-        public double rotationW
-        {
-            get
-            {
-                return values[3];
-            }
-            set
-            {              
-                values[3] = value;
-            }
+            this.rotation = q;
         }
 
-        public double rotationX
-        {
-            get
-            {
-                return values[4];
-            }
-            set
-            {
-                values[4] = value;
-            }
-        }
+        string name;
+        Vector3 position;
+        Quaternion rotation;
 
-        public double rotationY
-        {
-            get
-            {
-                return values[5];
-            }
-            set
-            {
-                values[5] = value;
-            }
-        }
-
-        public double rotationZ
-        {
-            get
-            {
-                return values[6];
-            }
-            set
-            {
-                values[6] = value;
-            }
-        }        
+        public string Name { get => name; }
+        public double X { get => position.X; set => position.X = (float)value; }
+        public double Y { get => position.Y; set => position.Y = (float)value; }
+        public double Z { get => position.Z; set => position.Z = (float)value; }
+        public double qW { get => rotation.W; set => rotation.W = (float)value; }
+        public double qX { get => rotation.X; set => rotation.X = (float)value; }
+        public double qY { get => rotation.Y; set => rotation.Y = (float)value; }
+        public double qZ { get => rotation.Z; set => rotation.Z = (float)value; }
     }
 }

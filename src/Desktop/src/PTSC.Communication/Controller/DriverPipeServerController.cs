@@ -16,6 +16,7 @@ namespace PTSC.Communication.Controller
 
         }
 
+        object LockObject = new object();
         [Dependency] public ILogger Logger { get; set; }
         [Dependency("DriverDataLogger")] public ILogger DriverDataLogger { get; set; }
 
@@ -37,8 +38,7 @@ namespace PTSC.Communication.Controller
                 dataProcessedEvent = EventAggregator.GetEvent<DataProcessedEvent>();
                 subscriptionToken = dataProcessedEvent.Subscribe(SendData, ThreadOption.BackgroundThread);
                 driverConnectionEvent = EventAggregator.GetEvent<DriverConnectionEvent>();
-                server = new NamedPipeServerStream(DriverPipeConstants.PipeName, PipeDirection.Out, 1, PipeTransmissionMode.Byte);
-                WaitForConnection();
+                CreateServer(true);
             }
             catch (Exception ex)
             {
@@ -46,17 +46,28 @@ namespace PTSC.Communication.Controller
             }
         }
 
-
-        private void WaitForConnection()
+        public void CreateServer(bool force=false)
         {
-            isClientConnected = false;
-            Task.Run(() =>
+            lock (LockObject)
             {
-                server.WaitForConnection();
-                Logger.Log("Driver pipe server: client connected.");
-                isClientConnected = true;
-                driverConnectionEvent.Publish(new ConnectionPayload(true));
-            });
+                if (!isClientConnected && !force)
+                    return;
+
+                isClientConnected = false;
+
+                server?.Close();
+                server?.Dispose();
+
+                server = new NamedPipeServerStream(DriverPipeConstants.PipeName, PipeDirection.Out, 1, PipeTransmissionMode.Byte);
+                
+                Task.Run(() =>
+                {
+                    server.WaitForConnection();
+                    Logger.Log("Driver pipe server: client connected.");
+                    isClientConnected = true;
+                    driverConnectionEvent.Publish(new ConnectionPayload(true));
+                });
+            }
         }
 
         private void SendData(DataProcessedPayload obj)
@@ -75,10 +86,9 @@ namespace PTSC.Communication.Controller
                 catch
                 {
                     //Restart the Server on Error 
-                    server?.Close();
-                    driverConnectionEvent.Publish(new ConnectionPayload(true));
-                    server = new NamedPipeServerStream(DriverPipeConstants.PipeName, PipeDirection.Out, 1, PipeTransmissionMode.Byte);
-                    WaitForConnection();
+                    
+                    driverConnectionEvent.Publish(new ConnectionPayload(false));
+                    CreateServer();
                 }
                 
             }

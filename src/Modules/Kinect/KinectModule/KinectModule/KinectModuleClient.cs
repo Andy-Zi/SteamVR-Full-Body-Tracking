@@ -2,11 +2,11 @@
 
 using Interfaces;
 using Newtonsoft.Json;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
 using System.Drawing;
 using System.IO.Pipes;
 using System.Text;
-using OpenCvSharp;
-using OpenCvSharp.Extensions;
 
 namespace KinectModule
 {
@@ -27,9 +27,12 @@ namespace KinectModule
 
         private void Kinect_OnImageProcessed(Bitmap image)
         {
+            lock (LockObject)
+            {
                 this.image?.Dispose();
                 this.image = null;
-                this.image = image;    
+                this.image = image;
+            }
         }
 
         public void Start()
@@ -41,26 +44,32 @@ namespace KinectModule
         {
 
             if (pipeclient.IsConnected)
-            { 
+            {
+                lock (LockObject)
+                {
                     data.NormalizeToHead();
                     var text = JsonConvert.SerializeObject(data);
                     byte[] text_buffer = Encoding.UTF8.GetBytes(text);
 
-                    if(image != null)
+                    if (image != null)
                     {
-                        using (Mat mat = BitmapConverter.ToMat(image)) {
+                        using (Mat mat = BitmapConverter.ToMat(image))
+                        {
                             Cv2.ImEncode(".jpg", mat, out var img_buffer);
                             var combined_buffer = new byte[8192 + img_buffer.Length];
                             text_buffer.CopyTo(combined_buffer, 0);
-                        img_buffer.CopyTo(combined_buffer, 8192);
-                        pipeclient.Write(combined_buffer, 0, combined_buffer.Length);
-                    } 
-                        
+                            img_buffer.CopyTo(combined_buffer, 8192);
+                            pipeclient.Write(combined_buffer, 0, combined_buffer.Length);
+                        }
+
 
                     }
-                    else{
+                    else
+                    {
                         pipeclient.Write(text_buffer, 0, text_buffer.Length);
                     }
+                }
+
             }
         }
     }

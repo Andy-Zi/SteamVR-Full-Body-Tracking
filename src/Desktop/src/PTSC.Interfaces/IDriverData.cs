@@ -1,6 +1,9 @@
 ﻿namespace PTSC.Interfaces
 {
-    public interface IDriverData : IDictionary<string, IDriverDataPoint>
+    public interface IDriverData
     {
+        public IDriverDataPoint waist { get; set; }
+        public IDriverDataPoint left_foot { get; set; }
+        public IDriverDataPoint right_foot { get; set; }
     }
 }

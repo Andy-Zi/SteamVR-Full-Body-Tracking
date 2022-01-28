@@ -101,7 +101,7 @@ namespace PTSC.Ui.Modules
             {
                 //Ask the process to gently stop
                 CurrentProcess.StandardInput.WriteLine("Please Stop");
-                Task.Delay(100).Wait();
+                Task.Delay(300).Wait();
             }
             catch
             {
