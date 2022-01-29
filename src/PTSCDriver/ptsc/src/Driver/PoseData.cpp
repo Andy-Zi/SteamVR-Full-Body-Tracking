@@ -51,13 +51,20 @@ bool ptscDriver::PoseData::contains(const std::string& position)
 std::vector<double> ptscDriver::PoseData::get_position_vector(const std::string& position)
 {
 	std::vector<double> v;
-	if (!contains(position))
+	try
 	{
-		v = { 0, 0, 0, 0, 0, 0, 0 };
-		return v;
+		if (!contains(position))
+		{
+			v = { 0, 0, 0, 0, 0, 0, 0 };
+			return v;
+		}
+		if (cur_positions[position].size() == 7)
+			return cur_positions[position];
 	}
-	if(cur_positions[position].size() == 7)
-		return cur_positions[position];
+	catch (...)
+	{
+		
+	}
 	v = { 0, 0, 0, 0, 0, 0, 0 };
 	return v;
 }

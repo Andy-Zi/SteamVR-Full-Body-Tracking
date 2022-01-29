@@ -186,7 +186,7 @@ namespace PTSC.Pipeline
         private void CalculateRotations(IDriverData driverData, IModuleData moduleData)
         {
             // calculate waist's direction as a normal vector of the vector from right to left hip
-            driverData.waist.setRotation(CalculateRotation(moduleData["RIGHT_HIP"], moduleData["LEFT_HIP"]));
+            driverData.waist.setRotation(CalculateRotation(moduleData["LEFT_HIP"],moduleData["RIGHT_HIP"]));
             // set feet directions as the knee's direction from the hip
             driverData.left_foot.setRotation(CalculateRotation(moduleData["LEFT_ANKLE"], moduleData["LEFT_FOOT_INDEX"]));
             driverData.right_foot.setRotation(CalculateRotation(moduleData["RIGHT_ANKLE"], moduleData["RIGHT_FOOT_INDEX"]));
@@ -194,9 +194,11 @@ namespace PTSC.Pipeline
 
         private Quaternion CalculateRotation(IModuleDataPoint startPoint, IModuleDataPoint endPoint)
         {
+            Vector3 start = new Vector3(0,1,0);
             Vector3 V1 = new Vector3((float)startPoint.X, (float)startPoint.Y, (float)startPoint.Z);
             Vector3 V2 = new Vector3((float)endPoint.X, (float)endPoint.Y, (float)endPoint.Z);
-            Vector3 v = Vector3.Cross(V2 - V1, new Vector3(0,1,0));
+            Vector3 end = Vector3.Normalize(V2 - V1);
+            Vector3 v = Vector3.Cross(start,end);
             Quaternion q;
             q.X = v.X;
             q.Y = v.Y;
