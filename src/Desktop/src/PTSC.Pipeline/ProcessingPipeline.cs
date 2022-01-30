@@ -197,7 +197,7 @@ namespace PTSC.Pipeline
             Vector3 start = new Vector3(0,1,0);
             Vector3 V1 = new Vector3((float)startPoint.X, (float)startPoint.Y, (float)startPoint.Z);
             Vector3 V2 = new Vector3((float)endPoint.X, (float)endPoint.Y, (float)endPoint.Z);
-            Vector3 end = Vector3.Normalize(V2 - V1);
+            Vector3 end = Vector3.Normalize(V1 - V2);
             Vector3 v = Vector3.Cross(start,end);
             Quaternion q;
             q.X = v.X;
