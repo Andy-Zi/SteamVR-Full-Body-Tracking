@@ -8,7 +8,7 @@ import os
 
 
 class RealSenseStream:
-    def __init__(self, sample_size: int = 5, camera_source=0):
+    def __init__(self, sample_size: int = 5):
 
         self.sample_size = sample_size
         self.depth_scale: float = 0.0
@@ -80,8 +80,7 @@ class RealSenseStream:
         output,
         cut_off_distance: float = 10.0,
         remove_background: bool = False,
-        test: bool = False,
-    ):
+        test: bool = False, camera_source=0):
         # Streaming loop
         depth_sensor = self.configure_divice(test)
 

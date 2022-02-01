@@ -32,8 +32,7 @@ def run_media_pipeline():
     streamer.loop(
         classifier=classifier,
         pipe=pipe,
-        output=output,
-        camera_source=parsed_options["integer"],
+        output=output,camera_source=parsed_options["integer"]
     )
 
 
