@@ -28,19 +28,28 @@ def run_media_pipeline():
     classifier = parsed_options["classifier"](default_value=default_value, options=None)
 
     streamer = parsed_options["video_stream"]()
-    streamer.loop(classifier=classifier, pipe=pipe, output=output)
+    streamer.loop(
+        classifier=classifier,
+        pipe=pipe,
+        output=output,
+        camera_source=parsed_options["integer"],
+    )
 
 
 def parse_options():
     from MediaPipe.classifier.pose import PoseMP
     from MediaPipe.camera_stream import CameraStream
 
+    available_camera_indices = get_avaiable_indices()
+    print(available_camera_indices)
+
     opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
-    parsed_options: dict[str, Union[bool, Callable]] = {
+    parsed_options: dict[str, Union[bool, Callable, int]] = {
         "default-position-value": False,
         "commandline-output": False,
         "classifier": PoseMP,
         "video_stream": CameraStream,
+        "integer": 0,
     }
 
     if "-dv" in opts:
@@ -69,7 +78,28 @@ def parse_options():
     if "-wc" in opts:  # webcam
         parsed_options["video_stream"] = CameraStream
 
+    integer = 0
+    for i in range(0, max(available_camera_indices)):
+        if f"-{i}" in opts:
+            parsed_options["integer"] = i
+
     return parsed_options
+
+
+def get_avaiable_indices():
+
+    # checks the first 10 indexes.
+    index = 0
+    arr = []
+    i = 10
+    while i > 0:
+        cap = cv2.VideoCapture(index)
+        if cap.read()[0]:
+            arr.append(index)
+            cap.release()
+        index += 1
+        i -= 1
+    return arr
 
 
 def not_implemented():

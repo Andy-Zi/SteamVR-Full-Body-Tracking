@@ -12,7 +12,8 @@ class PoseMP:
         default_value: bool = False,
         options: Optional[Dict[str, Union[str, float, bool]]] = None,
     ):
-
+        
+            
         self.points = PositionHandler(ignore_hidden_points=default_value)
 
         if isinstance(options, Dict):
