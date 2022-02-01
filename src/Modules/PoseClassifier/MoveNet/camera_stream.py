@@ -4,7 +4,7 @@ import tensorflow as tf
 import pyrealsense2.pyrealsense2 as rs
 import numpy as np
 import cv2
-import os
+import sys
 
 
 class RealSenseStream:
@@ -13,6 +13,9 @@ class RealSenseStream:
         self.sample_size = sample_size
         self.depth_scale: float = 0.0
         self.align = self.align_stream()
+        if not sys.warnoptions:
+            import warnings
+            warnings.simplefilter("ignore")
 
     def start_streaming(self):
         # Start streaming
