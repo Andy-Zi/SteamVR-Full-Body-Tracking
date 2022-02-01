@@ -8,7 +8,7 @@ import numpy as np
 import cv2
 from utils.positions_dataclass import Positions
 from MoveNet.config import MoveNetConfig as cfg
-
+import os
 
 class MoveNetModel:
     image_size:int #only square pictures
@@ -35,18 +35,22 @@ class MoveNetModel:
         
         if model_name == "movenet_lightning":
             try:
+
                 module = hub.load("/PoseClassifier/MoveNet/models/movenet_singlepose_lightning_4")
                 self.accepted_input_size:int = 192
             except Exception as e:
                 print("Error loading movenet_singlepose_lightning: ", e)
-                
+                os.environ['TFHUB_CACHE_DIR'] = '/PoseClassifier/MoveNet/models/'
                 module = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
                 self.accepted_input_size:int = 192
+            
         elif "movenet_thunder" in model_name:
             module = hub.load("https://tfhub.dev/google/movenet/singlepose/thunder/4")
             self.accepted_input_size = 256
         else:
             raise ValueError("Unsupported model name: %s" % model_name)
+
+        
         self.model = module.signatures['serving_default']
         
         
