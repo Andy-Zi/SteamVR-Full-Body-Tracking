@@ -1,3 +1,5 @@
+from typing import Dict,List,Tuple
+
 class MoveNetConfig:
     
     MIN_CROP_KEYPOINT_SCORE: float = 0.2
@@ -23,7 +25,7 @@ class MoveNetConfig:
     [14, 16, (255, 255, 255)],  # right knee → right ankle
 ]
 
-    KEYPOINT_DICT:dict[str,int] = {
+    KEYPOINT_DICT:Dict[str,int] = {
         'nose': 0,
         'left_eye': 1,
         'right_eye': 2,
@@ -44,7 +46,7 @@ class MoveNetConfig:
     }
 
     # Maps bones to a matplotlib color name.
-    KEYPOINT_EDGE_INDS_TO_COLOR:dict[tuple[int,int],str] = {
+    KEYPOINT_EDGE_INDS_TO_COLOR:Dict[Tuple[int,int],str] = {
         (0, 1): 'm',
         (0, 2): 'c',
         (1, 3): 'm',
