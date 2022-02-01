@@ -93,14 +93,15 @@ namespace PTSC.Pipeline
             return await Task.Run(async () =>
             {
                 var moduledata = payload.ModuleData;
-                //moduledata = correctYAxis(moduledata);
+
                 moduledata = await FilterData(moduledata);
+
+                await Task.Run(() => ModuleDataProcessedEvent.Publish(new (moduledata)));
+
                 // scale data
                 ScaleData(moduledata);
                 // rotate rotate
                 RotateData(moduledata);
-
-                await Task.Run(() => ModuleDataProcessedEvent.Publish(new(moduledata)));
 
                 DriverData driverdata = MapData(moduledata);
                 // calculate destination for waist and feet
@@ -164,7 +165,7 @@ namespace PTSC.Pipeline
             double rotation = ToRadians(RotationOffset);
             foreach (KeyValuePair<string, IModuleDataPoint> entry in moduledata)
             {
-                RotateProperty(moduledata[entry.Key],rotation);
+                RotateProperty(moduledata[entry.Key], rotation);
             }
         }
 
@@ -188,8 +189,17 @@ namespace PTSC.Pipeline
             // calculate waist's direction as a normal vector of the vector from right to left hip
             driverData.waist.setRotation(CalculateRotation(moduleData["LEFT_HIP"],moduleData["RIGHT_HIP"]));
             // set feet directions as the knee's direction from the hip
-            driverData.left_foot.setRotation(CalculateRotation(moduleData["LEFT_ANKLE"], moduleData["LEFT_FOOT_INDEX"]));
-            driverData.right_foot.setRotation(CalculateRotation(moduleData["RIGHT_ANKLE"], moduleData["RIGHT_FOOT_INDEX"]));
+
+            Quaternion CalcFootRotation(IModuleDataPoint ankle, IModuleDataPoint toe)
+            {
+                if(!ankle.IsVisible() || !toe.IsVisible())
+                {
+                    return driverData.waist.getRotation();
+                }
+                return CalculateRotation(ankle, toe);
+            }
+            driverData.left_foot.setRotation(CalcFootRotation(moduleData["LEFT_ANKLE"], moduleData["LEFT_FOOT_INDEX"]));
+            driverData.right_foot.setRotation(CalcFootRotation(moduleData["RIGHT_ANKLE"], moduleData["RIGHT_FOOT_INDEX"]));
         }
 
         private Quaternion CalculateRotation(IModuleDataPoint startPoint, IModuleDataPoint endPoint)

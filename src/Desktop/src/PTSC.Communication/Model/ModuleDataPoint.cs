@@ -5,6 +5,7 @@ namespace PTSC.Communication.Model
 
     public class ModuleDataPoint : IModuleDataPoint
     {
+        object LockObject = new object();
 
         private List<double> values = new();
         private int length = 0;
@@ -23,7 +24,8 @@ namespace PTSC.Communication.Model
             {
                 if (length >= 1)
                 {
-                    values[0] = value;
+                    lock(LockObject)
+                        values[0] = value;
                 }
             }
         }
@@ -42,7 +44,8 @@ namespace PTSC.Communication.Model
             {
                 if (length >= 2)
                 {
-                    values[1] = value;
+                    lock (LockObject)
+                        values[1] = value;
                 }
             }
         }
@@ -61,7 +64,8 @@ namespace PTSC.Communication.Model
             {
                 if (length >= 3)
                 {
-                    values[2] = value;
+                    lock (LockObject)
+                        values[2] = value;
                 }
             }
         }
@@ -74,23 +78,46 @@ namespace PTSC.Communication.Model
                 {
                     return values[3];
                 }
-                return 0;
+                return UsesVisabilty ? 0 : 1;
             }
         }
-        public ModuleDataPoint(IEnumerable<double> data)
+
+
+        public bool IsVisible(double threshold = 0.2)
         {
-            Update(data);
+            return Visibility > threshold;
+        }
+
+        private bool UsesVisabilty = true;
+        public ModuleDataPoint(List<double> data)
+        {
+            lock (LockObject)
+            {
+                if (data != null)
+                {
+                    if (data.Count <= 3)
+                    {
+                        UsesVisabilty = false;
+                    }
+                    values.AddRange(data);
+                }
+                length = values.Count;
+            }
+            
         }
         public List<double> GetValues() => values;
 
-        public void Update(IEnumerable<double> newData)
+        public IModuleDataPoint Clone()
         {
-            values.Clear();
-            if(newData != null)
+            var clone = new List<double>();
+            lock (LockObject)
             {
-                values.AddRange(newData);
+                foreach (var value in values)
+                {
+                    clone.Add(value);
+                }
             }
-            length = values.Count;
+            return new ModuleDataPoint(clone);
         }
     }
 }
