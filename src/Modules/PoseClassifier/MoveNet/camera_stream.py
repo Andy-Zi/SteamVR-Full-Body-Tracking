@@ -4,15 +4,15 @@ import tensorflow as tf
 import pyrealsense2.pyrealsense2 as rs
 import numpy as np
 import cv2
-import os
 
 
 class RealSenseStream:
     def __init__(self, sample_size: int = 5):
 
         self.sample_size = sample_size
-        self.depth_scale: float = 0.0
+        self.depth_scale: float = 0.0001
         self.align = self.align_stream()
+        
 
     def start_streaming(self):
         # Start streaming
@@ -78,19 +78,19 @@ class RealSenseStream:
         classifier,
         pipe,
         output,
-        cut_off_distance: float = 10.0,
+        cut_off_distance: float = 1.0,
         remove_background: bool = False,
         test: bool = False, camera_source=0):
         # Streaming loop
         depth_sensor = self.configure_divice(test)
 
         self.depth_scale = self.get_depth_scale(depth_sensor)
-        self.clipping_distance = self.set_clipping_distance(cut_off_distance)
+        clipping_distance = self.set_clipping_distance(cut_off_distance)
         try:
             while True:
                 # Get frameset of color and depth
                 frames = self.pipeline.wait_for_frames()
-                # frames.get_depth_frame() is a 640x360 depth image
+                # frames.get_depth_frame() is a 640x480 depth image
 
                 # Align the depth frame to color frame
                 aligned_frames = self.align.process(frames)
@@ -101,47 +101,18 @@ class RealSenseStream:
                 )  # aligned_depth_frame is a 640x480 depth image
                 color_frame = aligned_frames.get_color_frame()
 
-                # print(color_frame)
                 # Validate that both frames are valid
                 if not aligned_depth_frame or not color_frame:
                     continue
-
-                depth_image = np.asanyarray(aligned_depth_frame.get_data())
+                
                 color_image = np.asanyarray(color_frame.get_data())
-
-                # Apply colormap on depth image (image must be converted to 8-bit per pixel first)
-                # depth_colormap = cv2.applyColorMap(cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET)
-
-                depth_map_dim = depth_image.shape[:2]
-                color_map_dim = color_image.shape[:2]
-
-                # If depth and color resolutions are different, resize color image to match depth image for display
-                if depth_map_dim != color_map_dim:
-                    resized_color_image = cv2.resize(
-                        color_image,
-                        dsize=(depth_map_dim[1], depth_map_dim[0]),
-                        interpolation=cv2.INTER_AREA,
-                    )
-                    images = np.dstack((resized_color_image, depth_image))
-                else:
-                    images = np.dstack((color_image, depth_image))
-
-                # stacked images with depthmap in images[:,:,3]
-                assert images.shape[2] == 4
-
+    
                 # Remove background - Set pixels further than clipping_distance to grey
-                grey_color = 153
-                if remove_background:
-                    depth_image = np.where(
-                        (depth_image > self.clipping_distance) | (depth_image <= 0),
-                        grey_color,
-                        color_image,
-                    )
-                    images = np.dstack((color_image, depth_image))
-                image = np.uint8(images)
-                results, output_overlay = classifier.classify_image(image)
-
-                if results is not None and images is not None:
+ 
+                image = np.uint8(color_image)
+                results, output_overlay = classifier.classify_image(image,depth_frame = aligned_depth_frame)
+                
+                if results is not None and output_overlay is not None:
                     if pipe:
                         pipe.SendPositions(results, output_overlay)
 

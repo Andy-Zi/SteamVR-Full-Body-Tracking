@@ -18,19 +18,9 @@ class CameraStream:
 
             image.flags.writeable = False
             results, image = classifier.classify_image(image)
-            # chance = np.random.randint(100)
-            # if chance < 2:
-            #     x,y,z,keys = [],[],[],[]
-            #     for key,values in results.serialize().items():
-            #         x.append(values[0])
-            #         y.append(values[1])
-            #         z.append(values[2])
-            #         keys.append(key)
-            #     plot_landmarks(x,y,z,keys)
 
             if results is not None and image is not None:
                 if pipe:
-
                     pipe.SendPositions(results, image)
 
                 # show prediction
