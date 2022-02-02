@@ -8,6 +8,8 @@ import numpy as np
 import cv2
 from utils.positions_dataclass import Positions
 from MoveNet.config import MoveNetConfig as cfg
+import os
+import json
 
 
 class MoveNetModel:
@@ -35,18 +37,22 @@ class MoveNetModel:
         
         if model_name == "movenet_lightning":
             try:
+
                 module = hub.load("/PoseClassifier/MoveNet/models/movenet_singlepose_lightning_4")
                 self.accepted_input_size:int = 192
             except Exception as e:
                 print("Error loading movenet_singlepose_lightning: ", e)
-                
+                os.environ['TFHUB_CACHE_DIR'] = '/PoseClassifier/MoveNet/models/'
                 module = hub.load("https://tfhub.dev/google/movenet/singlepose/lightning/4")
                 self.accepted_input_size:int = 192
+            
         elif "movenet_thunder" in model_name:
             module = hub.load("https://tfhub.dev/google/movenet/singlepose/thunder/4")
             self.accepted_input_size = 256
         else:
             raise ValueError("Unsupported model name: %s" % model_name)
+
+        
         self.model = module.signatures['serving_default']
         
         
@@ -55,8 +61,8 @@ class MoveNetModel:
         keypoints = []
         scores = []
         for index in range(17):
-            keypoint_x = int(width * keypoints_with_scores[index][1])
-            keypoint_y = int(height * keypoints_with_scores[index][0])
+            keypoint_x = abs(int(width * keypoints_with_scores[index][1]))
+            keypoint_y = abs(int(height * keypoints_with_scores[index][0]))
             score = keypoints_with_scores[index][2]
 
             keypoints.append([keypoint_x, keypoint_y])
@@ -87,16 +93,13 @@ class MoveNetModel:
     def _look_up_depth_values_for_keys(self, keypoints_xy:List):
         """extract values from depthmap where keypoints are"""
             
-        max_y,max_x = self.depth_map.shape
+        max_y,max_x = np.asanyarray(self.depth_map.get_data()).shape
         for key,val in cfg.KEYPOINT_DICT.items():
             x,y = keypoints_xy[val]
-            
             if x < max_x and y < max_y:
-                depth_m = self.depth_map[y][x].astype(float)*self.depth_scale
-                
+                depth_m = self.depth_map.get_distance(x,y)
             else:
                 depth_m = 0.0
-
             self.depth_values[key.upper()] = depth_m
         
     def insert_depth_value(self, keypoints_with_scores:np.ndarray)->List:
@@ -113,11 +116,17 @@ class MoveNetModel:
         list_of_body_parts = list(cfg.KEYPOINT_DICT.keys())
         nose = keypoints[cfg.KEYPOINT_DICT["nose"]]
         for ind,val in enumerate(keypoints):
-            #positions[list_of_body_parts[ind].upper()] = [val[i]-nose[i] if i < 3 else float(scores[ind]) for i in range(4)] #scale to nose
-            positions[list_of_body_parts[ind].upper()] = [val[1]-nose[1], (-1) * (val[0]-nose[0]), val[2]-nose[2], float(scores[ind])]
+            #catch errors in depth values, when parts of the body are not seen, or values are wrongly picked from frame
+            if scores[ind] < 0.3 or abs(val[2]-nose[2])>0.7:
+                depth = 0
+            else:depth = val[2]-nose[2]
+            positions[list_of_body_parts[ind].upper()] = [val[1]-nose[1], (-1) * (val[0]-nose[0]), depth, float(scores[ind])]
+        positions["LEFT_FOOT_INDEX"] = [0.0,0.0,0.0]
+        positions["RIGHT_FOOT_INDEX"] = [0.0,0.0,0.0]
         return Positions(**positions)
     
-    def draw_image_overlay(self,image,keypoints,scores,keypoint_score_th=0.3):
+    @staticmethod
+    def draw_image_overlay(image,keypoints,scores,keypoint_score_th=0.3):
         # Connect Line
         image2 = image.copy()
         for (index01, index02, color) in cfg.CONNECTIONS:
@@ -134,24 +143,22 @@ class MoveNetModel:
 
         return image2
 
-    def classify_image(self,rawimage:np.ndarray):
+    def classify_image(self,rawimage:np.ndarray,depth_frame):
         """classify image and crop"""
         # Resize and pad the image to keep the aspect ratio and fit the expected size.
         height, width = rawimage.shape[0], rawimage.shape[1]
-        #check if shape[3]==4 -> depth map was appended
-        if rawimage.shape[2] == 4:
-            image = rawimage[:,:,:3]
-            self.depth_map = rawimage[:,:,3]
-        else: 
-            print("No depthmap was found, make sure dimension 4 of picture contains depth values. Otherwise this model won't work for VR")
-            self.depth_map = np.zeros((rawimage.shape[0],rawimage.shape[1]))
-            image = rawimage
         
-        if len(self.depth_map.shape) != 2:
-            raise ValueError("Depth map is not of the right shape -> maybe camera is not selected")
-            self.depth_map = np.zeros((rawimage.shape[0],rawimage.shape[1]))
+
+        self.depth_map = depth_frame
         
-        input_image = tf.expand_dims(image, axis=0)
+
+        #when configuring this project this might be helpful
+        #depth_map_shape = np.asanyarray(self.depth_map.get_data()).shape
+        # if len(depth_map_shape) != 2:
+        #     raise ValueError("Depth map is not of the right shape -> maybe camera is not selected")
+        # if rawimage.shape[:2] != depth_map_shape:
+        #     raise ValueError("Depth map is not of the right shape -> maybe camera is not selected")
+        input_image = tf.expand_dims(rawimage, axis=0)
         
         input_image = tf.image.resize(input_image, (self.accepted_input_size, self.accepted_input_size))
         # Run model inference.
@@ -160,7 +167,7 @@ class MoveNetModel:
         #postprocess
         keypoints_xy,scores = self.postprocess_image(keypoints_with_scores, height=height, width=width)
         self._look_up_depth_values_for_keys(keypoints_xy)
-        output_overlay = self.draw_image_overlay(image=image, keypoints = keypoints_xy, scores=scores)
+        output_overlay = self.draw_image_overlay(image=rawimage, keypoints = keypoints_xy, scores=scores)
         keypoints_3d = self.insert_depth_value(keypoints_with_scores)
         positions = self.calculate_positions(keypoints_3d,scores)
     
