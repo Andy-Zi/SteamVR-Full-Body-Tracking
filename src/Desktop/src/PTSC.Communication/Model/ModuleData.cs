@@ -9,6 +9,10 @@ namespace PTSC.Communication.Model
 {
     public class ModuleData : Dictionary<string, IModuleDataPoint> , IModuleData
     {
+        protected ModuleData()
+        {
+
+        }
         public ModuleData(ModuleDataModel moduleDataModel)
         {
             this.Add("NOSE",new ModuleDataPoint(moduleDataModel.NOSE));
@@ -30,6 +34,16 @@ namespace PTSC.Communication.Model
             this.Add("RIGHT_ANKLE", new ModuleDataPoint(moduleDataModel.RIGHT_ANKLE));
             this.Add("LEFT_FOOT_INDEX", new ModuleDataPoint(moduleDataModel.LEFT_FOOT_INDEX));
             this.Add("RIGHT_FOOT_INDEX", new ModuleDataPoint(moduleDataModel.RIGHT_FOOT_INDEX));
+        }
+
+        public IModuleData Clone()
+        {
+            ModuleData clone = new();
+            foreach(var (key,value) in this)
+            {
+                clone.Add(key, value.Clone());
+            }
+            return clone;
         }
     }
 }

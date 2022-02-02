@@ -1,7 +1,6 @@
-import cv2
-
 
 import sys
+import cv2
 from typing import Union, Callable
 
 try:
@@ -9,9 +8,11 @@ try:
 except:
     pass
 
-import sys
 
-
+def WriteToStd(message):
+    print(message)
+    sys.stdout.flush() 
+    
 def run_media_pipeline():
     """runs pose detection with mediapipe (scalable) and return image and results"""
 
@@ -40,7 +41,7 @@ def parse_options():
     from MediaPipe.camera_stream import CameraStream
 
     available_camera_indices = get_avaiable_indices()
-    print(available_camera_indices)
+    WriteToStd(f"Available Webcam indices: {available_camera_indices}")
 
     opts = [opt for opt in sys.argv[1:] if opt.startswith("-")]
     parsed_options: dict[str, Union[bool, Callable, int]] = {
@@ -78,7 +79,7 @@ def parse_options():
         parsed_options["video_stream"] = CameraStream
 
     integer = 0
-    for i in range(0, max(available_camera_indices)):
+    for i in range(0, max(available_camera_indices)+1):
         if f"-{i}" in opts:
             parsed_options["integer"] = i
 
@@ -93,9 +94,14 @@ def get_avaiable_indices():
     i = 10
     while i > 0:
         cap = cv2.VideoCapture(index)
-        if cap.read()[0]:
-            arr.append(index)
-            cap.release()
+        try:
+            if cap.isOpened():
+                if cap.read()[0]:
+                    arr.append(index)
+        except:
+            pass
+            
+        cap.release()
         index += 1
         i -= 1
     return arr
@@ -106,5 +112,4 @@ def not_implemented():
 
 
 if __name__ == "__main__":
-
     run_media_pipeline()

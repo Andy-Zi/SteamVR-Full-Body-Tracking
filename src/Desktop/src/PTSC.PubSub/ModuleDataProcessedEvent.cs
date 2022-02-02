@@ -12,7 +12,7 @@ namespace PTSC.PubSub
     {
         public ModuleDataProcessedPayload(IModuleData moduleData)
         {
-            ModuleData = moduleData;
+            ModuleData = moduleData.Clone();
         }
 
         public IModuleData ModuleData { get; }

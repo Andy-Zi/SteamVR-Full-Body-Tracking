@@ -1,4 +1,4 @@
-
+.nuke/temp/
 *.db
 *.ipch
 src/PTSCDriver/x64/
@@ -12,3 +12,5 @@ venv
 *.py[cod]
 *.suo
 *.so
+
+

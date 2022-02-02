@@ -136,6 +136,9 @@ namespace ChartWin
                 if (value == null)
                     continue;
 
+                if (!value.IsVisible())
+                    continue;
+
                 Points.Add(key, new(key, new((float)value.X, (float)value.Y, (float)value.Z)));
 
                 var p = Chard3DSeries.Points?.AddXY((float)value.X, (float)value.Y, (float)value.Z);
@@ -143,7 +146,6 @@ namespace ChartWin
                 {
                     Chard3DSeries.Points[p ?? 0].Color = Color.Transparent;
                 }
-             
             }
         }
 
@@ -167,9 +169,16 @@ namespace ChartWin
 
             foreach (var (_, point) in Points)
             {
-                using SolidBrush brush = new SolidBrush(point.Color);
-                graphics.FillEllipse(brush, point.AbsoluteCoordinates.X - JointSize / 2,
-                                     point.AbsoluteCoordinates.Y - JointSize / 2, JointSize, JointSize);
+                try
+                {
+                    using SolidBrush brush = new SolidBrush(point.Color);
+                    graphics.FillEllipse(brush, point.AbsoluteCoordinates.X - JointSize / 2,
+                                         point.AbsoluteCoordinates.Y - JointSize / 2, JointSize, JointSize);
+                }
+                catch
+                { 
+                }
+
             }
 
         }
