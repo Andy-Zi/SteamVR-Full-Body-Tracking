@@ -80,9 +80,10 @@ namespace ChartWin
             ChartArea3D.Area3DStyle.Enable3D = true;// set the chartarea to 3D!
             ChartArea3D.Area3DStyle.Rotation = 15;
             ChartArea3D.Area3DStyle.Inclination = 50;
-            ChartArea3D.AxisX.Minimum = -1;
-            ChartArea3D.AxisX.Maximum = 1;
-
+            ChartArea3D.AxisX.Minimum = -1.1;
+            ChartArea3D.AxisX.Maximum = 1.1;
+            ChartArea3D.AxisY.Minimum = -1.8;
+            ChartArea3D.AxisY.Maximum = 0.4;
 
             ChartArea3D.AxisX.MajorGrid.Enabled = false;
             ChartArea3D.AxisY.MajorGrid.Enabled = false;
