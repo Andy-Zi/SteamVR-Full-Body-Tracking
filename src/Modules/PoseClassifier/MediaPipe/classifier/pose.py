@@ -35,7 +35,7 @@ class PoseMP:
         self.mp_drawing = mp.solutions.drawing_utils
         self.mp_drawing_styles = mp.solutions.drawing_styles
 
-    def classify_image(self, image: np.ndarray):
+    def classify_image(self, image: np.ndarray,**kwargs):
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         pose = self._get_pose(image_rgb)
         # image = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)

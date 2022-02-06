@@ -78,11 +78,13 @@ def parse_options():
     if "-wc" in opts:  # webcam
         parsed_options["video_stream"] = CameraStream
 
-    integer = 0
-    for i in range(0, max(available_camera_indices)+1):
-        if f"-{i}" in opts:
-            parsed_options["integer"] = i
-
+    
+    if available_camera_indices:
+        for i in range(0, max(available_camera_indices)+1):
+            if f"-{i}" in opts:
+                parsed_options["integer"] = i
+    else:
+        parsed_options["integer"] = 0
     return parsed_options
 
 
