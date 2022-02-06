@@ -20,6 +20,8 @@ namespace PTSC.Communication.Controller
         [Dependency] public ILogger Logger { get; set; }
         [Dependency("DriverDataLogger")] public ILogger DriverDataLogger { get; set; }
 
+        [Dependency] public IApplicationEnvironment ApplicationEnvironment { get; set; }
+
         [Dependency] public DataController DataController { get; set; }
 
         [Dependency] public IEventAggregator EventAggregator { get; set; }
@@ -72,12 +74,12 @@ namespace PTSC.Communication.Controller
 
         private void SendData(DataProcessedPayload obj)
         {
-            DriverDataLogger.Log($"Serialized DriverData: {DataController.SerializeDriverData(obj.DriverData)}");
+            string serializedDataString = DataController.SerializeDriverData(obj.DriverData);
+            if (ApplicationEnvironment.Settings.LogPositionData)
+                DriverDataLogger.Log($"{DataController.SerializeDriverData(obj.DriverData)}");
             // send data if a client is connected to the pipe
             if (isClientConnected)
             {
-                string serializedDataString = DataController.SerializeDriverData(obj.DriverData);
-                DriverDataLogger.Log($"Serialized DriverData: {serializedDataString}");
                 byte[] buffer = Encoding.UTF8.GetBytes(serializedDataString);
                 try
                 {

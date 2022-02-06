@@ -23,9 +23,15 @@ namespace PTSC.Ui.Controller
 
         }
 
+        protected virtual void Subscribe()
+        {
+
+        }
+        
         public virtual BaseController<TModel, TView> Initialize()
         {
             BindData();
+            Subscribe();
             View.Initialize(this);
             return this;
         }

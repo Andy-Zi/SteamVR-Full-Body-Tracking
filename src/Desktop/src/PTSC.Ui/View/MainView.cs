@@ -67,7 +67,10 @@ namespace PTSC.Ui.View
             }
         }
 
-   
+        internal void ShowDebugButton(bool v)
+        {
+           this.button_debug.Visible = v;
+        }
 
         private void buttonStartModule_Click(object sender, EventArgs e)
         {
@@ -87,6 +90,11 @@ namespace PTSC.Ui.View
         private void button_moduleSettings_Click(object sender, EventArgs e)
         {
             (this.Controller as MainController).ShowModuleOptions();
+        }
+
+        private void button_debug_Click(object sender, EventArgs e)
+        {
+            (this.Controller as MainController).ShowDebugView();
         }
     }
 }

@@ -9,12 +9,12 @@ namespace PTSC.Interfaces
         Quaternion getRotation();
         string Serialize(string seperator);
         string Name { get; }
-        double X { get; set; }
-        double Y { get; set; }
-        double Z { get; set; }
-        double qW { get; set; }
-        double qX { get; set; }
-        double qY { get; set; }
-        double qZ { get; set; }
+        float X { get; set; }
+        float Y { get; set; }
+        float Z { get; set; }
+        float qW { get; set; }
+        float qX { get; set; }
+        float qY { get; set; }
+        float qZ { get; set; }
     }
 }

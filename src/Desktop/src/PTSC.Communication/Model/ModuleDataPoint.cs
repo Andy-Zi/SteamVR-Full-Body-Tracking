@@ -25,7 +25,7 @@ namespace PTSC.Communication.Model
                 if (length >= 1)
                 {
                     lock(LockObject)
-                        values[0] = value;
+                        values[0] = Math.Round(value, 3);
                 }
             }
         }
@@ -45,7 +45,7 @@ namespace PTSC.Communication.Model
                 if (length >= 2)
                 {
                     lock (LockObject)
-                        values[1] = value;
+                        values[1] = Math.Round(value, 3);
                 }
             }
         }
@@ -65,7 +65,7 @@ namespace PTSC.Communication.Model
                 if (length >= 3)
                 {
                     lock (LockObject)
-                        values[2] = value;
+                        values[2] = Math.Round(value,3);
                 }
             }
         }
@@ -99,7 +99,10 @@ namespace PTSC.Communication.Model
                     {
                         UsesVisabilty = false;
                     }
-                    values.AddRange(data);
+                    foreach(var value in data)
+                    {
+                        values.Add(Math.Round(value, 3));
+                    }
                 }
                 length = values.Count;
             }

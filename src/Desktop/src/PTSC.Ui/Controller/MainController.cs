@@ -47,6 +47,11 @@ namespace PTSC.Ui.Controller
         public override BaseController<MainModel, MainView> Initialize()
         {
 
+#if DEBUG
+            this.View.ShowDebugButton(true);
+#else
+            this.View.ShowDebugButton(false);
+#endif
             ModulePipeServer.Value.FPSLimit = ApplicationEnvironment.Settings.FPSLimit;
             ModulePipeServer.Value.RetrieveImage = ApplicationEnvironment.Settings.SupportModuleImage;
 
@@ -77,6 +82,14 @@ namespace PTSC.Ui.Controller
         private void OnDriverConnected(ConnectionPayload obj)
         {
             this.View.labelDriverStateValue.Text = obj.IsConnected ? "Connected" : "Disconnected";
+        }
+
+        internal void ShowDebugView()
+        {
+            UnityContainer.Resolve<DebugController>()
+              .Initialize()
+              .View
+              .Show();
         }
 
         internal void ShowModuleOptions()
