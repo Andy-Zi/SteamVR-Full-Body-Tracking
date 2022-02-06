@@ -131,7 +131,7 @@ class MoveNetModel:
             else:
                 depth = val[2] - nose[2]
             positions[list_of_body_parts[ind].upper()] = [
-                val[1] - nose[1],
+                (-1) * (val[1] - nose[1]),
                 (-1) * (val[0] - nose[0]),
                 depth,
                 float(scores[ind]),
