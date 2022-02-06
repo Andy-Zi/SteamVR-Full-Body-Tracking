@@ -29,7 +29,8 @@ namespace PTSC.Communication.Controller
             if (jsonString != string.Empty)
             {
                 string receivedData = jsonString.Replace("\0", string.Empty);
-                ModuleDataLogger.Log($"Received ModuleData: {receivedData}");
+                if(ApplicationEnvironment.Settings.LogPositionData)
+                    ModuleDataLogger.Log($"Received ModuleData: {receivedData}");
                 return JsonSerializer.Deserialize<ModuleDataModel>(receivedData);
             }
             return null;

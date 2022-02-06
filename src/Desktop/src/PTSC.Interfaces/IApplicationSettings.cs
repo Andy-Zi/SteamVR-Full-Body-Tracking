@@ -2,6 +2,8 @@
 {
     public interface IApplicationSettings : IModel
     {
+
+        bool LogPositionData { get; set; }
         double Scaling { get; set; }
         double Rotation { get; set; }
         bool UseKalmanFilter { get; set; }

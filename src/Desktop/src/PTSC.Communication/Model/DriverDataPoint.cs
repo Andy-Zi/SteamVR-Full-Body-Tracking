@@ -10,7 +10,7 @@ namespace PTSC.Communication.Model
 {
     public class DriverDataPoint : IDriverDataPoint
     {
-        public DriverDataPoint(String name)
+        public DriverDataPoint(string name)
         {
             this.name = name;
             Position.X = 0;
@@ -21,25 +21,30 @@ namespace PTSC.Communication.Model
             Rotation.Z = 0;
             Rotation.W = 0;
         }
-        public DriverDataPoint(String name,float x, float y, float z, float qx, float qy, float qz, float qw)
+
+        protected float Round(float value)
+        {
+            return MathF.Round(value, 3);
+        }
+        public DriverDataPoint(string name,float x, float y, float z, float qx, float qy, float qz, float qw)
         {
             this.name = name;
-            Position.X = x;
-            Position.Y = y;
-            Position.Z = z;
-            Rotation.X = qx;
-            Rotation.Y = qy;
-            Rotation.Z = qz;
-            Rotation.W = qw;
+            Position.X = Round(x);
+            Position.Y = Round(y);
+            Position.Z = Round(z);
+            Rotation.X = Round(qx);
+            Rotation.Y = Round(qy);
+            Rotation.Z = Round(qz);
+            Rotation.W = Round(qw);
         }
 
         void IDriverDataPoint.setPosition(List<double> data)
         {
             if (data.Count != 0)
             {
-                this.Position.X = (float)data[0];
-                this.Position.Y = (float)data[1];
-                this.Position.Z = (float)data[2];
+                this.X = (float)data[0];
+                this.Y = (float)data[1];
+                this.Z = (float)data[2];
             }
         }
 
@@ -63,7 +68,10 @@ namespace PTSC.Communication.Model
 
         public void setRotation(Quaternion q)
         {
-            this.Rotation = q;
+            this.qW = q.W;
+            this.qX = q.X;
+            this.qY = q.Y;
+            this.qZ = q.Z;
         }
 
         public Quaternion getRotation()
@@ -77,12 +85,12 @@ namespace PTSC.Communication.Model
         public Quaternion Rotation;
 
         public string Name { get => name; }
-        public double X { get => Position.X; set => Position.X = (float)value; }
-        public double Y { get => Position.Y; set => Position.Y = (float)value; }
-        public double Z { get => Position.Z; set => Position.Z = (float)value; }
-        public double qW { get => Rotation.W; set => Rotation.W = (float)value; }
-        public double qX { get => Rotation.X; set => Rotation.X = (float)value; }
-        public double qY { get => Rotation.Y; set => Rotation.Y = (float)value; }
-        public double qZ { get => Rotation.Z; set => Rotation.Z = (float)value; }
+        public float X { get => Position.X; set => Position.X = Round(value); }
+        public float Y { get => Position.Y; set => Position.Y = Round(value); }
+        public float Z { get => Position.Z; set => Position.Z = Round(value); }
+        public float qW { get => Rotation.W; set => Rotation.W = Round(value); }
+        public float qX { get => Rotation.X; set => Rotation.X = Round(value); }
+        public float qY { get => Rotation.Y; set => Rotation.Y = Round(value); }
+        public float qZ { get => Rotation.Z; set => Rotation.Z = Round(value); }
     }
 }

@@ -35,7 +35,7 @@ namespace PTSC.Pipeline
         protected DataProcessedEvent DataProcessedEvent;
         protected ModuleDataProcessedEvent ModuleDataProcessedEvent;
         protected PipelineLatencyEvent PipelineLatencyEvent;
-
+        protected RotationSmoothingContainer RotationSmotthingContainer = new();
         public void Start()
         {
             SubscriptionToken = EventAggregator.GetEvent<DataRecievedEvent>().Subscribe(async (payload) =>  await Process(payload));
@@ -106,8 +106,14 @@ namespace PTSC.Pipeline
                 DriverData driverdata = MapData(moduledata);
                 // calculate destination for waist and feet
                 CalculateRotations(driverdata, moduledata);
+                SmoothRotations(driverdata);
                 return driverdata;
             });
+        }
+
+        private void SmoothRotations(DriverData driverdata)
+        {
+            RotationSmotthingContainer.Apply(driverdata);
         }
 
         private DriverData MapData(IModuleData moduledata)
@@ -138,9 +144,9 @@ namespace PTSC.Pipeline
             if (leftHip.Count < 3 || rightHip.Count < 3)
                 return new DriverDataPoint("waist");
 
-            driverdatapoint.X = (leftHip[0] + rightHip[0]) / 2;
-            driverdatapoint.Y = (leftHip[1] + rightHip[1]) / 2;
-            driverdatapoint.Z = (leftHip[2] + rightHip[2]) / 2;
+            driverdatapoint.X = (float)(leftHip[0] + rightHip[0]) / 2;
+            driverdatapoint.Y = (float)(leftHip[1] + rightHip[1]) / 2;
+            driverdatapoint.Z = (float)(leftHip[2] + rightHip[2]) / 2;
             
             return driverdatapoint;
         }
@@ -187,7 +193,7 @@ namespace PTSC.Pipeline
         private void CalculateRotations(IDriverData driverData, IModuleData moduleData)
         {
             // calculate waist's direction as a normal vector of the vector from right to left hip
-            driverData.waist.setRotation(CalculateRotation(moduleData["LEFT_HIP"],moduleData["RIGHT_HIP"]));
+            driverData.waist.setRotation(CalculateRotation(moduleData["RIGHT_HIP"],moduleData["LEFT_HIP"]));
             // set feet directions as the knee's direction from the hip
 
             Quaternion CalcFootRotation(IModuleDataPoint ankle, IModuleDataPoint toe)
@@ -204,11 +210,12 @@ namespace PTSC.Pipeline
 
         private Quaternion CalculateRotation(IModuleDataPoint startPoint, IModuleDataPoint endPoint)
         {
-            Vector3 start = new Vector3(0,1,0);
+
+            Vector3 start = new Vector3(0, 1, 0);
             Vector3 V1 = new Vector3((float)startPoint.X, (float)startPoint.Y, (float)startPoint.Z);
             Vector3 V2 = new Vector3((float)endPoint.X, (float)endPoint.Y, (float)endPoint.Z);
             Vector3 end = Vector3.Normalize(V1 - V2);
-            Vector3 v = Vector3.Cross(start,end);
+            Vector3 v = Vector3.Cross(start, end);
             Quaternion q;
             q.X = v.X;
             q.Y = v.Y;
@@ -217,6 +224,26 @@ namespace PTSC.Pipeline
             q = Quaternion.Normalize(q);
 
             return q;
+
+            //Vector3 u = new Vector3((float)startPoint.X, (float)startPoint.Y, (float)startPoint.Z);
+            //Vector3 v = new Vector3((float)endPoint.X, (float)endPoint.Y, (float)endPoint.Z);
+            //Quaternion result = new Quaternion();
+            //float k_cos_theta = Vector3.Dot(u, v);
+            //float k = MathF.Sqrt(MathF.Pow(u.Length(),2) * MathF.Pow(v.Length(), 2));
+
+            //Vector3 cross;
+
+            //if (k_cos_theta / k == -1)
+            //{
+            //    cross = Vector3.Cross(u, new Vector3(0,1,0));
+            //}
+            //cross = Vector3.Cross(u, v);
+
+            //result.X = cross.X;
+            //result.Y = cross.Y;
+            //result.Z = cross.Z;
+            //result.W = 0;
+            //return Quaternion.Normalize(result);
         }
 
     }

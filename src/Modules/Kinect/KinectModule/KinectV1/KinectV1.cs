@@ -40,8 +40,8 @@ namespace KinectV1
 
             if (useCamera)
             {
+                kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
                 colorPixels = new byte[kinectSensor.ColorStream.FramePixelDataLength];
-                kinectSensor.ColorStream.Enable(ColorImageFormat.RgbResolution1280x960Fps12);
                 kinectSensor.ColorFrameReady += KinectSensor_ColorFrameReady;
             }
 

@@ -51,6 +51,7 @@
             this.labelDriverState = new System.Windows.Forms.Label();
             this.labelApplicationSettings = new System.Windows.Forms.Label();
             this.buttonApplicationSettings = new System.Windows.Forms.Button();
+            this.button_debug = new System.Windows.Forms.Button();
             this.groupBoxVisualization.SuspendLayout();
             this.tabControlModuleView.SuspendLayout();
             this.tabPageModuleView.SuspendLayout();
@@ -296,11 +297,22 @@
             this.buttonApplicationSettings.UseVisualStyleBackColor = true;
             this.buttonApplicationSettings.Click += new System.EventHandler(this.buttonApplicationSettings_Click);
             // 
+            // button_debug
+            // 
+            this.button_debug.Location = new System.Drawing.Point(865, 761);
+            this.button_debug.Name = "button_debug";
+            this.button_debug.Size = new System.Drawing.Size(104, 39);
+            this.button_debug.TabIndex = 6;
+            this.button_debug.Text = "Debug";
+            this.button_debug.UseVisualStyleBackColor = true;
+            this.button_debug.Click += new System.EventHandler(this.button_debug_Click);
+            // 
             // MainView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1216, 806);
+            this.Controls.Add(this.button_debug);
             this.Controls.Add(this.buttonApplicationSettings);
             this.Controls.Add(this.labelApplicationSettings);
             this.Controls.Add(this.groupBoxVisualization);
@@ -345,5 +357,6 @@
         private Panel panelPipelineContainer;
         public Label labelDriverStateValue;
         public Label labelModuleStateValue;
+        private Button button_debug;
     }
 }

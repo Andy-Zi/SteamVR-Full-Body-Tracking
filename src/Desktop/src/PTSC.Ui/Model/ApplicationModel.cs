@@ -1,10 +1,5 @@
 ﻿using MvvmGen;
 using PTSC.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PTSC.Ui.Model
 {
@@ -12,6 +7,10 @@ namespace PTSC.Ui.Model
     [ViewModel]
     public partial class ApplicationSettingsModel : BaseModel, IApplicationSettings
     {
+
+        [Property]
+        private bool logPositionData;
+
         [Property]
         private bool supportModuleImage;
 
@@ -54,6 +53,7 @@ namespace PTSC.Ui.Model
             kalmanVelocityError = 1.0;
             fPSLimit = 30;
             supportModuleImage = true;
+            logPositionData = false;
             return this;
         }
 

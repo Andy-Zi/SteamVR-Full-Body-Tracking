@@ -20,7 +20,7 @@ class MoveNetModel:
 
     def __init__(
         self,
-        model_name: str = "movenet_lightning",
+        model_name: str = "movenet_thunder",
         default_value=False,
         options=None,
         output_image_height=480,
