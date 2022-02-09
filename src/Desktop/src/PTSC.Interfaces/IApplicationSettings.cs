@@ -15,5 +15,7 @@
         bool UseHipAsFootRotation { get; set; }
         int FPSLimit { get; set; }
         bool SupportModuleImage { get; set; }
+
+        bool RotationSmoothing { get; set; }
     }
 }

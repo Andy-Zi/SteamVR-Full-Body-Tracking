@@ -21,6 +21,7 @@ namespace PTSC.Pipeline
         public double RotationOffset = 0;
         public double ScalingOffset = 1;
         public bool UseHipAsFootRotation;
+        public bool RotationSmoothing;
 
         public List<double> zeroList = new List<double>() { 0.0, 0.0, 0.0 };
         [Dependency] public IEventAggregator EventAggregator { get; set; }
@@ -31,6 +32,7 @@ namespace PTSC.Pipeline
             RotationOffset = settings.Rotation;
             ScalingOffset = settings.Scaling;
             UseHipAsFootRotation = settings.UseHipAsFootRotation;
+            RotationSmoothing = settings.RotationSmoothing;
         }
 
         protected SubscriptionToken SubscriptionToken;
@@ -116,7 +118,8 @@ namespace PTSC.Pipeline
 
         private void SmoothRotations(DriverData driverdata)
         {
-            RotationSmotthingContainer.Apply(driverdata);
+            if(RotationSmoothing)
+                RotationSmotthingContainer.Apply(driverdata);
         }
 
         private DriverData MapData(IModuleData moduledata)

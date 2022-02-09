@@ -9,6 +9,9 @@ namespace PTSC.Ui.Model
     {
 
         [Property]
+        private bool rotationSmoothing;
+
+        [Property]
         private bool useHipAsFootRotation;
 
         [Property]
@@ -58,6 +61,7 @@ namespace PTSC.Ui.Model
             supportModuleImage = true;
             logPositionData = false;
             useHipAsFootRotation = false;
+            rotationSmoothing = true;
             return this;
         }
 

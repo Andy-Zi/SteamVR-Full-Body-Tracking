@@ -76,6 +76,7 @@ namespace PTSC.Ui.Controller
             ProcessingPipeline.ScalingOffset = Model.Scaling;
             ProcessingPipeline.RotationOffset = Model.Rotation;
             ProcessingPipeline.UseHipAsFootRotation = Model.UseHipAsFootRotation;
+            ProcessingPipeline.RotationSmoothing = Model.RotationSmoothing;
         }
     }
 }
