@@ -9,6 +9,9 @@ namespace PTSC.Ui.Model
     {
 
         [Property]
+        private bool useHipAsFootRotation;
+
+        [Property]
         private bool logPositionData;
 
         [Property]
@@ -54,6 +57,7 @@ namespace PTSC.Ui.Model
             fPSLimit = 30;
             supportModuleImage = true;
             logPositionData = false;
+            useHipAsFootRotation = false;
             return this;
         }
 

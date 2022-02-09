@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.groupBoxApplication = new System.Windows.Forms.GroupBox();
+            this.checkBox3 = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.numericUpDown3 = new System.Windows.Forms.NumericUpDown();
             this.numericUpDown2 = new System.Windows.Forms.NumericUpDown();
@@ -51,7 +52,7 @@
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.buttonApply = new System.Windows.Forms.Button();
-            this.checkBox3 = new System.Windows.Forms.CheckBox();
+            this.checkBox4 = new System.Windows.Forms.CheckBox();
             this.groupBoxApplication.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
@@ -66,6 +67,7 @@
             // 
             // groupBoxApplication
             // 
+            this.groupBoxApplication.Controls.Add(this.checkBox4);
             this.groupBoxApplication.Controls.Add(this.checkBox3);
             this.groupBoxApplication.Controls.Add(this.label2);
             this.groupBoxApplication.Controls.Add(this.numericUpDown3);
@@ -81,6 +83,18 @@
             this.groupBoxApplication.TabIndex = 0;
             this.groupBoxApplication.TabStop = false;
             this.groupBoxApplication.Text = "Application";
+            // 
+            // checkBox3
+            // 
+            this.checkBox3.AutoSize = true;
+            this.checkBox3.Font = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.checkBox3.Location = new System.Drawing.Point(576, 28);
+            this.checkBox3.Name = "checkBox3";
+            this.checkBox3.Size = new System.Drawing.Size(171, 29);
+            this.checkBox3.TabIndex = 7;
+            this.checkBox3.Tag = "LogPositionData";
+            this.checkBox3.Text = "Log Position Data";
+            this.checkBox3.UseVisualStyleBackColor = true;
             // 
             // label2
             // 
@@ -457,17 +471,17 @@
             this.buttonApply.UseVisualStyleBackColor = true;
             this.buttonApply.Click += new System.EventHandler(this.buttonApply_Click);
             // 
-            // checkBox3
+            // checkBox4
             // 
-            this.checkBox3.AutoSize = true;
-            this.checkBox3.Font = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.checkBox3.Location = new System.Drawing.Point(576, 28);
-            this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(171, 29);
-            this.checkBox3.TabIndex = 7;
-            this.checkBox3.Tag = "LogPositionData";
-            this.checkBox3.Text = "Log Position Data";
-            this.checkBox3.UseVisualStyleBackColor = true;
+            this.checkBox4.AutoSize = true;
+            this.checkBox4.Font = new System.Drawing.Font("Segoe UI", 13F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.checkBox4.Location = new System.Drawing.Point(512, 69);
+            this.checkBox4.Name = "checkBox4";
+            this.checkBox4.Size = new System.Drawing.Size(229, 29);
+            this.checkBox4.TabIndex = 8;
+            this.checkBox4.Tag = "UseHipAsFootRotation";
+            this.checkBox4.Text = "Use Hip as Foot Rotation";
+            this.checkBox4.UseVisualStyleBackColor = true;
             // 
             // SettingsView
             // 
@@ -523,5 +537,6 @@
         private Button buttonCancel;
         private Button buttonApply;
         private CheckBox checkBox3;
+        private CheckBox checkBox4;
     }
 }

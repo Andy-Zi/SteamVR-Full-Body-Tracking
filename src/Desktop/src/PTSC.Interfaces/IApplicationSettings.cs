@@ -12,7 +12,7 @@
         double KalmanYError { get; set; }
         double KalmanZError { get; set; }
         double KalmanVelocityError { get; set; }
-
+        bool UseHipAsFootRotation { get; set; }
         int FPSLimit { get; set; }
         bool SupportModuleImage { get; set; }
     }

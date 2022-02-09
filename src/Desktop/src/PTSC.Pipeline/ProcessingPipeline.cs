@@ -20,6 +20,8 @@ namespace PTSC.Pipeline
         public bool UseKalmanFilter;
         public double RotationOffset = 0;
         public double ScalingOffset = 1;
+        public bool UseHipAsFootRotation;
+
         public List<double> zeroList = new List<double>() { 0.0, 0.0, 0.0 };
         [Dependency] public IEventAggregator EventAggregator { get; set; }
         [Dependency] public IKalmanFilterModel KalmanFilterModel { get; set; }
@@ -28,6 +30,7 @@ namespace PTSC.Pipeline
             var settings = applicationEnvironment.Settings;
             RotationOffset = settings.Rotation;
             ScalingOffset = settings.Scaling;
+            UseHipAsFootRotation = settings.UseHipAsFootRotation;
         }
 
         protected SubscriptionToken SubscriptionToken;
@@ -198,7 +201,7 @@ namespace PTSC.Pipeline
 
             Quaternion CalcFootRotation(IModuleDataPoint ankle, IModuleDataPoint toe)
             {
-                if(!ankle.IsVisible() || !toe.IsVisible())
+                if(UseHipAsFootRotation || !ankle.IsVisible() || !toe.IsVisible())
                 {
                     return driverData.waist.getRotation();
                 }
